@@ -1,12 +1,15 @@
 package br.com.model;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Objects;
 
 @Entity
 @Table(name = "permissao")
-public class Permissao implements Serializable {
+public class Permissao implements Serializable, GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -23,7 +26,7 @@ public class Permissao implements Serializable {
     @ManyToOne()
     @JoinColumn(name = "interface_codigo",
             insertable = true, updatable = true)
-    private br.com.model.Menu interfaceDTO;
+    private Menu interfaceDTO;
 
     public String getDescricao() {
         return descricao;
@@ -72,5 +75,11 @@ public class Permissao implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(codigo);
+    }
+
+    @Override
+    @Transient
+    public String getAuthority() {
+        return MessageFormat.format("{0}{1}", interfaceDTO.getDescricaoCurta(), descricao);
     }
 }

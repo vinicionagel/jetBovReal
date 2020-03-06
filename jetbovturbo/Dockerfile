@@ -2,7 +2,7 @@
 # example Dockerfile for https://docs.docker.com/engine/examples/postgresql_service/
 #
 
-FROM ubuntu:16.04 
+FROM ubuntu:16.04
 
 # Add the PostgreSQL PGP key to verify their Debian packages.
 # It should be the same key as https://www.postgresql.org/media/keys/ACCC4CF8.asc
@@ -50,5 +50,5 @@ CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main
 #to run primeiro buildar a imagem....
 #docker build -t postgresql-jetbov .
 #para rodar...
-#docker run --rm -it -p 5432:5432 -P --name pg-jetbov postgresql-jetbov
+#docker run --rm -it -d -p 5432:5432 -P --name pg-jetbov postgresql-jetbov
 

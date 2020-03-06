@@ -30,7 +30,7 @@ public class Usuario implements Serializable {
     private int estado;
     private String verificacao;
     //relacionamentos
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "usuario_permissao",
             joinColumns = {
                     @JoinColumn(name = "usuario_codigo")},
