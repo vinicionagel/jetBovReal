@@ -29,7 +29,7 @@ public class Usuario implements Serializable {
     private String telefone;
     private int estado;
     private String verificacao;
-    //relacionamentos
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "usuario_permissao",
             joinColumns = {

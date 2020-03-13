@@ -15,7 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
 	List<Usuario> findAll();
 
-	Usuario findByCpf(String cpf);
+	Usuario findByEmail(String cpf);
 
 	@Query("FROM Usuario WHERE nome = ?1 or situacaoUsuario = ?2 or perfilAcessoUsuario = ?3 ")
 	List<Usuario> findByNomeSituacaoPerfil(String nome);
