@@ -1,0 +1,15 @@
+version: "3"
+services:
+  postgresql:
+    build:
+      dockerfile: postgresql.dockerfile
+      context: .
+    image: jetbov/postgresql
+    container_name: banco-aplicacao
+    ports:
+      - "5432:5432"
+    networks:
+      - production-network
+networks:
+  production-network:
+    driver: bridge
