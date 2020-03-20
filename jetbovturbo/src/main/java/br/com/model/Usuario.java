@@ -39,6 +39,10 @@ public class Usuario implements Serializable {
     private List<Permissao> permissoes;
 
     public Usuario() {
+
+    }
+
+    public Usuario(Usuario usuario) {
         permissoes = new ArrayList<>();
     }
 
