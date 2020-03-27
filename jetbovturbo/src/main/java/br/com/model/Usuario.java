@@ -42,8 +42,10 @@ public class Usuario implements Serializable {
 
     }
 
-    public Usuario(Usuario usuario) {
-        permissoes = new ArrayList<>();
+    public Usuario(Usuario usuario) { //TODO arrumar o restante das paradas!
+        this.email = usuario.getEmail();
+        this.senha = usuario.getSenha();
+        this.permissoes = usuario.getPermissoes();
     }
 
     public String getNome() {

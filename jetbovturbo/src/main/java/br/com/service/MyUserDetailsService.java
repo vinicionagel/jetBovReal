@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -56,12 +57,12 @@ public class MyUserDetailsService implements UserDetailsService {
 
         @Override
         public boolean isAccountNonExpired() {
-            return super.getEstado() == 1;
+            return true;
         }
 
         @Override
         public boolean isAccountNonLocked() {
-            return false;
+            return true;
         }
 
         @Override

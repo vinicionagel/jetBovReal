@@ -80,6 +80,6 @@ public class Permissao implements Serializable, GrantedAuthority {
     @Override
     @Transient
     public String getAuthority() {
-        return MessageFormat.format("{0}{1}", interfaceDTO.getDescricaoCurta(), descricao);
+        return MessageFormat.format("{0}{1}", interfaceDTO.getDescricaoCurta(), tipoPermissao.getDescricao());
     }
 }

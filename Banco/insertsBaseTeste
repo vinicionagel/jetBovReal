@@ -1,0 +1,81 @@
+INSERT INTO usuario (nome, email, "login", senha, telefone, data_nascimento, estado, verificacao) 
+	VALUES ('Administrador da Silva', 'adm.silva@ifc.com', 'admin', '{bcrypt}$2a$10$V0b0OuCLQTZE59yZquDJyeAbFykl/vjcd8Wcg8T6Pb7MW2.u2OYIq', '(47) 3523-0648', '1983-08-03', 1, 'dASKlA@d#'),
+	       ('Usuario da Silva', 'usu.silva@ifc.com', 'usuario', '{bcrypt}$2a$10$V0b0OuCLQTZE59yZquDJyeAbFykl/vjcd8Wcg8T6Pb7MW2.u2OYIq', '(47) 3523-0649', '1980-01-12', 1, 'dASKlA@d#'),
+	       ('Usuario de Souza', 'usu.souza@ifc.com', 'usu', '{bcrypt}$2a$10$V0b0OuCLQTZE59yZquDJyeAbFykl/vjcd8Wcg8T6Pb7MW2.u2OYIq', '(47) 3523-0649', '1980-01-12', 1, 'dASKlA@d#a');
+
+
+
+INSERT INTO tipo_permissao (descricao)
+	VALUES ('Pesquisar'), 
+	       ('Incluir'), 
+	       ('Editar'), 
+	       ('Excluir'), 
+	       ('Ver Menu'),
+               ('Agendar'),
+               ('Configurar');
+
+
+INSERT INTO interface (interface_codigo, descricao_completa, descricao_curta, posicao_menu, url, icone, cor) 
+	VALUES (null, 'Infraestrutura', 'InfraGeral', 1, '', '', '#000000'),	
+	       (18, 'Chamado', 'chamado', 3, 'chamadoPesquisar', '/imagens/img3', '#000000'), 
+               (1, 'Unidade', 'campus', 4, 'campusPesquisar', '/imagens/img3', '#000000'), 
+	       (1, 'Fabricante', 'fabricante', 5, 'fabricantePesquisar', '/imagens/img3', '#000000'), 
+	       (18, 'Função', 'funcao', 6, 'funcaoPesquisar','/imagens/img3', '#000000'), 
+	       (1, 'Localização', 'localizacao', 7, 'localizacaoPesquisar','/imagens/img3', '#000000'), 
+	       (1, 'Patrimônio', 'patrimonio', 8, 'patrimonioPesquisar','/imagens/img3', '#000000'), 
+	       (18, 'Permissão', 'permissao', 9, 'permissaoPesquisar','/imagens/img3', '#000000'), 
+	       (1, 'Setor', 'setor', 10, 'setorPesquisar','/imagens/img3', '#000000'), 
+	       (1, 'Tipo Patrimônio', 'tipoPatrimonio', 11, 'tipoPatrimonioPesquisar','/imagens/img3', '#000000'),      
+	       (1, 'Usuário', 'usuario', 12, 'usuarioPesquisar', '/imagens/img3', '#000000'), 
+	       (18, 'Serviço', 'servico', 13, 'servicoPesquisar', '/imagens/img3', '#000000'),
+	       (18, 'Tipo Serviço', 'tipoServico', 14, 'tipoServicoPesquisar', '/imagens/img3', '#000000'),
+	       (18, 'Víncular Usuário', 'vincularUsuarioSetor', 15, 'vincularUsuarioSetorPesquisar', '/imagens/img3', '#000000'),
+	       (18, 'Gráfico', 'grafico', 16, 'graficoPesquisar', '/imagens/img3', '#000000'),
+	       (18, 'Relatórios', 'relatorio', 17, 'relatorioPesquisar', '/imagens/img3', '#000000'),
+	       (1,'Publicidade', 'publicidade',18, 'publicidadePesquisar','/imagens/img3', '#000000'),
+	       (null,'Controle de Manutenção','CONTM',2,'','','#000000'),
+	       (18,'Reserva de Recursos', 'reservaRecurso', 19, 'reservaRecursoPesquisar', '/images/img3', '#000000'),
+               (null,'Controle dos Internos', 'CONTI', 20, '', '/images/img3', '#000000'),
+               (20,'Sincronização de Dados', 'migracao', 21, 'sincronizacao', '/images/img3', '#000000'),
+               (20,'Ocorrência', 'ocorrencia', 22, 'ocorrenciaPesquisar', '/images/img3', '#000000'),
+               (20,'Ação Disciplinar', 'acaoDisciplinar', 23, 'acaoDisciplinarPesquisar', '/images/img3', '#000000');
+
+
+INSERT INTO permissao (interface_codigo, tipo_permissao_codigo, descricao) 
+	VALUES (1, 5, 'Vêr menu'),
+	(2, 1, 'Pesquisar'),
+	(3, 1, 'Pesquisar'), (3, 2, 'Incluir'),(3, 3, 'Alterar'),(3, 4, 'Excluir'),
+	(4, 1, 'Pesquisar'), (4, 2, 'Incluir'),(4, 3, 'Alterar'),(4, 4, 'Excluir'), 
+	(5, 1, 'Pesquisar'), (5, 2, 'Incluir'),(5, 3, 'Alterar'),(5, 4, 'Excluir'), 
+	(6, 1, 'Pesquisar'), (6, 2, 'Incluir'),(6, 3, 'Alterar'),(6, 4, 'Excluir'),
+	(7, 1, 'Pesquisar'), (7, 2, 'Incluir'),(7, 3, 'Alterar'),(7, 4, 'Excluir'),
+	(8, 1, 'Pesquisar'), (8, 2, 'Incluir'),(8, 3, 'Alterar'),(8, 4, 'Excluir'),
+	(9, 1, 'Pesquisar'), (9, 2, 'Incluir'),(9, 3, 'Alterar'),(9, 4, 'Excluir'),(9, 7, 'Adicionar setores para outras unidades'),
+	(10, 1, 'Pesquisar'), (10, 2, 'Incluir'),(10, 3, 'Alterar'),(10, 4, 'Excluir'),
+	(11, 1, 'Pesquisar'), (11, 2, 'Incluir'),(11, 3, 'Alterar'),
+	(12, 1, 'Pesquisar'), (12, 2, 'Incluir'),(12, 3, 'Alterar'),(12, 4, 'Excluir'),
+	(13, 1, 'Pesquisar'), (13, 2, 'Incluir'),(13, 3, 'Alterar'),(13, 4, 'Excluir'),
+	(14, 1, 'Pesquisar'), (14, 2, 'Incluir'),(14, 3, 'Alterar'),(14, 4, 'Excluir'),
+        (15, 1, 'Pesquisar'),
+	(16, 1, 'Pesquisar'),
+	(17, 1, 'Pesquisar'), (17, 2, 'Incluir'),(17, 3, 'Alterar'),(17, 4, 'Excluir'),
+	(18, 5,'Vêr Menu'),
+	(19, 1,'Pesquisar'),(19, 4,'Excluir'),
+        (20, 5,'Vêr Menu'),
+        (21, 1,'Sincronizacão'),(21, 6,'Agendar Sincronizacão'),(21, 7,'Configurar Base de Dados'),
+        (22, 1,'Pesquisar'),(22, 2,'Incluir'),(22, 3,'Alterar'),
+        (2, 2,'Incluir'),
+        (23, 1,'Pesquisar'),(23, 2,'Incluir'),(23, 3,'Alterar'), (23,4,'Excluir');
+INSERT INTO usuario_permissao (permissao_codigo, usuario_codigo)
+	VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1),
+	       (9, 1), (10, 1), (11, 1), (12, 1), (13, 1), (14, 1), (15, 1), 
+	       (16, 1),(17, 1), (18, 1), (19, 1), (20, 1), (21, 1), (22, 1), (23, 1), (24, 1),
+	       (25, 1), (26, 1), (27, 1), (28, 1), (29, 1), (30, 1), (31, 1), (32, 1),
+               (33, 1), (34, 1), (35, 1), (36, 1), (37, 1), (38, 1), (39, 1), (40, 1),
+               (41, 1), (42, 1), (43, 1), (44, 1), (45, 1), (46, 1), (47, 1), (48, 1),
+               (49, 1), (50, 1), (51, 1), (52, 1), (53, 1), (54, 1),(55, 1),(56, 1),(57, 1),(58,1),
+               (59,1),(60,1), (61,1), (62,1), (63,1), (64,1), (65,1),(66,1),(67,1),(68,1),(69,1),(70,1),(71,1),
+               (15, 2), (13, 2), (14, 2), (66,2),
+  	       (16, 2), (17, 2), (18, 3), (19, 3), (20, 3), (21, 3), (22, 3),(1,2),(1,3),(66,3);
+
+
