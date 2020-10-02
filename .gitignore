@@ -1,0 +1,8 @@
+*.project
+*.factorypath
+*.prefs
+web/.tern-project
+target/
+.idea/
+*.iml
+javadoc/
