@@ -9,21 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/service")
-@CrossOrigin(origins="http://localhost:4200")
+@RequestMapping("/user")
 public class UsuarioService {
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
-	@Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
 	@RequestMapping(value="/usuario", method = RequestMethod.POST,
 			consumes=MediaType.APPLICATION_JSON_UTF8_VALUE,
 			produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -32,9 +29,8 @@ public class UsuarioService {
 		this.usuarioRepository.save(usuario);
 		return new ResponseEntity<>(usuario, HttpStatus.CREATED);
 	}
-
+	@Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
 	@RequestMapping(value="/usuario", method = RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
-	@Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
 	public ResponseEntity<Usuario> atualizar(@RequestBody @Valid Usuario usuario) {
 		this.usuarioRepository.save(usuario);
 		return new ResponseEntity<>(usuario, HttpStatus.OK);
@@ -48,20 +44,19 @@ public class UsuarioService {
 		}
 	}
 
+	@Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
 	@RequestMapping(value="/usuario", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
-	@Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
 	public @ResponseBody List<Usuario> consultar() {
 		return this.usuarioRepository.findAll();
 	}
 
-	@Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
+	@Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
 	@RequestMapping(value="/usuario/{email}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody Usuario buscar(@PathVariable("email") String email) {
 		return this.usuarioRepository.findByEmail(email);
 	}
-	
+
 	@RequestMapping(value="/usuario/{codigo}", method = RequestMethod.DELETE, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
-	@Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
 	public void excluir(@PathVariable("codigo") Long codigo){
 		usuarioRepository.deleteById(codigo);
 	}

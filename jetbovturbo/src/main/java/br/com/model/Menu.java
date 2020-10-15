@@ -30,9 +30,6 @@ public class Menu {
     @JoinColumn(name = "interface_codigo")
     private Menu interfaceRecursiva;
 
-    @OneToMany(mappedBy="interfaceDTO", fetch = FetchType.LAZY, cascade= CascadeType.ALL)
-    private List<Permissao> permissoes;
-
     public Long getCodigo() {
         return codigo;
     }
@@ -95,14 +92,6 @@ public class Menu {
 
     public void setInterfaceRecursiva(Menu interfaceRecursiva) {
         this.interfaceRecursiva = interfaceRecursiva;
-    }
-
-    public List<Permissao> getPermissoes() {
-        return permissoes;
-    }
-
-    public void setPermissoes(List<Permissao> permissoes) {
-        this.permissoes = permissoes;
     }
 
     @Override

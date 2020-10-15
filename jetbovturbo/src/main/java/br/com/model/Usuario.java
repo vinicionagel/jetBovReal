@@ -42,10 +42,12 @@ public class Usuario implements Serializable {
 
     }
 
-    public Usuario(Usuario usuario) { //TODO arrumar o restante das paradas!
+    public Usuario(Usuario usuario) {
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
         this.permissoes = usuario.getPermissoes();
+        this.codigo = usuario.getCodigo();
+        this.login = usuario.getLogin();
     }
 
     public String getNome() {
@@ -118,6 +120,14 @@ public class Usuario implements Serializable {
 
     public List<Permissao> getPermissoes() {
         return permissoes;
+    }
+
+    public Long getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(Long codigo) {
+        this.codigo = codigo;
     }
 
     public void setPermissoes(List<Permissao> permissoes) {

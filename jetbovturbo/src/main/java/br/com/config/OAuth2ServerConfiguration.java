@@ -33,14 +33,12 @@ public class OAuth2ServerConfiguration {
 
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) {
-            resources
-                    .resourceId(RESOURCE_ID);
+            resources.resourceId(RESOURCE_ID);
         }
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http
-                    .logout()
+            http.logout()
                     .invalidateHttpSession(true)
                     .clearAuthentication(true)
                     .and().authorizeRequests()
@@ -85,8 +83,7 @@ public class OAuth2ServerConfiguration {
                     .refreshTokenValiditySeconds(300000)
                     .resourceIds(RESOURCE_ID)
                     .secret(passwordEncoder.encode("123"))
-                    .accessTokenValiditySeconds(50000)
-            ;
+                    .accessTokenValiditySeconds(50000);
 
         }
 

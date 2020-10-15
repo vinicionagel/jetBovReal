@@ -1,5 +1,6 @@
 package br.com.model;
 
+import br.com.constantes.ConstPermissoes;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -78,8 +79,7 @@ public class Permissao implements Serializable, GrantedAuthority {
     }
 
     @Override
-    @Transient
     public String getAuthority() {
-        return MessageFormat.format("{0}{1}", interfaceDTO.getDescricaoCurta(), tipoPermissao.getDescricao());
+        return MessageFormat.format("{0}_{1}_{2}", "ROLE",interfaceDTO.getDescricaoCurta(), descricao).toUpperCase();
     }
 }
