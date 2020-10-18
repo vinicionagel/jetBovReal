@@ -1,6 +1,5 @@
 package br.com.model;
 
-import br.com.constantes.ConstPermissoes;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
