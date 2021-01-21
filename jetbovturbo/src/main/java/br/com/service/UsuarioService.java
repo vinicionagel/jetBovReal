@@ -1,6 +1,8 @@
 package br.com.service;
 
 import br.com.constantes.ConstPermissoes;
+import br.com.core.ModelMapperUsuarioConfig;
+import br.com.dto.UsuarioDTO;
 import br.com.exception.UsuarioFoundException;
 import br.com.model.Usuario;
 import br.com.repository.UsuarioRepository;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -25,6 +28,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ModelMapperUsuarioConfig modelMapperUsuarioConfig;
 
     @RequestMapping(value = "/usuario", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
@@ -43,7 +49,28 @@ public class UsuarioService {
         return new ResponseEntity<>(usuario, HttpStatus.OK);
     }
 
-    private void verificarUsuarioExiste(Usuario usuario) throws UsuarioFoundException {
+    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
+    @RequestMapping(value = "/usuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public @ResponseBody
+    List<UsuarioDTO> consultar() {
+        return this.usuarioRepository.findAll().stream()
+                .map(usuario -> modelMapperUsuarioConfig.modelMapper()
+                        .map(usuario, UsuarioDTO.class)).collect(Collectors.toList());
+    }
+
+    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
+    @RequestMapping(value = "/usuario/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public @ResponseBody
+    UsuarioDTO buscar(@PathVariable("email") String email) {
+        return modelMapperUsuarioConfig.modelMapper().map(this.usuarioRepository.findByEmail(email), UsuarioDTO.class);
+    }
+
+    @RequestMapping(value = "/usuario/{codigo}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public void excluir(@PathVariable("codigo") Long codigo) {
+        usuarioRepository.deleteById(codigo);
+    }
+
+    private void verificarUsuarioExiste(Usuario usuario) {
         String email = usuario.getEmail();
         Usuario usuarioBuscado = usuarioRepository.findByEmail(email);
         if (usuarioBuscado != null) {
@@ -51,23 +78,6 @@ public class UsuarioService {
         }
     }
 
-    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
-    @RequestMapping(value = "/usuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public @ResponseBody
-    List<Usuario> consultar() {
-        return this.usuarioRepository.findAll();
-    }
-
-    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
-    @RequestMapping(value = "/usuario/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public @ResponseBody
-    Usuario buscar(@PathVariable("email") String email) {
-        return this.usuarioRepository.findByEmail(email);
-    }
-
-    @RequestMapping(value = "/usuario/{codigo}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public void excluir(@PathVariable("codigo") Long codigo) {
-        usuarioRepository.deleteById(codigo);
-    }
+    //https://www.youtube.com/watch?v=HU7bfKG8nV4 estudando...
 
 }
