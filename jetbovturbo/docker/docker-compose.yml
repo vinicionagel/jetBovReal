@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     networks:
       - production-network
-
+ 
   appjetbov:
     build:
       dockerfile: api.dockerfile
