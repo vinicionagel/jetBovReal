@@ -35,6 +35,7 @@ public class UsuarioService {
     @RequestMapping(value = "/usuario", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
     public @ResponseBody
     ResponseEntity<Usuario> salvar(@RequestBody @Valid Usuario usuario) {
         verificarUsuarioExiste(usuario);
@@ -42,14 +43,14 @@ public class UsuarioService {
         return new ResponseEntity<>(usuario, HttpStatus.CREATED);
     }
 
-    @Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
+    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
     @RequestMapping(value = "/usuario", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Usuario> atualizar(@RequestBody @Valid Usuario usuario) {
         this.usuarioRepository.save(usuario);
         return new ResponseEntity<>(usuario, HttpStatus.OK);
     }
 
-    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
+    @Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
     @RequestMapping(value = "/usuario", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public @ResponseBody
     List<UsuarioDTO> consultar() {
@@ -58,7 +59,7 @@ public class UsuarioService {
                         .map(usuario, UsuarioDTO.class)).collect(Collectors.toList());
     }
 
-    @Secured({ConstPermissoes.ROLE_USUARIO_INSERIR})
+    @Secured({ConstPermissoes.ROLE_USUARIO_PESQUISAR})
     @RequestMapping(value = "/usuario/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public @ResponseBody
     UsuarioDTO buscar(@PathVariable("email") String email) {

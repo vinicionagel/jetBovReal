@@ -14,10 +14,10 @@ public class Permissao implements Serializable, GrantedAuthority {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "codigo")
-    protected Long codigo;
+    private Long codigo;
 
     @Column(name = "descricao", length = 255)
-    protected String descricao;
+    private String descricao;
 
     @ManyToOne()
     @JoinColumn(name = "tipo_permissao_codigo")
