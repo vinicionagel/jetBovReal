@@ -6,7 +6,7 @@ public class PermissaoDTO implements Serializable {
 
     private Long codigo;
     private String descricao;
-    private String authority;
+    private String authority;  
 
     public String getAuthority() {
         return authority;
