@@ -1,7 +1,7 @@
 package br.com.service;
 
 import br.com.constantes.ConstPermissoes;
-import br.com.core.ModelMapperUsuarioConfig;
+import br.com.core.ModelMapperConfig;
 import br.com.dto.UsuarioDTO;
 import br.com.exception.UsuarioFoundException;
 import br.com.model.Usuario;
@@ -30,7 +30,7 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private ModelMapperUsuarioConfig modelMapperUsuarioConfig;
+    private ModelMapperConfig modelMapperUsuarioConfig;
 
     @RequestMapping(value = "/usuario", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,

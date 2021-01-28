@@ -4,8 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.Serializable;
+
 @Configuration
-public class ModelMapperPermissaoConfig {
+public class ModelMapperConfig implements Serializable {
 
     @Bean
     public ModelMapper modelMapper() {

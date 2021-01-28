@@ -11,12 +11,13 @@
 	<groupId>br.com</groupId>
 	<artifactId>jetBovTurbo-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<name>jetBovTurbo-service</name>
 	<description>jetBovTurbo</description>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<start-class>br.com.ServiceApplication</start-class>
 	</properties>
 
 	<dependencies>
@@ -87,5 +88,10 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<modules>
+		<module>rest</module>
+		<module>repositorio</module>
+	</modules>
 
 </project>
