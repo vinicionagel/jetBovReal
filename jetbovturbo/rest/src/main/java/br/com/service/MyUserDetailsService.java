@@ -42,7 +42,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-            return getPermissoes();
+            return  getPermissoes();
         }
 
         @Override

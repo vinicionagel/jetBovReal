@@ -6,8 +6,5 @@ public class ConstPermissoes {
     public static final String ROLE_USUARIO_INSERIR = "ROLE_USUARIO_INSERIR";
     public static final String ROLE_PERMISSAO_PESQUISAR = "ROLE_PERMISSAO_PESQUISAR";
 
-    private ConstPermissoes(){
-
-    }
 }
 
