@@ -48,3 +48,42 @@ Ctrl r busca um comando recente
 !! repete o ultimo comando
 exit sai da cesão atual
 
+
+Usando o nano
+
+Chapeiuzinho ^ = ctrl então seria Ctrl + X para sair
+M significa Alt
+
+cat = mostra no terminal o texto do arquivo
+tac = inverte as linhas do arquivo
+
+head nome_arquivo só mostra as 10 primeiras linhas
+tail somente as 10 ultimas linhas 
+tail teste.txt > teste2.txt joga a saída do tail dentro do arquivo
+
+cal mostra o calendario do mes corrente
+cal > calendario.txt joga a saída dentro de um arquivo
+date >> calendario.txt concate os textos pulando linha
+
+| = executa dois comandos
+grep Linux procura o texto dentro do arquivo
+tail distros.txt | grep Linux = mostra as 10 ultimas linha + destaca o Linux
+
+paginação leitura --
+
+cat teste.txt | more --> vai paginando o arquivo 
+cat teste.txt | les --> apresenta os dois pontos e vai paginando
+
+operadores & e && 
+
+& separa por linha de terminal a saída
+&& executa os dois em consecutivo tudo na mesma linha
+
+file mostra o tipo do arquivo ou diretorio
+whatis mostra o que faz --> whatis find
+find procura o caminho do arquivo exemplo. find ~ -name teste.txt vai procurar no diretório do usuario o arquivo teste.txt
+
+
+
+
+
