@@ -1,0 +1,50 @@
+Shell ou konsole ferramenta de linha de comando, para executar programas especificos do linux
+
+
+~ significa pasta pessoal /home/seu_usuario
+
+
+pwd(mostra onde estamos rsrs) todo comando terá uma saída, vazia, 
+ls mostra o conteudo do diretorio que estamos dir funciona igual
+
+
+ls e a pasta mostra o conteudo da mesma
+
+cd entra no diretório
+mkdir cria uma pasta
+cd .. volta um diretório
+cd / volta ao caminho atual do terminal muda a linha do terminal
+ls -l mostra muito mais do que nomes rs detalhes 
+ls dir mostra outro diretorio não o corrente
+
+para saber opções do comandos, exemplo man ls, retorna o manual do ls, ls --help, um traço abreviatura, -- traços comando inteiro
+
+History mostra o historico de todos os comandos utilizados;
+cd ~ volta para o diretorio do usuario
+
+MV mover ou renomear
+Para renomear
+mv Teste Linux --> troca o nome
+Para mover
+mv teste para voltar um diretorio basta o nome da pasta ou arquivo mv Teste ~
+
+touch cria arquivos sem coteudo --> touch exemplo.txt
+
+cp para copiar o arquivo  --> cp linux.txt /home/vinicio
+
+rmdir remove os diretorios em vez de rm -r --> rmdir teste
+rm remove arquivos --> rm teste.txt
+
+
+
+Terminal linux atalhos
+
+Ctrl c, cancela comando atual,
+Ctrl z, pausa o comando atual,
+Ctrl d faz logout, (saia do terminal)
+Ctrl w apaga uma palavra da linha atual
+Ctrl u apaga a linha inteira
+Ctrl r busca um comando recente
+!! repete o ultimo comando
+exit sai da cesão atual
+
