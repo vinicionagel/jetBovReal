@@ -165,3 +165,40 @@ dig +short --> mostra somente o endereço do host a ser acessado
 whois --> mostra mais informações sobre determinado host --> mostra o dominio, o dono, o id, responsavel, pais e por ai vai...
 finger --> mostra toda a informações do usuario logado no nosso host 
 
+alias e history // comandos gerais
+
+alias --> utilizado para abreviar comandos, exemplo alias hh='history' ao usuar hh assim por diante
+nl --> mostra o total de letras do arquivo
+wc --> mostra as linhas em branco
+wc -w --> conta o total de palavras
+wc -c --> conta total de linhas
+wc -m --> conta total de caracteres
+ls -F --> mostra os diretorios
+ls -a --> mostra as paradas ocultas
+rm -r --> apaga tudo de um diretorio
+cmp para comparar dois arquuivos 
+diff --> chega as diferenças entre arquivos de texto
+sort -n --> mostra a saída do arquivo em ordem númerica
+which --> exibi o caminho de um programa
+
+last reboot --> mostra todas as informações de reanicialização do sistema
+route -n --> mostra todas as tabelas de roteamento do kernel
+time --> mostra o tempo de execução de um comando
+uptime mostra o tempo que o sistema está rodando
+cowsay -->vaca que mostra texto KKK
+cowsay -d --> vaca meio estragada kkk
+cowsay -g --> sai vaca com dinheiro
+cowsay -f --> troca as bixinhos(desenhos)
+xcowsay --> sai da tela a vaca kkk
+cmatriz --> fica a chuva de matriz no terminal
+
+init 0 --> desliga a maquina imediatamente
+telinit 0 -> desliga a maquina imediatamente
+halt -> pede autenticação pra desligar a maquina
+seq 1 10 > vazio.txt --> coloca essa sequencia num arquivo
+
+JSLinux --> bellard.org/jslinux/ --> emuladores de terminal(linux) pelo navegador
+
+-- Adicionando usuarios e outras paradas...
+
+
