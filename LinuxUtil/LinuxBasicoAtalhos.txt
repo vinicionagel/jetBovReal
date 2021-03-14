@@ -83,7 +83,42 @@ file mostra o tipo do arquivo ou diretorio
 whatis mostra o que faz --> whatis find
 find procura o caminho do arquivo exemplo. find ~ -name teste.txt vai procurar no diretório do usuario o arquivo teste.txt
 
+Diretórios
 
+/ --> diretório raiz;
+/bin/ binários(executáveis) principas do usuario
+/boot/ arquuivos do sistema de boot
+/dev/ arquivos de dispositivos
+/etc/ arquivos de configuração do sistema
+/home/ diretórios dos usuarios
+/lib/ bibliotecas do sistema e os módulos do kernel
+/media/ diretório de montagem e dispositivos
+/mnt/ diretório de montagem de dispostiviso mesmo que "media"
+/opt/ instalaçao de programas não oficias da distribuiçção ou por conta de usuario
+/sbin/ armaena arquivos executaveis que representas comandos administrativos. Exemplo shutdown
+/srv/ diretório de dados de serviços fornecediso pelo sistema
+/tmp/ diretório para arquivos temporários
+/usr/ segunda hierarquia do sistema. onde ficam os usuarios comuns de sistema e programas
+/var/ diretorio com arquivos várias gerados pelos programados do sistema. Exemplo logs, impressosras e-mail e cache
+/root/ diretório do usuario root - O usuárioroot tem total poder
+/proc/ diretório virtual controlado pelo Kernel --> 
 
+cat /proc/cpuInfo -> mostra as informacoes de cpu
+cat /proc/meminfo -> mostra as informacoes da memória
+lspci -> mostra as placas de rede
+lsusb -> mostra o que ta conectado nas usb
+arch -> mostra a arquitetura do sistema
+uname -r mostra a versão do kernel
+uname -m mostra a arquitetua
+free -> mostra o swap e mem física
+du -h ~ mostra o consumo do diretório pessoal -> -h = human readable facilita a leitura dos dados
+
+cat /etc/passwd -> mostra todos os usuarios
+shutdown -h now --> desliga na hora
+shutdown -r reinicia
+reboot  - reinicia
+lscpu -> mostra informações de cpu
+lshw -> mostra todos os hardware que ele achar
+lshw -short -> mostra tudo mais reduzido
 
 
