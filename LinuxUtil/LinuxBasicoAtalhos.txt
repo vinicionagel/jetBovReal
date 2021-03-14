@@ -122,3 +122,46 @@ lshw -> mostra todos os hardware que ele achar
 lshw -short -> mostra tudo mais reduzido
 
 
+Redes Util Linux ###############
+
+Rede é um conjuto de equipamentos interligados...
+
+Rede Wan -> é uma rede geograficamente distruibuida
+Rede Man -> Metropolitan area network, interligam várias redes locais
+Rede Lan -> local area network é uma rede local
+
+Protocolos é a "linguagem" usados pelos dispositivos para se entender.
+
+Ip -> Protocolo de Internet -> Endereço Ip -> Identificador do dispositivo na rede
+ICMP -> Internet Control Message Protocol -> tem por objetivo prover mensagem de controle na comunicação
+DNS -> Domain Name Server -> esse protocolo identifica endereços Ip para manter uma tabela com os endereços de caminhos de algumas redes;
+
+No linux as interfaces de rede estão no /dev/
+
+A interface loopback é um tipo especial de interface, que permite fazer conexões com ele mesmo, últil para criar um servidor local(127.0.0.1).
+
+Comandos:
+
+ifconfig net-tools é a dona do comando rsrs.
+BroadCast --> endereço público da rede, se mandar uma mensagem pinga pra todo mundo conectado na rede
+
+ping e hostname
+
+hostname --> nos mostra informações sobre o host que é nosso pc na rede
+hostane --> sai ubuntu
+hostane -I --> sai o endereço ip da nossa rede local
+hostane -i --> sai o endereço ip do pc 127...
+who --> traz como estamos logados nessa rede 
+whoami --> sai o nome do usuario logado na rede
+w --> exibe informações detalhes sobre o usuario do computador na rede
+
+pinh enderelço -w -4 --> manda 4 pacotes exemplo
+dig www.google.com --> mostra informações sobre o dns
+
+tracerout e finger
+
+tracerout www.google.com --> traça toda a rota nós que existem até chegar no google.com, o caminho...
+dig +short --> mostra somente o endereço do host a ser acessado
+whois --> mostra mais informações sobre determinado host --> mostra o dominio, o dono, o id, responsavel, pais e por ai vai...
+finger --> mostra toda a informações do usuario logado no nosso host 
+
