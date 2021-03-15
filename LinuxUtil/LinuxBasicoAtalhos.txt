@@ -201,4 +201,100 @@ JSLinux --> bellard.org/jslinux/ --> emuladores de terminal(linux) pelo navegado
 
 -- Adicionando usuarios e outras paradas...
 
+sudo adduser dio --> adiciona o usuario novo chamado dio
+su dio --> trocar de usuario
+passwd dio --> trocar de senha
 
+lastlog --> exibi as inforações de login de todos os usuarios do sistema
+logname --> exibi o nome atual do usuario logado no sistema
+id --> exibi o id do usuario
+cat /etc/passwd --> exibir todos os usuários
+
+remover usuario e pasta pessoal
+
+userdel -r nome_usuario --> remove tudo do usuario inclusive a pasta
+
+Grupos do sistema
+
+cat /etc/group | more
+groups --> exibi quais grupos o usuario pertence
+addgroup ubuntu --> adiciona um novo grupo ao usuario corrente
+adduser usuario grupo --> adiciona um novo grupo ao usuario setado
+gpasswd -a "gpasswd -a usuario grupo" --> adiciona usuario a grupo
+gpasswd -d "gpasswd -d usuario grupo" --> remove grupo do usuario
+sudo groupdel teste --> remove um grupo do sistema
+ver grupos cat /etc/group | grep teste --> procura grupos no sistema.
+
+permissões
+para arquivos e diretórios restrigem o acesso
+
+r -> read(leitura) - 4
+w -> write(escrita) - 2
+x -> eXecution(execução) - 1
+
+ls -lh --> mostra detalhes do diretório questão de permissão
+d -> diretórios
+- ->arquivo
+chmod 100  --> adiciona só leitura pro owner 
+chmod 200 --> adiciona só escrita  pro owner
+chmod 400 --> adiciona só execucao  pro owner
+chmod 700 --> adiciona só leitura,escritura,execucao pro owner
+chmod 777 --> adiciona só leitura,escritura,execucao pra todos owner, grupo e outros
+
+Compactação --> as extensões identificam um tipo de arquivo;
+.rar -> se compactado pelo rar
+.tar -> pelo tar 
+.zip -> pelo zip
+ao descompactar o arquivo a extensão é removida
+
+gzip -> gzip arquivo.txt
+gunzip ->gunzip arquivos.txt
+gzip -9 -> gzip -9 arquivo.txt  -> melhor compactação
+
+zip -> arquivo.zip arquivo.txt
+unzip arquivo.zip --> descompactar
+
+bzip2 arquivo.txt --> compactar
+bzip2 -d arquivo.bz2
+
+
+rar a arquivo.rar arquivos--> compactar vários arquivos
+rar x arquivo.rar --> descompactar
+
+tar -cf aulasredes.txt.tar aulasrede.txt --> exemplo do comando tar
+tar -xvf aulasredes.txt.tar.gz 
+tar -xvf aulasredes.txt.tar.gz -C ~/Documentos --> para extrair em determinada pasta
+
+Gerenciadores de pacotes são sistemas que possuem resolução automatica de dependencia
+Exemplo:
+apt,yum,dpgk
+sudo apt install nmap
+atualizacao
+sudo apt upgrade nomepacote
+remoção
+sudo apt remove nomepacote
+
+Atualização de sistema
+
+apt update && apt-upgrade
+
+pkgs.org --> para procurar pacotes
+sudo dpkg -I nomepacote mostra informações  
+
+adição pacote deb:
+sudo dpkg -i nomeDoPacote.deb --> executa a instalação
+remoção pacote deb:
+sudo dpkg -r nomepacote
+
+.rpm
+
+rpm -ivh pacote.rpm --> instalar pacote rpm
+sudo rpm -ivh --nodeps pacote --> para resolver problemas com dependencias
+rpm -U --> para atualização 
+rpm -e pacote.rpm --> para remoção
+
+yum
+
+yum install pacote --> faz o download e instalação do pacote parecido com o apt
+yum update pacote --> faz update do pacote
+yum remove pacote --> remove o pacote

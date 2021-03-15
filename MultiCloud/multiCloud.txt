@@ -1,0 +1,12 @@
+DataCenter Tradicional (On-Premises)
+
+Cloud --> Pagamento por demanda
+
+MultiCloud --> utiliza os melhores de cada nuvem, exemplo banco de dados oracle cloud infra --> reconhecimento facil usa aws.
+
+Beneficios -- 
+
+Redução de custos --> usa só pego que paga;
+Flexibilidade --> criação a medida de servidores;
+escalabilidade --> aumentar a capacidade conforme a demanda;
+alta disponibilidade --> altamente disponível, resiliente a falhas
