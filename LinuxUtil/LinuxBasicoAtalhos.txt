@@ -10,8 +10,11 @@ ls mostra o conteudo do diretorio que estamos dir funciona igual
 
 ls e a pasta mostra o conteudo da mesma
 
-cd entra no diretório
-mkdir cria uma pasta
+mkdir cria diretorio
+
+
+cd entra no diretório 
+
 cd .. volta um diretório
 cd / volta ao caminho atual do terminal muda a linha do terminal
 ls -l mostra muito mais do que nomes rs detalhes 
@@ -27,14 +30,36 @@ Para renomear
 mv Teste Linux --> troca o nome
 Para mover
 mv teste para voltar um diretorio basta o nome da pasta ou arquivo mv Teste ~
+mv -i confirma antes de substituir;
+-n sem substituir
+-b susbituindo pelo backup
+-u susbstitua se o arquivo destino for antigo ou não
+
 
 touch cria arquivos sem coteudo --> touch exemplo.txt
 
 cp para copiar o arquivo  --> cp linux.txt /home/vinicio
+cp -i confirmação de existencia --> cp -i m.txt --> pergunta se vai sobreescrever
+cp -v -- detalha o que ta sendo copiado
+cp -r --> copia direto o diretorio
+cp -L --> criar hard links em vez de copiar os arquivos
+cp -s --> criar links simbolicos
+cp -u --> copiar quando o arquivo de origem for mais novo que o destino
+
 
 rmdir remove os diretorios em vez de rm -r --> rmdir teste
+rm -f --> remover arquivo sem fazer pergunta
+rm -rf --> remover diretorio não vazio
 rm remove arquivos --> rm teste.txt
 
+env --> variaveis de ambiente
+limao=limao
+echo $limao
+export limao
+env --> exibi todas variaveis de ambiente
+
+
+mkdir --> criar diretorio
 
 
 Terminal linux atalhos
@@ -82,6 +107,9 @@ operadores & e &&
 file mostra o tipo do arquivo ou diretorio
 whatis mostra o que faz --> whatis find
 find procura o caminho do arquivo exemplo. find ~ -name teste.txt vai procurar no diretório do usuario o arquivo teste.txt
+find ./ type -f -name "o" -> procura arquivos que tem a eltra o ./ pasta atual
+find ./ type d -name "meu*" -> procura diretorio que tenha o meu
+find ./ type f -name ".*" -> procura arquivos ocultos
 
 Diretórios
 
@@ -178,6 +206,8 @@ ls -a --> mostra as paradas ocultas
 rm -r --> apaga tudo de um diretorio
 cmp para comparar dois arquuivos 
 diff --> chega as diferenças entre arquivos de texto
+
+
 sort -n --> mostra a saída do arquivo em ordem númerica
 which --> exibi o caminho de um programa
 

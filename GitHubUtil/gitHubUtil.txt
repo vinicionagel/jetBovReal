@@ -1,0 +1,16 @@
+- Sistema de versionamento de codigo distruibuido -- criado por linus torvalds
+
+git != github
+
+1 - controle de versão
+2 - armazenamento em numvem
+3 - trabalho em equipe
+4 - melhorar o fonte
+5 - reconhecimento
+
+Silence on sucess --> se não dar nenhuma resposta deu boa!
+
+Windows del(somente arquivos) em vem de rm e rmdir
+dir<>ls
+
+
