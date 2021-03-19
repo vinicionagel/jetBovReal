@@ -1,0 +1,67 @@
+- Sistema de versionamento de codigo distruibuido -- criado por linus torvalds
+
+git != github
+
+1 - controle de versão
+2 - armazenamento em numvem
+3 - trabalho em equipe
+4 - melhorar o fonte
+5 - reconhecimento
+
+Silence on sucess --> se não dar nenhuma resposta deu boa!
+
+Windows del(somente arquivos) em vem de rm e rmdir
+dir<>ls
+
+
+Git por baixos dos panos---
+
+Sha --> arquivos criptografados, projeto pela NSA
+Encriptação gera um conjuto de characteres identificador de 40 digitos
+É uma forma curta de representar um arquivo
+
+openssl sha1 texto.txt --> exemplo de utilização
+
+Utilizado para verificar se os arquivos sofreram alteração;
+
+BLOBS
+
+Arquivos no git ficam salvos dentro dos blobs --> tipo do objeto, tamanho, \0 e o conteudo
+git guarda sha deles para saber como ele está, além de armazenar metadados do arquivo
+ñ guarda o nome do arquivo apenas o sha dele
+
+TREES
+trees armazenam blobs, responsavel por montar toda a estrutura do blob ou outras árvores.
+
+COMMITS
+Objeto que junta tudo, que da sentido a alteração, aponta para uma árvores, para um parent(ultimo commit) autor e mensagem
+e o sha1 é o hash de toda essa informação
+
+Sistema distribuido seguro -->
+
+código na nuvem representa o estado final do seu código, é seguro pois cada um possue uma copia segura, por conta da estrutura dele.
+
+git init --> inicia um repositorio
+git add --> adiciona arquivos ao versionamento
+git commit --> commit os arquivos adicionados
+
+tracked e untracked
+
+Arquivo 
+
+untracked --> arquivo que não era identificado pelo git -> foi pra staged 
+unmodified --> sem modificação
+modified --> modificado
+staged --> dps do add antes do commit
+
+Após o commit volta para unmodified
+
+quando commit passa a integrar o local repository
+quando adiciona o arquivo vai para staging area
+
+arquivos ficam transitando entre working directory e staging area
+
+seu repositorio local só fica populado por commit
+
+
+git status --> ajuda a monitor como está o estado do arquivo
