@@ -1,0 +1,60 @@
+problemas do spring normal:
+
+configuração de beans em arquivos xml;
+dispatcher servelet e view resolver em web.xml
+setup manual de banco de dados;
+Ou seja muito tempo gasto em configuração
+
+Spring boot --> criando em 2012 --> facilitar do setup;
+Spring initializr --> facilitar de criar um projeto
+Starters --> engloba várias dependencias, agrupadas, agora facilita muito;
+Application.properties --> configurações uteis -> tudo para facilitar a agregação de valor no fonte;
+
+AutoConfiguration -->
+
+Starters: dependências simplificadas e auto configuráveis;
+
+o starter já vai para outro pom, para o autoconfigure;
+
+@Configuration --> para o spring identificar que é uma classe de configuração do spring.
+
+FatJar - UberJar
+
+Dependencia de um container web ou servidor de aplicação.
+
+Complexidade grande para configuração;
+
+Gerenciamento manual de configurações;
+
+FatJar / UberJar --> vantagem -->
+
+Artefato do projeto pronto para execução
+
+--> Container web embutido na geração e execução(Padrão Tomcat).
+
+--> Se necessário outros container são opcionais
+
+--> Dependencias principais do projeto embarcado;
+
+Emgloba todas as dependencias
+
+mvn package && java -jar target/spring-boot-example-0.1.0.jar --> pronto já sobe tudo de maneira muito mais fácil, inclusive numa maquina de produção
+se necessário só trocar o packaging pra war
+
+subir com jar -->
+mvn clean package
+cd target
+java -jar springboot.jar dessa maneira já sobe a aplicação.
+
+
+Subir como war -->
+
+mvn clean package
+entrar na target tem o war gerado....
+mv target/springboot.war para apache-tomcat-9/webapps
+cd apache-tomcat-...
+./startup.sh --> dessa forma sobe o tomcat 
+localhost:8080/springboot/ pronto chamará o que foi feito antes;
+
+
+

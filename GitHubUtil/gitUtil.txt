@@ -65,3 +65,25 @@ seu repositorio local só fica populado por commit
 
 
 git status --> ajuda a monitor como está o estado do arquivo
+git config --list para verificar os acessos
+--> para alterar usuario -->
+git config --global --unset user.email --> limpar email
+git config --global --unset user.nickname --> limpar usuario
+git config --global user.email "email@email.com" --> set email
+git config --global user.nickname "batata" --> set usuario
+
+Se commitou com outro autor já era, vai aparecer com outro usuario no gitHub.
+
+git remote add origin --caminho git hub --> para setar a origem em um repositorio
+git remote -v --> mostra as listas de repositorios remotos cadastrados origin --> somente um apelido
+
+git push origin master para enviar ao servidor 
+
+Resolvendo conflitos <-->
+
+quando há edições na mesma linha gera o conflito
+antes de empurrar o código pro gitHub, puxe a versão e resolva os conflitos e empurre o código
+<<<<<<<<<<<< HEAD --> a alteração mais recete é essa...
+============ --> pra baixo é a alteração que estava no gitHub
+
+git clone url --> clona o projeto remoto, vai com todo o repositorio, não apenas uma pasta simples, tem a pasta .git com todo o versionamento
