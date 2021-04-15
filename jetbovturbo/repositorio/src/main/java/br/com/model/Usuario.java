@@ -1,6 +1,5 @@
 package br.com.model;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Cacheable(true)
 @Table(name = "usuario")
 public class Usuario implements Serializable {
 
@@ -106,7 +104,7 @@ public class Usuario implements Serializable {
     }
 
     public void setSenha(String senha) {
-        this.senha = senha;//MD5.cripto(senha);
+        this.senha = senha;
     }
 
     public void setSenhaMD5(String senha) {

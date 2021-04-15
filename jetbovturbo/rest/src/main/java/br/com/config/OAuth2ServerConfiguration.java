@@ -84,7 +84,6 @@ public class OAuth2ServerConfiguration {
                     .resourceIds(RESOURCE_ID)
                     .secret(passwordEncoder.encode("123"))
                     .accessTokenValiditySeconds(50000);
-
         }
 
         @Bean

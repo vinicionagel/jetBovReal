@@ -1,0 +1,27 @@
+VAR - LET E CONST
+
+VAR --> Pode modificar 
+
+LET --> let mais moderna não pode redeclarar
+
+CONST --> Constante;
+
+
+--Tipagem fraca;
+
+tipagem dinamica;
+
+sem especificar o tipo;
+
+'' ou "" ==> texto livre
+
+typeof diz o tipo da variavel
+
+conselo.log(typeof a)
+
+Number
+
+mesmo estando 2.0 é considerado um inteiro;
+Há várias funcoes ao tipo Number;
+Number com nome maisculo é função
+com number minusculo é o nome

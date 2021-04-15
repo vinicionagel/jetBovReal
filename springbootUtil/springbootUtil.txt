@@ -56,5 +56,58 @@ cd apache-tomcat-...
 ./startup.sh --> dessa forma sobe o tomcat 
 localhost:8080/springboot/ pronto chamará o que foi feito antes;
 
+Profiles -->
+	Configurações com arquivos
+Importância dos profiles
+	Mutiplos ambientes...
+	Execução de testes unitários em abiente local;
+	Suíte de testes completas em ambiente de teste;
+	Simulação do ambiente real em staging;
+	Deploy simplificado em produção;
+Configuração próprias para cada ambiente;
+Ambientes com sua configuração dev, production
+application.properties;
+application-dev.properties;
+application-release.properties;
 
+Exemplo via fonte:
+@Configuration
+@ConfigurationProperties("spring.datasource")
+
+public class DBConfiguaration {
+
+atributos... driverClassName, url, username, password assim por diante.
+
+para exibir os profiles quando determinado profile ativo, exemplo para dev...
+
+@Profile("dev")
+@Bean
+public String devDataBaseConnection() {
+	System.out.pritln(driverClassName);...
+}
+
+
+Exemplo no git --> https://github.com/vinicionagel/springboot-multiprofile	
+
+Diferença entre .properties e .YML
+.properties
+basic.value=true
+basic.message=Dynamic message
+basic.number=100
+
+.YML (vantagem simplifica a leitura, além da escrita ficar mais bem estruturada.)
+basic:
+	value: true
+	message: Dynamic...
+	number: 100
+
+Uso de command line:
+Pode sobreescrever propriedades do arquivo de configuração na linha de comando
+Sobreescrever propriedades definidas no arquivo de configuração padrão
+
+Como injetar váriaveis de ambiente no spring.
+
+@Value("${NOME_VARIAVEL_AMBIENTE}")
+ENV_DB_URL:NENHUMA se não encontra sai nenhuma
+@Value("${ENV_DB_URL:NENHUMA}")
 
