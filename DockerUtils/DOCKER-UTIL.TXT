@@ -1,3 +1,10 @@
+cliente interage com o docker_host
+Todo conteiner é baseado em uma imagem.
+docker container run nome-da-imagem
+docker container run hello-word
+docker container -ls -a mostra todos os conteiners
+docker container run -d -e --VARIAVEIS DE CONFIGURACAO.
+
 @@@EXEMPLO DOCKERRR COMPOSEEEE NODEEEE
 
 
@@ -100,6 +107,10 @@ docker login - inicia o processo de login no Docker Hub.
 docker push NOME_USUARIO/NOME_IMAGEM - envia a imagem criada para o Docker Hub.
 docker pull NOME_USUARIO/NOME_IMAGEM - baixa a imagem desejada do Docker Hub.
 Comandos relacionados à rede
+
+Análogia OO
+​imagem = class
+​container = objeto
 
 hostname -i - mostra o ip atribuído ao container pelo docker (funciona apenas dentro do container).
 docker network create --driver bridge NOME_DA_REDE - cria uma rede especificando o driver desejado.

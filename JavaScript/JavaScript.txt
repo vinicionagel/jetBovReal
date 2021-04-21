@@ -24,4 +24,54 @@ Number
 mesmo estando 2.0 é considerado um inteiro;
 Há várias funcoes ao tipo Number;
 Number com nome maisculo é função
-com number minusculo é o nome
+com number minusculo é o nome.
+
+Number --cuidados: 
+
+pode se dividir direto string para numero exemplo:
+
+console.log('10'/2)
+
+Cuidado com algo como console.log('10'+2);
+
+Exemplo template String:
+
+const up = texto => texto.toUpperCase();
+
+console.log(`dasdsad asad asd ${cod3r} dasdsadas dasdas das ${up(cod3r)}`)
+
+Arrays --> agrupa vários valores como vetor.
+
+Estrutura indexada. Não tem tamanho FIXO. pode ser qualquer tipo.
+
+const valores[];
+
+mesmo que possa ser qualquer tipo, tentar usar o tipo separado!
+Indice que não existe = undefiny, sem erro;
+
+valores.pop() --> retira o ultimo valor do array
+delete valores[0] --> deleta o elemento na posição X
+array é do tipo object;
+
+
+object:
+
+exemplo básico.
+
+const prod1 = {} --> representa um objeto
+pode fazer tudo dynamicamente --> ou seja prod1.nome = 'mario' --> dinamicamente
+pode ter algo como 
+const prod1 = {}
+prod1.tipo = {}
+prod1.tipo.nome = 'teste'
+exemplo com espaçõ
+prod1['Desconto Máximo'] = 0.40;
+
+const prod2 = {
+nome = 'teste'
+valor = 2.33;
+}
+
+Json é diferente de objeto 
+
+
