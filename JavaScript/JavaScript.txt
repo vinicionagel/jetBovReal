@@ -71,7 +71,44 @@ const prod2 = {
 nome = 'teste'
 valor = 2.33;
 }
+para retirar um atributo de um objeto usar o delete produto.preco --> remove o atributo preco
 
 Json é diferente de objeto 
 
+null sem endereço de memória;
+Undefined sem valor;
+Null usado para tirar o valor de referencia;
+gera nullPointer O.O typeeror;
+consolo.log(!!produto.preco) --> se for null ou undefined retorna false;
 
+
+Base da linguagem --> função tudo é função.
+Qualquer class Produto{} --> é uma função.
+Função em nenhum momento fica explicito se tem return ou não.
+bloco de códido nomeada para retulizar;
+function imprimirSoma(a, b) { //não precisa de let, nada
+	console.log(a + b);
+}
+
+Se tiver 2 parametros pode colocar apenas um parametro...
+
+É possível armazenar o valor em uma constante
+
+
+VAR mesmo que dentro de um bloco de código que não seja uma função ela está visivel fora. 	
+Só tera 2 escopos possiveis;
+Se for dentro de função fica vísivel só lá.
+Em ambiente web tudo fica dentro do window --> se declarar um var ficaria disponivel no windows, ou seja, se sobreescrever muda o valor;
+
+let --> tem escopo de bloco, somente dentro do bloco, mais safe, sempre no menor escopo.
+em for também melhor usar let.
+
+hosting --> no var ele içar o valor; com let não existe o hosting;
+
+contexto léxico ==> em que local fisica está definido no seu código o par nome valor;
+
+Uma função é um contexto local, se uma variável estiver fora ainda consegue alcançar;
+
+Contexto diferentes, sempre no mais restrito para o mais aberto;
+
+Objetos são grupos aninhados de chave valor;
