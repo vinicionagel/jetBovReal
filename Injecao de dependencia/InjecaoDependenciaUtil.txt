@@ -1,0 +1,2 @@
+Exemplo de factory injecao dependencia.
+http://buraktas.com/cdi-dependency-injection-producer-method-example/
