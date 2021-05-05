@@ -112,3 +112,75 @@ Uma função é um contexto local, se uma variável estiver fora ainda consegue 
 Contexto diferentes, sempre no mais restrito para o mais aberto;
 
 Objetos são grupos aninhados de chave valor;
+
+
+Destruction: tirar de dentro de uma estrutura(objeto) atributos exemplo:
+
+
+
+const pessoa = {
+    nome: 'Ana',
+    idade: 5,
+    endereco: {
+        logradouro : 'Rua ABC',
+        numero: 100
+    }
+}
+console.log(pessoa)
+const {nome, idade} = pessoa //retirar vários atributos de dentro de um objeto
+console.log(nome, idade);
+
+
+
+const pessoa = {
+    nome: 'Ana',
+    idade: 5,
+    endereco: {
+        logradouro : 'Rua ABC',
+        numero: 100
+    }
+}
+console.log(pessoa)
+const {nome, idade} = pessoa //retirar vários atributos de dentro de um objeto
+console.log(nome, idade);
+
+
+const {nome: n, idade: i} = pessoa //retirar vários atributos de dentro de um objeto
+
+console.log(n, i)
+
+const {sobrenome = 'batata', idade: h} = pessoa //retirar vários atributos de dentro de um objeto
+console.log(sobrenome, h)
+
+
+CUIDADO COM Objetos aninhados --> pode ocorrer problema;
+
+Muito parecido com arrays:
+
+const [n1, ,n2, , n4] = [10,2,4]
+console.log(n1,n2,n4)
+
+
+Operadores lógicos:
+
+> < sempre vai retornar true ou false;
+
+Operadores '1' == 1 compara valores não se são do mesmo tipo ou seja retorna true
+           '1' === 1 compara tipo e valores false
+           '3' != 3 não usa em consideração o tipo false
+           '3' !== 3 um é tipo number e outro texto então vai dar true  
+new Date(0) --> 1970... data de referencia;
+
+const d1 = new Date(0);
+const d2 = new Date(0);
+console.log('09', d1 === d2) -> vai dar false pois são do mesmo tipo, mais endereço de memoria diferente
+console.log('09', d1 === d2) -> vai dar false pois independendo do tipo, o endereço de memoria diferente
+
+geralmente se usa os === pq você compara o tipo junto, cuidado****;
+
+
+
+
+
+
+
