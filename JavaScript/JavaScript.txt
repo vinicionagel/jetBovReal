@@ -182,5 +182,10 @@ geralmente se usa os === pq você compara o tipo junto, cuidado****;
 
 
 
+Angularrr === inicio
+
+main.ts --> appmodule tudo funciona numa grande árvore de componentes, que são organizadas em módulos, fica bem encapsulado.
+cada componente cria uma tag --> todo código criado html, ts e css ficará lá.
+
 
 
