@@ -188,4 +188,13 @@ main.ts --> appmodule tudo funciona numa grande árvore de componentes, que são
 cada componente cria uma tag --> todo código criado html, ts e css ficará lá.
 
 
+TypeScript --> Tipagem FORTE !@!@!@!
 
+Orientado a objetos;
+Garente a tipagem...
+Decorator !!!! --> recurso do typeScript
+Interface!
+Superset do JavaScript;
+
+Árvore de componentes --> cada framework é feito de um jeito;
+Angular tem sua própria forma;
