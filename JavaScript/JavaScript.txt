@@ -198,3 +198,55 @@ Superset do JavaScript;
 
 Árvore de componentes --> cada framework é feito de um jeito;
 Angular tem sua própria forma;
+
+
+
+ng new NOME_PROJETO --minimal
+
+--minimal retira a parte de testes...
+
+
+angular.json:
+
+"inlineTemplate": false,
+"inlineStyle": false,
+
+irá deixar em arquivos separados CSS e HTML
+
+Configuração padrão do minimal
+
+angular.json tem configurações do projeto
+
+src --> ficam os componentes.
+
+assets ficam imagens, logo.
+
+environments --> ficam as variaveis de ambiente;
+
+dupla chaves equivale ao #{} do jsf... consegue chamar variaveis do app.component.ts
+
+instalando material -->
+
+ng add @angular/material
+
+
+ Choose a prebuilt theme name, or "custom" for a custom theme: Indigo/Pink        [ Preview: https://material.angular.io?theme=indigo-pink ]
+? Set up global Angular Material typography styles? Yes --> aplicar toda a typografia para o projeto
+? Set up browser animations for Angular Material? Yes--> usar animações angular material
+
+criando componente
+
+ng generate component 
+Exemplo:
+ng generate component componentes/template/header ou ng g c componentes/template/header
+
+vai criar no app/componentes/template/header
+
+componentes/diretivas
+rotas/pipes
+Observables
+Services
+
+Além de injeção de dependencias
+
+
