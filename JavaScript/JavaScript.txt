@@ -250,3 +250,48 @@ Services
 Além de injeção de dependencias
 
 
+Seletores --> utilizados para trabalhar com o html(comportamento e estilo), exemplo:
+
+@Directive({
+	selector: '[appRed]'
+})
+export class RedDirective {
+	constructor(el: ElementRef) {
+		el.nativeElement.Style.color = 'red';
+}
+}
+
+<i .... appRed>
+
+Mudara o valor para vermelho...
+
+Structurar Directives....
+
+Mexe na dom direto -->
+Seguindo por um asterisco exemplo
+
+<form> *ngIf="product" >....
+
+Property binding -->
+
+[dataSource]="products"> --> liga com a váriavel no back-end; em table << material
+
+Event binding --> (click)="login()" --> vai fazer o binding com o evento
+
+login(): void {
+console.log('batata');
+}
+
+oneWayDataBinding --> html = nome typeScript = nome; [value]="nome"
+
+TwoWayDataBinding --> [(ngModel)]="nome" alterar tanto com html como no typeScript;
+
+Router-->
+
+{{}} --> angular pipes --> | formata valores exemplo
+
+{{produto.vencimento | date}} --> modifica a date para o padrão correto
+{{product.price | currency: 'BRL'}} --> passa com parametros 
+{{produto.vencimento | date: 'fullDate' | uppercase}} --> encadeamento de chamadas
+
+
