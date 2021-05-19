@@ -294,4 +294,27 @@ Router-->
 {{product.price | currency: 'BRL'}} --> passa com parametros 
 {{produto.vencimento | date: 'fullDate' | uppercase}} --> encadeamento de chamadas
 
+Services --> angular
 
+São classes que tem como principal objetivo organizar e compartilhar métodos e dados entre componentes;
+
+viabilizar comunicação entre componentes;
+
+Service são as lógicas comuns entre os componentes;
+
+ng g s services/product
+
+@Injectable({
+	providedIn: "root", --> no lugar do root pode usar o module...
+}) --> significa que só terá uma instancia pra todo o projeto --> singleton;
+
+Para injetar só declara demtro do construtor;
+
+@NgModule --> injetor de modulo
+@Injectable --> provider de modulo, ou root para vários modelo
+
+ElementInjector
+@Directive
+@Component 
+
+uma unica instancia pra toda aplicação.
