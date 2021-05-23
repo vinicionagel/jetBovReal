@@ -318,3 +318,20 @@ ElementInjector
 @Component 
 
 uma unica instancia pra toda aplicação.
+
+
+3º trimestre. Qual é a diferença entre o parâmetro URI e o parâmetro Query String?
+
+Resposta:  Ok, deixe-me explicar isso com um exemplo.
+
+--> Decorar. https://dzone.com/articles/microservices-interview-questions-answers?edition=674393
+
+api / product / {productname} / items, aqui productname é um parâmetro URI.
+
+api / product / items? productname = mobile, aqui productname é um parâmetro de string de consulta.
+
+
+Binding atributos pode ser com {{}}; para ações com (click)="fazerAlgo()"; ou outro binding [id]="atributoLegal";
+
+
+service do tipo  providedIn: 'root' é um singleton para toda aplicação.
