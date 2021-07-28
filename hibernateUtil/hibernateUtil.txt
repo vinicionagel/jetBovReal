@@ -1,0 +1,152 @@
+One to many --> 
+- sempre utilizar Lazy nas duas pontas;
+- criar métodos auxiliares exemplo algo como:
+@OneToMany (cascade = CascadeType.ALL, orphaRemove=true)
+
+ public void addBook (livro livro) {
+        this.books.add (livro);
+        book.setAuthor (this);
+    }
+    public void removeBook (livro livro) {
+        book.setAuthor (null);
+        this.books.remove (livro);
+    }
+    public void removeBooks () {
+        Iterator <Book> iterator = this.books.iterator ();
+        while (iterator.hasNext ()) {
+            Livro livro = iterator.next ();
+            book.setAuthor (null);
+            iterator.remove ();
+        }
+    }
+
+- Sempre cascadeAll
+- Utilizar dessa forma pq é melhor mais performatico e menos trabalho na manutenção que outros uniderecional
+ou com tabela auxiliar;
+
+---------------------------------
+-ManyToMany --> 
+- A associação @ManyToMany bidirecional pode ser navegada de ambos os lados, portanto, ambos os lados podem ser pais (lado dos pais). Como ambos são pais, nenhum deles terá uma chave estrangeira. Nessa associação, há duas chaves estrangeiras armazenadas em uma tabela separada, conhecida como junção ou tabela de junção. A mesa de junção está oculta e desempenha o papel do lado da criança.
+-Sempre utilizar set em vez de list, muito melhor na remoção, evita comandos sqls a mais para fazer o delete;
+-Evitar cascadeType.ALL e CascadeType.REMOVE;
+-Usar o mapeamento @ManyToMany padrão requer que o desenvolvedor escolha um proprietário do relacionamento e um lado mappedBy (também conhecido como o lado inverso). Apenas um lado pode ser o proprietário e as alterações são propagadas para o banco de dados apenas deste lado específico.
+-Na maioria dos casos, remoções em cascata são ideias ruins. Por exemplo, a remoção de uma entidade Autor não deve desencadear a remoção de um Livro porque o Livro também pode ser referenciado por outros autores (um livro pode ser escrito por vários autores). Portanto, evite CascadeType.ALL e CascadeType.REMOVE e dependem explícita CascadeType.PERSIST e CascadeType.MERGE:
+-
+A remoção de uma entidade Autor é automaticamente enviada em cascata às entidades Book associadas . Isso está acontecendo enquanto CascadeType.REMOVE ou órfãoRemoval = true estiver presente. Ou seja, nessa perspectiva, a presença.
+
+Então, como eles são diferentes? Bem, considere o seguinte método auxiliar usado para desconectar (ou desassociar) um livro de seu autor :
+public void removeBook (livro livro) {
+    book.setAuthor (null);
+    this.books.remove (livro);
+}
+Ou, para desconectar todos os livros de seus autores :
+public void removeBooks () {
+Iterator <Book> iterator = this.books.iterator ();
+    while (iterator.hasNext ()) {
+        Livro livro = iterator.next ();
+        book.setAuthor (null);
+        iterator.remove ();
+    }
+}
+Chamar o método removeBook () na presença de órfãoRemoval = true resultará na remoção automática do livro por meio de uma instrução DELETE . Chamá-lo na presença de órfãoRemoval = false acionará uma instrução UPDATE . Como desconectar um livro não é uma operação de remoção, a presença de CascadeType.REMOVE não importa. Portanto, órfãoRemoval = true é útil para limpar entidades (remover referências pendentes) que não deveriam existir sem uma referência de uma entidade proprietária ( Autor ).
+
+
+----Exclusão em massa ManyToMany:
+
+Um autor já foi carregado no contexto de persistência
+Vamos supor que o Autor que deve ser excluído foi carregado anteriormente no Contexto de Persistência sem seu Livro associado . Para excluir este Autor e os livros associados, você pode usar o identificador de autor ( author.getId () ). Primeiro, exclua todos os livros associados do autor:
+// adicione este método em BookRepository
+@Transactional
+@Modifying (flushAutomatically = true, clearAutomatically = true)
+@Query ("DELETE FROM Book b WHERE b.author.id =? 1")
+public int deleteByAuthorIdentifier (Long id);
+Então, vamos deletar o autor por seu identificador:
+// adicione este método em AuthorRepository
+@Transactional
+@Modifying (flushAutomatically = true, clearAutomatically = true)
+@Query ("DELETE FROM Author a WHERE a.id =? 1")
+public int deleteByIdentifier (Long id);
+A presença de flushAutomatically = true, clearAutomatically = true é explicada um pouco mais tarde. Por enquanto, o método de serviço responsável por acionar a exclusão é:
+@Transactional
+public void deleteViaIdentifiers () {
+    Autor autor = autorRepositório.findByName ("Joana Nimar");
+    bookRepository.deleteByAuthorIdentifier (author.getId ());
+    authorRepository.deleteByIdentifier (author.getId ());
+}
+Chamar deleteViaIdentifiers () aciona as seguintes consultas:
+APAGAR DO livro
+WHERE author_id =?
+EXCLUIR DO autor
+ONDE id =?
+Observe que os livros associados não são carregados no Contexto de Persistência e há apenas duas instruções DELETE acionadas. O número de livros não afeta o número de instruções DELETE .
+O autor também pode ser excluído por meio do deleteInBatch integrado (entidades Iterable <T>) :
+authorRepository.deleteInBatch (List.of (autor));
+Mais autores foram carregados no contexto de persistência
+Vamos supor que o Contexto de Persistência contém mais Author s que devem ser excluídos. Por exemplo, vamos deletar todos os autores de 34 anos buscados como uma Lista <Autor> (vamos supor que há dois autores de 34 anos ). Tentar excluir por identificador de autor (como no caso anterior) resultará em EXCLUIR separadamente para cada autor. Além disso, haverá um DELETE separado para os livros associados de cada autor. Portanto, isso não é eficiente.
+Desta vez, vamos contar com duas operações em massa . Um definido por você por meio do operador IN (que permite especificar vários valores em uma cláusula WHERE ) e o deleteInBatch integrado (entidades Iterable <T>) :
+// adicione este método em BookRepository
+@Transactional
+@Modifying (flushAutomatically = true, clearAutomatically = true)
+@Query ("DELETE FROM Book b WHERE b.author IN? 1")
+public int deleteBulkByAuthors (Listar <Author> autores);
+Os métodos de serviço para excluir uma Lista <Author> e o Livro associado são os seguintes:
+@Transactional
+public void deleteViaBulkIn () {
+    Listar <Autor> autores = autorRepositório.findByAge (34);
+    bookRepository.deleteBulkByAuthors (autores);
+    authorRepository.deleteInBatch (autores);
+}
+Chamar deleteViaBulkIn () aciona as seguintes consultas:
+APAGAR DO livro
+ONDE author_id IN (?,?)
+EXCLUIR DO autor
+ONDE id =?
+  OR id =?
+Observe que os livros associados não são carregados no Contexto de Persistência e há apenas duas instruções DELETE acionadas. O número de autores e livros não afeta o número de declarações DELETE .
+
+
+
+Item 7: Como buscar associações por meio de gráficos de entidades JPA -->
+
+
+Definindo um gráfico de entidade via @NamedEntityGraph
+A anotação @NamedEntityGraph ocorre no nível da entidade. Por meio de seus elementos, o desenvolvedor pode especificar um nome exclusivo para este gráfico de entidade (por meio do elemento de nome ) e os atributos a serem incluídos ao buscar o gráfico de entidade (por meio do elemento attributeNodes , que contém uma lista de anotações @NamedAttributeNode separadas por vírgulas; cada @NamedAttributeNode desta lista corresponde a um campo / associação que deve ser buscado). Os atributos podem ser campos básicos e associações.
+Vamos colocar o gráfico da entidade em código na entidade Autor :
+@Entidade
+@NamedEntityGraph (
+    nome = "autor-livros-gráfico",
+    attributeNodes = {
+        @NamedAttributeNode ("livros")
+    }
+)
+public class Author implementa Serializable {
+    privado estático final longo serialVersionUID = 1L;
+    @Identidade
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    ID longa privada;
+    nome da string privada;
+    gênero particular String;
+    idade privada;
+    @OneToMany (cascade = CascadeType.ALL,
+             mappedBy = "autor", órfãoRemoval = verdadeiro)
+      Lista privada <Book> books = new ArrayList <> ();
+    // getters e setters omitidos por questões de brevidade
+}
+Em seguida, concentre-se no repositório da entidade Autor , AuthorRepository .
+O AuthorRepository é o local onde o gráfico da entidade deve ser especificado. Spring Data fornece suporte para gráficos de entidade por meio da anotação @EntityGraph (a classe dessa anotação é org.springframework.data.jpa.repository.EntityGraph ).
+Substituindo um Método de Consulta
+Por exemplo, o código para usar o gráfico de entidade ( author-books-graph ) para encontrar todos os Author s, incluindo o Book associado , é o seguinte ( EntityGraph.EntityGraphType.FETCH é o padrão e indica um gráfico de busca; EntityGraph.EntityGraphType. LOAD pode ser especificado para um gráfico de carga):
+@Repositório
+@Transactional (readOnly = true)
+interface pública AuthorRepository estende JpaRepository <Author, Long> {
+    @Sobrepor
+    @EntityGraph (value = "author-books-graph",
+                type = EntityGraph.EntityGraphType.FETCH)
+    Lista pública <Author> findAll ();
+}
+
+
+------------------Entidades:
+
+Você pode buscar uma entidade por identificador por meio dos métodos de consulta integrados do Spring, findById () ou getOne () . Por trás do método findById () , Spring usa EntityManager # find () , e por trás do método getOne () , Spring usa EntityManager # getReference () .
+
