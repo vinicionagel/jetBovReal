@@ -150,3 +150,27 @@ interface pública AuthorRepository estende JpaRepository <Author, Long> {
 
 Você pode buscar uma entidade por identificador por meio dos métodos de consulta integrados do Spring, findById () ou getOne () . Por trás do método findById () , Spring usa EntityManager # find () , e por trás do método getOne () , Spring usa EntityManager # getReference () .
 
+-----------------One-To-One maps id
+
+O @MapsId é um 2,0 anotação APP que pode ser aplicado a @ManyToOne e unidireccionais (ou bidireccionais) @OneToOne associações . Por meio dessa anotação, a chave primária da tabela do livro também pode ser uma chave estrangeira que faz referência à chave primária da tabela do autor .
+
+Existem várias vantagens em usar @MapsId , como segue:
+Se o livro estiver presente no cache de segundo nível, ele será obtido de acordo (nenhuma viagem de ida e volta do banco de dados extra é necessária). Esta é a principal desvantagem de um @OneToOne unidirecional regular .
+Buscar o autor não dispara automaticamente uma consulta adicional desnecessária para buscar o livro também. Esta é a principal desvantagem de um @OneToOne bidirecional regular .
+Compartilhar a chave primária reduz a área de cobertura da memória (não há necessidade de indexar a chave primária e a chave estrangeira).
+
+---Como validar que apenas uma associação é não nula
+
+Exemplo:
+
+class test{
+@ManyToOne (fetch = FetchType.LAZY)...
+@ManyToOne (fetch = FetchType.LAZY)...
+@ManyToOne (fetch = FetchType.LAZY)...
+}
+
+Para garantir que pelo menos uma entidade seja preenchida basta adicionar o
+@JustOneOfMany
+
+
+
