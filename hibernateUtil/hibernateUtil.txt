@@ -172,5 +172,17 @@ class test{
 Para garantir que pelo menos uma entidade seja preenchida basta adicionar o
 @JustOneOfMany
 
+-----------------------------------Assync-------------------------------------------------------------------
+
+
+
+Durante a execução assíncrona:
+- Use um manipulador de eventos assíncronos com AFTER_COMPLETION (ou suas especializações) se precisar executar qualquer tarefa que se encaixe bem na execução assíncrona.
+- Se essas tarefas não envolverem operações de banco de dados (leitura / gravação), não use @Transactional no nível do método do manipulador de eventos (não inicie uma nova transação).
+- Se essas tarefas envolverem operações de leitura e / ou gravação do banco de dados , use Propagation.REQUIRES_NEW e atrase a aquisição da conexão do banco de dados até que seja necessária (depois que a conexão do banco de dados for aberta, evite tarefas demoradas).
+- Se essas tarefas envolverem apenas operações de leitura de banco de dados, anote o método do manipulador de eventos com @Transactional (readOnly = true, Propagation.REQUIRES_NEW) .
+- Se essas tarefas envolverem operações de gravação de banco de dados , anote o método do manipulador de eventos com @Transactional (Propagation.REQUIRES_NEW) .
+- Evite executar tarefas assíncronas na fase BEFORE_COMMIT , pois você não terá uma garantia de que essas tarefas serão concluídas antes que a transação do produtor seja confirmada.
+- Dependendo do seu cenário, pode ser necessário interceptar a conclusão do thread do manipulador de eventos.
 
 
