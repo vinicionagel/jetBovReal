@@ -186,3 +186,18 @@ Durante a execução assíncrona:
 - Dependendo do seu cenário, pode ser necessário interceptar a conclusão do thread do manipulador de eventos.
 
 
+-------batch-------------------------------------------------------------------------------------------------
+- rewriteBatchedStatements 
+
+Depois que essa propriedade é habilitada, as instruções SQL são reescritas em um único buffer de string e enviadas em uma única solicitação ao banco de dados. Caso contrário, as instruções em lote (por exemplo, INSERT s) têm a seguinte aparência:
+inserir valores de autor (idade, gênero, nome, id) (828, 'Gênero_810', 'Nome_810', 810)
+inserir valores de autor (idade, gênero, nome, id) (829, 'Gênero_811', 'Nome_811', 811)
+...
+Com essa configuração, essas instruções SQL são reescritas da seguinte maneira:
+inserir nos valores do autor (idade, gênero, nome, id) (828, 'Gênero_810', 'Nome_810', 810), (829, 'Gênero_811', 'Nome_811', 811), ...
+
+- saveAll não é um método muito bom a ser utilizado;
+
+
+
+
