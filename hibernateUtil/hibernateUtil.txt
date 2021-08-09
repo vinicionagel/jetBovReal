@@ -198,6 +198,15 @@ inserir nos valores do autor (idade, gênero, nome, id) (828, 'Gênero_810', 'No
 
 - saveAll não é um método muito bom a ser utilizado;
 
+-------------------------------------ElementCollection--------------
+
+Especialmente ao definir uma associação unidirecional um-para-muitos para um tipo Básico (por exemplo, String ) ou tipo Embeddable JPA tem uma solução simples na forma de @ElementCollection .
+Esses tipos são mapeados em uma tabela separada que pode ser personalizada por meio de @CollectionTable .
+
+Observe que @ElementCollection não é um tipo de associação de entidade, mesmo que você possa pensar assim. Principalmente, como você verá no próximo item, @ElementCollection atua como um @OneToMany unidirecional ( Item 2 ). Portanto, ele sofre as mesmas penalidades de desempenho. As melhores práticas aconselham você a usar @ElementCollection para representar tipos básicos (por exemplo, inteiros ou strings) ou tipos incorporáveis, mas não classes de entidade.
+
+
+Uma coleção que precisa ser atualizada frequentemente leva a óbvias penalidades de desempenho. É melhor confiar em uma associação explícita de um para muitos. Por outro lado, uma coleção que precisa de poucas (ou nenhuma) atualização é uma boa candidata para @ElementCollection , uma vez que não representa um lado da chave estrangeira.
 
 
 
