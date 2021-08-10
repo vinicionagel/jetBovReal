@@ -209,4 +209,15 @@ Observe que @ElementCollection não é um tipo de associação de entidade, mesm
 Uma coleção que precisa ser atualizada frequentemente leva a óbvias penalidades de desempenho. É melhor confiar em uma associação explícita de um para muitos. Por outro lado, uma coleção que precisa de poucas (ou nenhuma) atualização é uma boa candidata para @ElementCollection , uma vez que não representa um lado da chave estrangeira.
 
 
+------------------conexoes e transações--------------
+
+Por que @Transactional foi ignorado? Existem duas razões principais :
+@Transactional foi adicionado a um método privado , protegido ou protegido por pacote .
+@Transactional foi adicionado a um método definido na mesma classe de onde é chamado.
+Portanto, como regra geral, @Transactional funciona apenas em métodos públicos , e o método deve ser adicionado em uma classe diferente de onde é chamado.
+
+
+
+
+
 
