@@ -216,6 +216,36 @@ Por que @Transactional foi ignorado? Existem duas razões principais :
 @Transactional foi adicionado a um método definido na mesma classe de onde é chamado.
 Portanto, como regra geral, @Transactional funciona apenas em métodos públicos , e o método deve ser adicionado em uma classe diferente de onde é chamado.
 
+Portanto, recomendamos o uso de @Transactional (readOnly = true) para métodos de consulta também, que você pode obter facilmente adicionando essa anotação à interface do repositório. Certifique-se de adicionar um @Transactional simples aos métodos de manipulação que você pode ter declarado ou redecorado naquela interface.
+
+Portanto, garantimos que todos os métodos de consulta estão sendo executados em um contexto transacional somente leitura , anotando a interface do repositório com @Transactional (readOnly = true) . Além disso, para consulta-métodos que podem modificar dados, mudar para um transacional ao contexto que permite modificações de dados, adicionando @Transactional sem readOnly bandeira. Principalmente, o que fizemos aqui é exatamente o que Spring Data faz internamente para seus métodos de consulta integrados.
+
+
+Como regra geral, se esforce para evitar transações que intercalam lógicas de negócios pesadas que não interagem com o banco de dados com invocações de método de consulta. Isso pode resultar em transações demoradas e métodos de serviço complexos que se tornam demorados e difíceis de entender, depurar, refatorar e revisar. Quase sempre há soluções melhores, apenas leve o seu tempo para encontrá-las.
+
+
+Anote as interfaces do repositório com @Transactional (readOnly = true) .
+
+Substitua @Transactional (readOnly = true) por @Transactional para métodos de consulta que modificam dados / geram DML (como INSERT , UPDATE e DELETE ).
+
+Atrasar aquisição de conexão de banco de dados:
+Para o Hibernate 5.2.10+, atrase a aquisição da conexão do banco de dados até que seja realmente necessário (consulte o item 60 ).
+Avalie cada método de serviço:
+Avalie cada método de serviço para decidir se deve ser anotado com @Transactional ou não.
+
+Se você decidir anotar um método de serviço com @Transactional , adicione o @Transactional adequado . Você deve adicionar @Transactional (readOnly = true) se chamar apenas métodos de consulta somente leitura e adicionar @Transactional se chamar pelo menos um método de consulta que pode modificar dados.
+
+Meça e monitore a duração da transação:
+Certifique-se de avaliar a duração da transação e o comportamento no contexto do mecanismo de propagação da transação atual ( Apêndice G ) e se esforce para transações curtas e curtas / rápidas.
+
+Depois que a conexão com o banco de dados é adquirida, ela permanece aberta até que a transação seja concluída. Portanto, projete suas soluções para evitar transações demoradas.
+
+Evite adicionar @Transactional no nível da classe do controlador ou no nível da classe de serviço, pois isso pode levar a transações de longa duração ou mesmo desnecessárias (tal classe é propensa a abrir contextos transacionais e adquire conexões de banco de dados para métodos que não necessidade de interagir com o banco de dados). 
+Por exemplo, um desenvolvedor pode adicionar métodos públicos que contêm lógica de negócios que não interage com o banco de dados; nesses casos, se você atrasar a aquisição da conexão com o banco de dados, o Spring Boot ainda preparará o contexto transacional, mas nunca adquirirá uma conexão com o banco de dados para ele. 
+Por outro lado, se você não depende de atrasar a aquisição da conexão do banco de dados, o Spring Boot preparará o contexto transacional e também adquirirá a conexão do banco de dados para ele.
+
+
+------------------Identificadores----------------------------------------------
 
 
 
