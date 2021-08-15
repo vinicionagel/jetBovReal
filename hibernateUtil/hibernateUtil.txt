@@ -247,6 +247,34 @@ Por outro lado, se você não depende de atrasar a aquisição da conexão do ba
 
 ------------------Identificadores----------------------------------------------
 
+Sempre que suportado, as sequências de banco de dados representam a maneira adequada (em JPA e Hibernate ORM) de gerar identificadores. O gerador SEQUENCE sustenta batching, não tem mesa, pode tirar vantagem da pré-alocação de sequências de banco de dados e suporta uma etapa incremental.
+
+--HILO -- não utilizados se há conexão de sistemas externos----
+
+Este algoritmo divide os domínios da sequência em grupos hi de forma síncrona . O valor hi pode ser fornecido pela sequência do banco de dados (ou pelo gerador de tabela), e seu valor inicial é configurável ( valor_inicial ).
+
+
+Item 68: Como substituir corretamente equals () e hashCode ()
+
+Se o id for gerado pelo banco....
+
+public boolean equals (Object obj) {
+    if (obj == null) {
+        retorna falso;
+    }
+    if (this == obj) {
+        return true;
+    }
+    if (getClass ()! = obj.getClass ()) {
+        retorna falso;
+    }
+    IdGenBook outro = (IdGenBook) obj;
+    return id! = null && id.equals (other.getId ());
+}
+
+e valor fixo pro HashCode
+
+Retornar um valor constante de hashCode () ajudará você a atender ao requisito de Hibernate mencionado aqui, mas pode afetar o desempenho no caso de grandes Set s (ou Map s),
 
 
 
