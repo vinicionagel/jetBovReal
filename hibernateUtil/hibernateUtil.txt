@@ -274,8 +274,13 @@ public boolean equals (Object obj) {
 
 e valor fixo pro HashCode
 
-Retornar um valor constante de hashCode () ajudará você a atender ao requisito de Hibernate mencionado aqui, mas pode afetar o desempenho no caso de grandes Set s (ou Map s),
+Retornar um valor constante de hashCode () ajudará você a atender ao requisito de Hibernate mencionado aqui, mas pode afetar o desempenho no caso de grandes Set s (ou Map s);
 
 
+Contar com o Lombok @EqualsAndHashCode padrão para substituir equals () e hashCode () é uma má decisão. Outro cenário comum consiste em excluir campos como title e isbn e confiar apenas em id , @EqualsAndHashCode (exclude = {"title", "isbn"}) . Isso pode ser útil no caso de identificadores atribuídos manualmente, mas é inútil no caso de identificadores gerados por banco de dados.
+
+Em vez só usam os @Getter e @Setter métodos e implementar equals () , hashCode () e toString () métodos como você viu neste item.
+
+Hibernate ORM fornece suporte para declarar uma chave de negócios como um ID natural por meio da anotação @NaturalId.
 
 
