@@ -283,4 +283,20 @@ Em vez só usam os @Getter e @Setter métodos e implementar equals () , hashCode
 
 Hibernate ORM fornece suporte para declarar uma chave de negócios como um ID natural por meio da anotação @NaturalId.
 
+----Extra----
+
+@Transactional
+public void updateAuthorRedundantSave () {
+    Autor autor = authorRepository.findById (1L) .orElseThrow ();
+    author.setAge (44);
+    authorRepository.save (autor);
+}
+
+Verifique a linha em negrito ( authorRepository.save (autor) ) - esta linha é necessária? A resposta correta é não! Quando o aplicativo busca o autor no banco de dados, ele se torna uma instância gerenciada. Entre outras coisas, isso significa que o Hibernate cuidará de disparar as instruções UPDATE se a instância for modificada. Isso é realizado em tempo de liberação pelo mecanismo de verificação de sujeira do Hibernate. Em outras palavras, o mesmo comportamento pode ser realizado por meio do seguinte método:
+@Transactional
+public void updateAuthorRecommended () {
+    Autor autor = authorRepository.findById (1L) .orElseThrow ();
+    author.setAge (44);
+}
+
 
