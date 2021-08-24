@@ -300,3 +300,11 @@ public void updateAuthorRecommended () {
 }
 
 
+SOFT DELETE EXEMPLO: -------------
+
+
+https://github.com/vinicionagel/Hibernate-SpringBoot/tree/master/HibernateSpringBootSoftDeletes
+
+Mostra como implementar o soft-delete de maneira muito fácil e pratica.
+
+
