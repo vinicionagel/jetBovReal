@@ -308,3 +308,31 @@ https://github.com/vinicionagel/Hibernate-SpringBoot/tree/master/HibernateSpring
 Mostra como implementar o soft-delete de maneira muito fácil e pratica.
 
 
+
+--------------------------------chamar procedure------
+
+@Entidade
+@NamedStoredProcedureQueries ({
+    @NamedStoredProcedureQuery (
+            name = "CountByGenreProcedure",
+            procedureName = "COUNT_AUTHOR_BY_GENRE",
+            resultClasses = {Author.class},
+            parâmetros = {
+                @StoredProcedureParameter (
+                        nome = "p_genre",
+                        type = String.class,
+                        mode = ParameterMode.IN),
+                @StoredProcedureParameter (
+                        nome = "p_count",
+                        type = Integer.class,
+                        mode = ParameterMode.OUT)})
+})
+public class Author implementa Serializable {
+
+
+Mais exemplo aqui: https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootCallStoredProcedureReturnValue
+
+
+
+
+
