@@ -332,7 +332,44 @@ public class Author implementa Serializable {
 
 Mais exemplo aqui: https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootCallStoredProcedureReturnValue
 
+--------------------MAPEANDO JSON POSTGRES---
 
+Item 147: Como mapear com eficiência um objeto Java JSON para uma coluna JSON PostgreSQL
+O item 146 abordou o tipo JSON do MySQL. Agora, vamos nos concentrar no PostgreSQL.
+PostgreSQL adicionou suporte a tipos JSON a partir da versão 9.2. Os tipos JSON do PostgreSQL são json e jsonb . Os tipos JSON do PostgreSQL são representados em formato de dados binários, então você precisa usar JsonBinaryType (no item 146 , dissemos que a Biblioteca de tipos do Hibernate fornece dois tipos JSON genéricos - JsonStringType e JsonBinaryType ).
+Vamos usar a entidade Author e o Book JSON Java Object . A entidade Autor está listada aqui:
+@Entidade
+@TypeDef (
+    name = "jsonb", typeClass = JsonBinaryType.class
+)
+public class Author implementa Serializable {
+    private static final long serialVersionUID = 1L;
+    @Identificação
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    ID longa privada;
+    nome da string privada;
+    gênero particular String;
+    idade privada;
+    @Type (type = "jsonb")
+    @Column (columnDefinition = "jsonb") // ou, json
+    livro de livro privado;
+    // getters e setters omitidos por questões de brevidade
+}
+O objeto Java JSON do livro está listado aqui (esta não é uma entidade JPA):
+public class Book implementa Serializable {
+    private static final long serialVersionUID = 1L;
+    Título da string privada;
+    private String isbn;
+    preço int privado;
+    // getters e setters omitidos por questões de brevidade
+}
+
+
+https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootJsonToPostgreSQL
+
+-----------------------------------------------Por baixo dos panos----
+
+O planejamento para modificar os objetos de entidade buscados é uma forma de explorar o fato de que, além de ser um cache para entidades, o Contexto de Persistência atua como um buffer de transições de estado de entidade e também como um cache write-behind transacional . No momento do flush, o Hibernate é responsável por traduzir as transições de estado das entidades em buffer em instruções DML (Data Manipulation Language) que têm como objetivo sincronizar de forma otimizada o estado persistente na memória com o banco de dados.
 
 
 
