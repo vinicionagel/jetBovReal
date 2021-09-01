@@ -367,9 +367,67 @@ public class Book implementa Serializable {
 
 https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootJsonToPostgreSQL
 
------------------------------------------------Por baixo dos panos----
+-----------------------------------------------Por baixo dos panos------------------------------
 
 O planejamento para modificar os objetos de entidade buscados é uma forma de explorar o fato de que, além de ser um cache para entidades, o Contexto de Persistência atua como um buffer de transições de estado de entidade e também como um cache write-behind transacional . No momento do flush, o Hibernate é responsável por traduzir as transições de estado das entidades em buffer em instruções DML (Data Manipulation Language) que têm como objetivo sincronizar de forma otimizada o estado persistente na memória com o banco de dados.
+
+-------------------------------Transições de estado de entidade---------------------------------
+
+
+Uma entidade JPA pode estar em qualquer um dos seguintes estados:
+Transiente (ou Novo ): Uma nova entidade que é totalmente desconhecida para o banco de dados (no momento da liberação, o Hibernate emitirá uma instrução INSERT para ela).
+Gerenciado (ou Persistente ): A entidade possui uma linha correspondente no banco de dados e está atualmente carregada no Contexto de Persistência. No modo de leitura e gravação, no momento do flush, o Hibernate executará o mecanismo Dirty Checking para esta entidade e, se detectar modificações, emitirá as instruções UPDATE adequadas em seu nome.
+Desanexada : A entidade estava no Contexto de Persistência, mas o Contexto de Persistência foi fechado ou a entidade foi limpa / removida (quaisquer modificações de uma entidade desanexada não são propagadas automaticamente para o banco de dados).
+Removido : A entidade estava no Contexto de Persistência e foi marcada para exclusão (no momento do flush, o Hibernate emitirá a instrução DELETE apropriada para excluir a linha correspondente do banco de dados).
+
+
+----------------------------------------------------------------------Chave primária vs. chave única-------------
+
+
+Decidir entre as chaves primárias e únicas chaves é uma tarefa que exige que você esteja ciente dos seguintes principais diferenças entre eles:
+Uma chave primária identifica exclusivamente uma linha em uma tabela, enquanto uma chave exclusiva garante valores exclusivos em uma coluna.
+Uma chave primária não pode ser NULL , enquanto uma chave exclusiva pode ser NULL .
+Uma tabela oferece suporte a uma única chave primária, mas oferece suporte a várias chaves exclusivas.
+Por padrão, uma chave primária leva a um índice clusterizado, enquanto uma chave exclusiva leva a um índice não clusterizado.
+Uma chave primária pode ser composta (combinando várias colunas na mesma tabela, incluindo colunas que têm chaves exclusivas), enquanto uma chave exclusiva pode ser usada para tornar várias colunas exclusivas juntas (restrição exclusiva composta).
+Uma chave primária não pode ser excluída / modificada, enquanto uma chave exclusiva pode ser excluída / modificada.
+Uma chave primária é construída por meio de uma restrição de chave primária e uma restrição exclusiva (a última é adicionada automaticamente), enquanto uma chave exclusiva é construída por meio de uma restrição exclusiva (a restrição exclusiva garante que não haja valores duplicados nessa coluna).
+
+------------------------------------------------------------------------------------------------------------------LIKE x igual (=)
+
+
+Há um debate sobre o uso do operador LIKE versus igual ( = ) .
+O operador LIKE é útil para correspondência de string flexível, enquanto equals ( = ) é útil quando você não precisa de curingas. As posições dos curingas nas expressões LIKE podem ter um impacto significativo na escolha do plano de execução e no intervalo do índice que precisa ser verificado. No caso do operador LIKE , como regra geral, você deve colocar curingas o mais tarde possível na correspondência de padrões e tentar evitar curingas na primeira posição. Isso pode desencadear uma verificação completa de tabela / índice e, como consequência, uma penalidade de desempenho.
+
+
+Como um princípio básico:
+Coloque os curingas o mais tarde possível e nunca na primeira posição
+Tente fornecer um predicado de acesso “consistente”
+
+-----------------------------------------------------------------------------------------------UNION vs. UNION ALL e JOIN Flavors----------------------------------
+
+Primeiro, vamos dar uma olhada rápida em UNION vs. UNION ALL :
+UNION remove duplicatas (ele executa um DISTINCT no conjunto de resultados), enquanto UNION ALL não remove duplicatas.
+Se você souber que todos os registros retornados são exclusivos, use UNION ALL em vez de UNION .
+UNION tem muito menos desempenho, especialmente se o número de duplicatas for grande. Por outro lado, transferir mais dados (duplicatas) pela rede pode ser mais lento do que aplicar DISTINCT e transferir menos dados.
+UNION classifica a saída final, enquanto UNION ALL não (para classificação, você precisa especificar ORDER BY ).
+
+
+--------------------------------------INDICES-------------
+
+Como regra geral, para criar o conjunto adequado de índices, tente fazer o seguinte:
+Obtenha a lista de consultas SQL a serem usadas
+Estime a frequência de cada consulta SQL
+Tente pontuar a importância de cada consulta SQL
+Tendo essas três coordenadas, encontre o conjunto adequado de índices que resulta nas maiores otimizações e no menor número de trade-offs.
+
+Esta dica destaca o segundo item da seção anterior, “estime a frequência de cada consulta”. As consultas SQL usadas com mais frequência devem ter prioridade para indexação. Se as consultas SQL usadas com mais frequência forem otimizadas, é mais provável que você obtenha o desempenho ideal do aplicativo.
+Como regra geral, crie índices para as consultas SQL mais usadas (muito exploradas) e crie índices com base em predicados.
+
+É altamente recomendável que você crie um índice em cada restrição de chave estrangeira na tabela filha.Enquanto o índice exclusivo para a
+chave primária é criado automaticamente, o índice exclusivo para a chave estrangeira é de responsabilidade do administrador do banco de
+dados ou dos desenvolvedores. Em outras palavras, se o banco de dados não cria índices automaticamente para as chaves estrangeiras (
+por exemplo, SQL Server), então os índices devem ser criados manualmente pelo administrador do banco de dados ou pelos desenvolvedores.
 
 
 
