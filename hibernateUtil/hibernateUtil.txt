@@ -429,5 +429,80 @@ chave primária é criado automaticamente, o índice exclusivo para a chave estr
 dados ou dos desenvolvedores. Em outras palavras, se o banco de dados não cria índices automaticamente para as chaves estrangeiras (
 por exemplo, SQL Server), então os índices devem ser criados manualmente pelo administrador do banco de dados ou pelos desenvolvedores.
 
+=-=-=-=-Não adivinhe os índices=-=-=-=-
+
+Adicionar colunas para acesso somente índice
+Adicionar colunas para acesso apenas ao índice é uma técnica conhecida como sobrecarga de índice .
+Basicamente, você cria um índice contendo todas as colunas necessárias para satisfazer a consulta.
+Isso significa que a consulta não exigirá dados do espaço de tabela. Portanto, requer menos operações de E / S.
+
+
+O nível de isolamento READ_COMMITTED afirma que uma transação não pode ler dados não confirmados de outras transações simultâneas.
+
+------@Transactional (isolamento = Isolation.REPEATABLE_READ)
+
+Como o próprio nome sugere, o nível de isolamento REPEATABLE_READ afirma que uma transação lê o mesmo resultado em várias leituras.
+Por exemplo, uma transação que lê um registro do banco de dados várias vezes obtém o mesmo resultado em cada leitura.
+
+Exemplo:
+
+Etapa 1: John e Mary selecionam o preço do Maserati em suas próprias transações.
+Etapa 2: John atualiza o preço de $ 65.000 para $ 85.000 (no MySQL, isso é permitido).
+Etapa 3: Maria seleciona o preço novamente como $ 65.000.
+Etapa 4: John confirma sua transação com sucesso e o preço se torna $ 85.000.
+Etapa 5: Maria seleciona o preço novamente como $ 65.000 (o MySQL evita leituras não repetíveis).
+
+
+@Transactional (isolamento = Isolation.SERIALIZABLE)
+
+O nível de isolamento SERIALIZABLE é muito rígido, mas a compensação é com o desempenho. Ele usa bloqueio em todos os níveis,
+portanto, é equivalente a uma execução serial. Teoricamente falando, SERIALIZABLE deveria prevenir todos os fenômenos ,
+mas na prática as coisas não são bem assim. Os detalhes de implementação são específicos para cada banco de dados e
+alguns deles ainda estão sujeitos a diversos fenômenos (veja a menção da tabela anterior). A Figura F-4 mostra o serializável em ação.
+
+Exemplo:
+
+Etapa 1: John seleciona o preço do Maserati em sua transação.
+Etapa 2: Maria tenta selecionar o mesmo registro em sua transação, mas a transação de John bloqueou esses dados. Portanto, a transação de Maria é suspensa até que o bloqueio seja liberado.
+Etapa 3: John atualiza o preço para $ 85.000.
+Etapa 4: a transação de Maria ainda está suspensa.
+Etapa 5: A transação de John foi confirmada com sucesso e o bloqueio foi liberado.
+Etapa 6: a transação de Maria é retomada e ela lê o preço como $ 85.000.
+
+
+@Transactional (propagation = Propagation.REQUIRED) - Propagation.REQUIRED
+
+Se não houver transação física existente, o contêiner Spring criará uma
+Se houver uma transação física existente, os métodos anotados com REQUIRE participarão desta transação física
+Cada método anotado com REQUIRED demarca uma transação lógica e essas transações lógicas participam da mesma transação física
+Cada transação lógica tem seu próprio escopo, mas, no caso desse mecanismo de propagação, todos esses escopos são mapeados para a mesma transação física
+
+Considere as duas transações lógicas a seguir (ou pense nisso como uma transação lógica externa contendo uma transação lógica interna):
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    insertSecondAuthorService.insertSecondAuthor ();
+}
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertSecondAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Alicia Tom");
+    authorRepository.save (autor);
+    if (new Random (). nextBoolean ()) {
+        lance new RuntimeException ("DummyException: isso deve causar
+            reversão de ambas as inserções! ");
+    }
+}
+
+Explicação:
+
+Etapa 1: Quando o método insertFirstAuthor () é chamado, não há transação física. Spring cria um para executar a transação lógica externa - o código deste método.
+
+Etapa 2: quando insertSecondAuthor () é chamado a partir de insertFirstAuthor () , há uma transação física existente. Portanto, o Spring convida a transação lógica interna representada pelo método insertSecondAuthor () a participar dessa transação física .
+
+Etapa 3: Se a RuntimeException causada aleatoriamente no final do método insertSecondAuthor () for lançada, o Spring irá reverter ambas as transações lógicas. Portanto, nada será inserido no banco de dados .
+
 
 
