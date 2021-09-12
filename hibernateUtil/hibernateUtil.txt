@@ -504,5 +504,121 @@ Etapa 2: quando insertSecondAuthor () é chamado a partir de insertFirstAuthor (
 
 Etapa 3: Se a RuntimeException causada aleatoriamente no final do método insertSecondAuthor () for lançada, o Spring irá reverter ambas as transações lógicas. Portanto, nada será inserido no banco de dados .
 
+------ Propagation.REQUIRES_NEW
 
 
+Se a transação física interna for revertida, ela pode ou não afetar a transação física externa.
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    insertSecondAuthorService.insertSecondAuthor ();
+}
+@Transactional (propagation = Propagation.REQUIRES_NEW)
+public void insertSecondAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Alicia Tom");
+    authorRepository.save (autor);
+    if (new Random (). nextBoolean ()) {
+        lançar new RuntimeException ("DummyException: isso deve causar
+            reversão da segunda inserção apenas! ");
+    }
+}
+
+Etapa 1: A primeira transação física (externa) é criada quando você chama insertFirstAuthor () , porque não há nenhuma transação física existente.
+Etapa 2: Quando o insertSecondAuthor () é chamado de insertFirstAuthor () , o Spring criará outra transação física (interna).
+Etapa 3: se RuntimeException for lançada, as duas transações físicas (a interna primeiro e a externa depois) serão revertidas. Isso está acontecendo porque a exceção lançada em insertSecondAuthor () é propagada para o chamador, o insertFirstAuthor () , causando também o rollback da transação física externa. Se este não for o comportamento desejado e você quiser reverter apenas a transação física interna sem afetar a transação física externa, será necessário capturar e manipular a RuntimeException em insertFirstAuthor () , conforme mostrado aqui:
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    Experimente {
+        insertSecondAuthorService.insertSecondAuthor ();
+    } catch (RuntimeException e) {
+        System.err.println ("Exceção:" + e);
+    }
+}
+
+***Se a transação física externa for revertida depois que a transação física interna for confirmada, a transação física interna não será afetada.
+
+
+Vamos ver alguns códigos:
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    insertSecondAuthorService.insertSecondAuthor ();
+}
+@Transactional (propagation = Propagation.NOT_SUPPORTED)
+public void insertSecondAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Alicia Tom");
+    authorRepository.save (autor);
+    if (new Random (). nextBoolean ()) {
+        lance new RuntimeException ("DummyException: isso deve causar"
+            + "reversão do insert disparado em insertFirstAuthor ()!");
+    }
+}
+---Propagation.NOT_SUPPORTED
+
+Vamos ver alguns códigos:
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    insertSecondAuthorService.insertSecondAuthor ();
+}
+@Transactional (propagation = Propagation.NOT_SUPPORTED)
+public void insertSecondAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Alicia Tom");
+    authorRepository.save (autor);
+    if (new Random (). nextBoolean ()) {
+        lance new RuntimeException ("DummyException: isso deve causar"
+            + "reversão do insert disparado em insertFirstAuthor ()!");
+    }
+}
+
+
+Etapa 1: quando insertFirstAuthor () é chamado, não há transação física disponível. Portanto, o Spring criará uma transação em conformidade com Propagation.REQUIRED .
+Passo 2: Posteriormente, o código aciona uma inserção (a autora Joana Nimar é persistida no banco de dados).
+Etapa 3: A instrução insertSecondAuthor () é chamada de insertFirstAuthor () e Spring deve avaliar a presença de Propagation.NOT_SUPPORTED . Existe uma transação física existente; portanto, antes de continuar, o Spring irá suspendê-lo.
+Etapa 4: o código de insertSecondAuthor () é executado fora de qualquer transação física até que o fluxo atinja a chamada save () . Por padrão, esse método está sob o guarda-chuva Propagation.REQUIRED ; portanto, o Spring cria uma transação física, executa o INSERT (para Alicia Tom) e confirma essa transação.
+Etapa 5: O código restante insertSecondAuthor () é executado fora de uma transação física.
+Etapa 6: Após a conclusão do código insertSecondAuthor () , o Spring retoma a transação física suspensa e retoma a execução da transação lógica insertFirstAuthor () de onde parou. Se o RuntimeException foi jogado na insertSecondAuthor () , então essa exceção foi propagada em insertFirstAuthor () , e esta transação lógica é rolada para trás .
+
+Mesmo que a transação seja suspensa graças ao Propagation.NOT_SUPPORTED , você ainda deve se esforçar para evitar tarefas de longa execução. Observe que, enquanto a transação está suspensa, a conexão do banco de dados anexada ainda está ativa, portanto, a conexão do pool não pode reutilizá-la. Em outras palavras, a conexão com o banco de dados está ativa mesmo quando sua transação limitada é suspensa:
+...
+A suspender a transação atual
+HikariPool-1 - Estatísticas da piscina (total = 10, ativo = 1, inativo = 9, em espera = 0)
+Retomando a transação suspensa após a conclusão da transação interna
+
+
+------------------- Propagation.SUPPORTS
+
+Propagation.SUPPORTS afirma que, se houver uma transação física, ele executará o método demarcado como uma transação lógica no contexto dessa transação física. Caso contrário, ele executará este método fora de uma transação física. Vamos ver alguns códigos:
+@Transactional (propagation = Propagation.REQUIRED)
+public void insertFirstAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Joana Nimar");
+    authorRepository.save (autor);
+    insertSecondAuthorService.insertSecondAuthor ();
+}
+@Transactional (propagation = Propagation.SUPPORTS)
+public void insertSecondAuthor () {
+    Autor autor = novo Autor ();
+    author.setName ("Alicia Tom");
+    authorRepository.save (autor);
+    if (new Random (). nextBoolean ()) {
+        lançar new RuntimeException ("DummyException: isso deve causar
+            reversão de ambas as inserções! ");
+    }
+}
+Etapa 1: quando insertFirstAuthor () é chamado, não há transação física disponível . Portanto, o Spring criará uma transação em conformidade com Propagation.REQUIRED .
+Etapa 2: Além disso, o Spring inicia a execução da transação lógica externa representada pelo método insertFirstAuthor () e dispara uma inserção por meio do método save () (a autora Joana Nimar é persistida no banco de dados).
+Etapa 3: O insertSecondAuthor () é chamado de insertFirstAuthor () e o Spring deve avaliar a presença de Propagation.SUPPORTS . Existe uma transação física existente. Portanto, o código de insertSecondAuthor () é executado como uma transação lógica interna no contexto desta transação física. Se uma RuntimeException for lançada, as transações lógicas interna e externa serão revertidas.
+Capturar e manipular a RuntimeException em insertFirstAuthor () ainda reverterá a transação lógica externa. Isso está acontecendo porque a transação lógica interna define o marcador somente de reversão e os escopos de ambas as transações lógicas são mapeados para a mesma transação física.
