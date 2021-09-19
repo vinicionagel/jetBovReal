@@ -622,3 +622,111 @@ Etapa 1: quando insertFirstAuthor () é chamado, não há transação física di
 Etapa 2: Além disso, o Spring inicia a execução da transação lógica externa representada pelo método insertFirstAuthor () e dispara uma inserção por meio do método save () (a autora Joana Nimar é persistida no banco de dados).
 Etapa 3: O insertSecondAuthor () é chamado de insertFirstAuthor () e o Spring deve avaliar a presença de Propagation.SUPPORTS . Existe uma transação física existente. Portanto, o código de insertSecondAuthor () é executado como uma transação lógica interna no contexto desta transação física. Se uma RuntimeException for lançada, as transações lógicas interna e externa serão revertidas.
 Capturar e manipular a RuntimeException em insertFirstAuthor () ainda reverterá a transação lógica externa. Isso está acontecendo porque a transação lógica interna define o marcador somente de reversão e os escopos de ambas as transações lógicas são mapeados para a mesma transação física.
+
+------Flushing --
+
+É o mecanismo de sincronização do estado persistente na memória (contexto de persistência) com o banco de dados. Além de armazenar ou armazenar em cache as entidades (lembre-se de que o Contexto de Persistência também é conhecido como Cache de Primeiro Nível).
+Obviamente, forçando manualmente o flush (chamando explicitamente os métodos de flush ), você pode diminuir os benefícios de deixar o Hibernate decidir o melhor plano de flush.
+
+O lote JDBC é usado.
+Se uma entidade for atualizada mais de uma vez, o Hibernate ainda dispara apenas uma instrução UPDATE .
+Se uma entidade for atualizada e depois excluída, apenas o DELETE é executado.
+
+o contexto de persistência - mais precisamente, no ActionQueue . No momento da descarga, o Hibernate habilita uma ordem muito estrita de processamento dessas ações, como segue :
+1 - OrphanRemovalAction
+
+2 - EntityInsertAction e EntityIdentityInsertAction
+
+3 - EntityUpdateAction
+
+4 - CollectionRemoveAction
+
+5 - CollectionUpdateAction
+
+6 - CollectionRecreateAction
+
+7 - EntityDeleteAction
+
+Ou, para todas as sessões (nível de aplicativo ) via application.properties :
+spring.jpa.properties.org.hibernate.flushMode = ALWAYS
+
+---------Descarga automática---
+
+Modos de descarga automática
+A descarga antes da execução de uma consulta e antes da confirmação da transação é realizada por JPA (e Hibernate ORM) por meio de modos de descarga automática .
+O modo de liberação automática do Contexto de Persistência deve funcionar da seguinte maneira:
+Antes de executar uma consulta DQL SELECT , JPA JPQL ou HQL específica do Hibernate
+Antes de executar uma consulta SELECT DQL nativa
+Antes que a transação seja confirmada
+
+entityManager.persist (new Book (). setTitle ("Carrie"));
+entityManager.createNativeQuery (
+    "SELECT COUNT (*) FROM book"). GetSingleResult ();
+
+A liberação é atrasada até que a transação seja confirmada, portanto, as instruções SQL acionadas são :
+SELECIONE COUNT (*) DO livro
+INSERT INTO book (title, ...) VALUES ("Carrie", ...);
+
+Para corrigir isso rapidamente, você pode alternar para o modo de liberação SEMPRE para a consulta nativa da seguinte maneira:
+entityManager.createNativeQuery ("SELECT COUNT (*) FROM book")
+    .unwrap (org.hibernate.query.Query.class)
+    .setHibernateFlushMode (FlushMode.ALWAYS)
+    .getSingleResult ();
+
+Os exemplos a seguir usam o Hibernate como o provedor JPA configurado via application.properties como de costume. Vamos ver como você pode definir os modos de liberação.
+Você pode determinar o modo de liberação atual para o JPA EntityManager da seguinte maneira:
+System.out.println (
+    "Modo de descarga, Hibernate JPA (EntityManager # getFlushMode ()):"
+    + entityManager.getFlushMode ());
+System.out.println (
+    "Modo de descarga, Hibernate JPA (Session # getFlushMode ()):"
+    + (entityManager.unwrap (Session.class)). getFlushMode ());
+E você pode determinar o modo de liberação atual para a sessão de Hibernate da seguinte maneira (começando com Hibernate 5.2):
+System.out.println (
+    "Modo Flush, Sessão Hibernate (Session # getHibernateFlushMode ()):"
+    + (entityManager.unwrap (Session.class)). getHibernateFlushMode ());
+Se você executar este código em um método de serviço anotado com @Transactional , a saída será a seguinte:
+Modo de descarga, Hibernate JPA (EntityManager # getFlushMode ()): AUTO
+Modo de descarga, Hibernate JPA (Session # getFlushMode ()): AUTO
+Modo Flush, Sessão Hibernate (Session # getHibernateFlushMode ()): AUTO
+Se você executar este código em um método de serviço anotado com @Transactional (readOnly = true) , a saída será a seguinte:
+Modo de descarga, Hibernate JPA (EntityManager # getFlushMode ()): COMMIT
+Modo de descarga, Hibernate JPA (Session # getFlushMode ()): COMMIT
+Modo Flush, Sessão Hibernate (Session # getHibernateFlushMode ()): MANUAL
+
+
+*----------Cache de Segundo Nível +-----
+
+Além do não-thread-safe, Session bound, Persistence Context (também referido como Cache de Primeiro Nível), o Hibernate ORM vem com um Second Level Cache que é vinculado à SessionFactory e é thread-safe.
+Implementações comuns do cache de segundo nível vêm de EhCache, Infinispan, Hazelcast, OSCache e SwarmCache.
+
+A ativação do cache de segundo nível pode ser feita em várias etapas, como segue:
+- hibernate.cache.use_second_level_cache : true (padrão)
+- hibernate.cache.provider_class : nome de classe totalmente qualificado do provedor de cache
+- hibernate.cache.region.factory_class : nome de classe totalmente qualificado da implementação de terceiros CacheRegionFactory
+- hibernate.cache.use_reference_entries . Definir como verdadeiro diz ao Hibernate que, em vez de copiar conjuntos de dados imutáveis inteiros,
+o Hibernate agora pode armazenar a referência aos dados no cache. Em outras palavras, objetos de dados imutáveis (@Immutable ) sem qualquer tipo de associação não são copiados para o cache de segundo nível.
+Em vez disso, apenas referências a eles são armazenadas.
+Aponte as entidades que devem ser armazenadas em cache via @Cache : como @Cache (usage = CacheConcurrencyStrategy.READ_WRITE)
+- Definir a mesma estratégia de sincronização para todas as entidades que devem ser armazenadas em cache pode ser feito por meio da propriedade de configuração cache.default_cache_concurrency_strategy .
+Além disso, você pode usar @Cache para substituir a estratégia de sincronização no nível da entidade ou via @Cacheable ( javax.persistence.Cacheable ).
+
+
+Você pode inspecionar uma região de cache por meio do seguinte método :
+public void inspectCacheRegion (String region) {
+    SecondLevelCacheStatistics stats =
+        getSessionFactory (). getStatistics ()
+            .getSecondLevelCacheStatistics (região);
+    System.out.println ("Região:" + região); // log region
+    System.out.println ("Estatísticas:" + estatísticas); // log estatísticas
+    System.out.println ("Entradas:" + stats.getEntries ()); // entradas de registro
+}
+Desembrulhar SessionFactory via EntityManager pode ser feito da seguinte maneira:
+EntityManager em;
+...
+public SessionFactory getSessionFactory () {
+    return em.getEntityManagerFactory (). unbrap (SessionFactory.class);
+}
+
+
+
