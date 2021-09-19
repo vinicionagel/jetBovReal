@@ -728,5 +728,73 @@ public SessionFactory getSessionFactory () {
     return em.getEntityManagerFactory (). unbrap (SessionFactory.class);
 }
 
+------Estratégias de cache hibernate------
+
+----NONSTRICT_READ_WRITE
+
+Essa estratégia é lida e não usa bloqueios. É útil quando os dados raramente são modificados. Suas principais características são :
+Inserções, atualizações e exclusões são feitas por meio de estratégia de leitura
+Atualizações e exclusões removem entradas de cache do cache no momento da liberação e após os commits
+Essas ações são válidas para entidades e coleções
+
+---READONLY
+
+Essa estratégia é útil para dados imutáveis. Suas principais características são :
+A inserção de entidades é lida se a estratégia de geração do identificador de entidade for IDENTITY
+A inserção de entidades é write-through se a estratégia de geração do identificador de entidade for SEQUENCE ou TABLE
+A inserção em coleções é sempre lida
+A atualização de entidades / coleções não é suportada
+Excluir uma entidade irá excluir as entradas de cache correspondentes
+A partir do Hibernate 5.1.0, a exclusão de uma coleção excluirá o CacheEntry correspondente , mas não invalidará o CollectionCacheEntry
+
+---READWRITE
+Essa estratégia usa bloqueios suaves para garantir a integridade dos dados. É assíncrono. Além disso, ele oferece suporte à estratégia de write-through sem a necessidade de transações JTA.
+Suas principais características são:
+
+A inserção de entidades é lida se a estratégia de geração do identificador de entidade for IDENTITY
+A inserção de entidades é write-through se a estratégia de geração do identificador de entidade for SEQUENCE ou TABLE
+A inserção em coleções é sempre lida
+A atualização de entidades é escrita e segue duas etapas:
+No momento da liberação, a entrada do cache é substituída por um bloqueio suave (isso evita a leitura de dados não confirmados)
+Após a confirmação, o soft lock é substituído pelo valor real
+Atualizar uma coleção requer duas etapas:
+No momento da liberação, a entrada do cache é substituída por um bloqueio suave (isso evita a leitura de dados não confirmados)
+Depois de um commit, você ainda tem um soft lock que será substituído pelo valor real por meio da estratégia de leitura
+A exclusão de entidades ou coleções requer duas etapas:
+No momento da liberação, a entrada do cache é substituída por um bloqueio suave (isso evita a leitura de dados não confirmados)
+Após uma confirmação, o bloqueio suave é substituído por outro bloqueio cujo período de tempo limite é ainda mais aumentado (os bloqueios flexíveis não podem ser revertidos; eles têm que expirar em caso de reversão da transação)
+
+
+---TRANSACIONAL
+Essa estratégia é a escolha adequada quando os dados são frequentemente modificados e revertidos. Ele fornece consistência extrema, mas é síncrono e requer transações JTA (por exemplo, Bitronix).
+Suas principais características são:
+
+
+A inserção de entidades é lida se a estratégia de geração do identificador de entidade for IDENTITY
+A inserção de entidades é write-through se a estratégia de geração do identificador de entidade for SEQUENCE ou TABLE
+A inserção em coleções é sempre lida
+A atualização de entidades ou coleções segue estas etapas:
+No momento da liberação, as modificações das entidades são realizadas, enquanto as regiões de cache das coleções são invalidadas; isso é visível apenas para a transação atual
+Após uma confirmação, as modificações são visíveis para todas as transações (as regiões de cache das coleções permanecem inválidas até a leitura)
+A exclusão de entidades ou coleções simplesmente remove todas as entradas de cache correspondentes
+
+--Cache de Consulta(GIT EXEMPLO:https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootHibernateSLCEhCacheKickoff)
+
+Habilitar caches de consulta pode ser feito via hibernate.cache.use_query_cache = true .
+
+Para um cache de consulta, o Hibernate usa uma estratégia de leitura , então a consulta é executada e os resultados são armazenados em cache em uma região chamada org.hibernate.cache.internal.StandardQueryCache .
+
+**Como regra geral, os melhores resultados ao usar o cache de consulta podem ser obtidos com entidades imutáveis ​​e entidades que raramente são modificadas.
+
+@QueryHints (value = @QueryHint (name = HINT_CACHEABLE, value = "true"))
+
+Não confunda o cache de segundo nível do Hibernate com o suporte a cache Spring.
+O cache do Spring é habilitado por meio da anotação @EnableCaching e é controlado por um monte de anotações, como @Cacheable , @CachePut , @CacheEvict , @CacheConfig , etc.
+Spring oferece suporte a partir de um provedor de cache integrado que depende de mapas simultâneos na memória para provedores como EhCache, JCache, Hazelcast, Caffeine e outros.
+Um aplicativo inicial de armazenamento em cache do Spring usando EhCache pode ser encontrado no GitHub (https://github.com/AnghelLeonard/Hibernate-SpringBoot/tree/master/HibernateSpringBootSpringCacheEhCacheKickoff)
+
+--Ferramentas
+
+
 
 
