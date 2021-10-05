@@ -1,0 +1,7 @@
+No entanto, Elasticsearch é muito mais do que apenas Lucene e muito mais do que “apenas” pesquisa de texto completo. Também pode ser descrito da seguinte forma:
+
+- Um armazenamento de documentos em tempo real distribuído onde cada campo é indexado e pesquisável
+
+- Um mecanismo de pesquisa distribuído com análises em tempo real
+
+- Capaz de escalar para centenas de servidores e petabytes de dados estruturados e não estruturados
