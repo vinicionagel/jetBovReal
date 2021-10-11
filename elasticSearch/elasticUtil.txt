@@ -5,3 +5,29 @@ No entanto, Elasticsearch é muito mais do que apenas Lucene e muito mais do que
 - Um mecanismo de pesquisa distribuído com análises em tempo real
 
 - Capaz de escalar para centenas de servidores e petabytes de dados estruturados e não estruturados
+
+
+Elasticsearch é orientado a documentos , o que significaque armazena objetos ou documentos inteiros. Ele não apenas os armazena, mas também indexa o conteúdo de cada documento para torná-los pesquisáveis.
+
+
+--Métodos simples de consulta:
+
+Para fazer isso, usaremos um método de pesquisa leve que é fácil de usar na linha de comando. Este método é frequentemente referido comouma pesquisa de string de consulta , já que passamos a pesquisa como um parâmetro de string de consulta de URL:
+
+GET /megacorp/employee/_search?q=last_name:Smith
+
+Elasticsearch fornece uma linguagem de consulta rica e flexível chamada DSL de consulta , que nos permite construir consultas muito mais complexas e robustas.
+
+--Consulta com dsl
+
+O idioma específico do domínio (DSL) éespecificado usando um corpo de solicitação JSON. Podemos representar a pesquisa anterior para todos os Smiths da seguinte forma:
+
+GET /megacorp/employee/_search
+{
+    "query" : {
+        "match" : {
+            "last_name" : "Smith"
+        }
+    }
+}
+
