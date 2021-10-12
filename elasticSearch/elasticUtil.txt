@@ -100,4 +100,17 @@ Elasticsearch tem uma funcionalidade chamada agregações , quepermitem que voc�
 
 
 
+Essas agregações não são pré-calculadas; eles são gerados instantaneamente a partir dos documentos que correspondem à consulta atual
+
+
+--Natureza distribuida
+
+Embora nosso tutorial tenha dado exemplos de como usar o Elasticsearch, ele não tocou na mecânica.
+Elasticsearch é distribuído por natureza e foi projetado para ocultar a complexidade que vem com a distribuição.
+
+Elasticsearch se esforça para esconder a complexidade dos sistemas distribuídos.
+Aqui estão algumas das operações que acontecem automaticamente nos bastidores:
+
+Capítulo 2. Vida dentro de um cluster
+
 

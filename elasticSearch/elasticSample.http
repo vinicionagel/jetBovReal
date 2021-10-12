@@ -36,5 +36,74 @@ Content-Type: application/json
 }
 
 ###
+PUT http://localhost:9200/megacorp/_mapping/employee
+Content-Type: application/json
+
+{
+  "employee": {
+    "properties": {
+      "interests": {
+        "type": "text",
+        "fielddata": true
+      }
+    }
+  }
+}
+
+###
 
 GET http://localhost:9200/megacorp/employee/_search?q=last_name:Smith
+
+###
+#Exemplo chamada com agregação fara a uma agregação com os maiores interreses
+#
+GET http://localhost:9200/megacorp/employee/_search
+Content-Type: application/json
+
+{
+  "aggs": {
+    "all_interests": {
+      "terms": { "field": "interests" }
+    }
+  }
+}
+
+###
+###
+#Exemplo chamada com agregação fara a uma agregação com os maiores interreses, filtrando por smith
+#
+GET http://localhost:9200/megacorp/employee/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "last_name": "smith"
+    }
+  },
+  "aggs": {
+    "all_interests": {
+      "terms": {
+        "field": "interests"
+      }
+    }
+  }
+}
+
+###
+#Também é possível fazer algo como cálcular a idade média dos funcionários que compartilham um interesse particular:
+GET http://localhost:9200/megacorp/employee/_search
+Content-Type: application/json
+
+{
+  "aggs" : {
+    "all_interests" : {
+      "terms" : { "field" : "interests" },
+      "aggs" : {
+        "avg_age" : {
+          "avg" : { "field" : "age" }
+        }
+      }
+    }
+  }
+}
