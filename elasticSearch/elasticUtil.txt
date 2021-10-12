@@ -31,3 +31,73 @@ GET /megacorp/employee/_search
     }
 }
 
+-- Subir elastic no docker --
+
+docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.8.19
+
+----
+
+Vamos complicar um pouco a pesquisa. Ainda queremos encontrar todos os funcionários com o sobrenome Smith, mas queremos apenas funcionários com mais de 30 anos.
+Nossa consulta mudará um pouco para acomodar um filtro , que nos permite executar pesquisas estruturadas com eficiência:
+
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+                    "age" : { "gt" : 30 } 1
+                }
+            },
+            "query" : {
+                "match" : {
+                    "last_name" : "smith" 2
+                }
+            }
+        }
+    }
+}
+
+ -- Match trata parecido por exemplo buscar que gosta de escalada:
+
+{
+"query" : {
+        "match" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+
+Irá retornar quem curte rock tbm... para contornarmos isso é preciso buscar a palavra igual por meio do:
+
+"match_phrase" : {
+            "about" : "rock climbing"
+        }
+
+
+-- Destacando nossas pesquisas --
+
+
+
+{
+  "query" : {
+    "match_phrase" : {
+      "about" : "rock climbing"
+    }
+  },
+  "highlight": {
+    "fields" : {
+      "about" : {}
+    }
+  }
+}
+
+Dessa forma vai trazer o le contém um trecho de texto do aboutcampo com as palavras correspondentes embrulhadas em <em></em> tags HTML.
+
+--Analytics
+
+Elasticsearch tem uma funcionalidade chamada agregações , quepermitem que você gere análises sofisticadas sobre seus dados.
+É semelhante ao GROUP BY SQL, mas muito mais poderoso.
+
+
+
+
