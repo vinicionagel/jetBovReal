@@ -111,6 +111,34 @@ Elasticsearch é distribuído por natureza e foi projetado para ocultar a comple
 Elasticsearch se esforça para esconder a complexidade dos sistemas distribuídos.
 Aqui estão algumas das operações que acontecem automaticamente nos bastidores:
 
-Capítulo 2. Vida dentro de um cluster
+Capítulo 3. Entrada de Dados, Saída de Dados
 
+Elasticsearch é um armazenamento de documentos distribuído .Ele pode armazenar e recuperar estruturas de dados complexas - serializadas como documentos JSON - em tempo real .
+Em outras palavras, assim que um documento é armazenado no Elasticsearch, ele pode ser recuperado de qualquer nó do cluster.
+
+No Elasticsearch, todos os dados em cada campo são indexados por padrão .Ou seja, cada campo tem um índice invertido dedicado para recuperação rápida.
+
+Um documento não consiste apenas em seus dados.Ele também tem metadados -informações sobre o documento.
+Os três elementos de metadados necessários são os seguintes:
+
+_index
+Onde o documento mora
+
+_type
+A classe de objeto que o documento representa
+
+_id
+O identificador único do documento
+
+Nome do índice: Este nome deve estar em minúsculas, não pode começar com sublinhado e não pode conter vírgulas.
+Vamos usar websitecomo nosso nome de índice.
+
+Por exemplo, se nosso índice for chamado website, nosso tipo for chamado bloge escolhermos o ID 123, a solicitação de índice terá a seguinte aparência:
+
+PUT /website/blog/123
+{
+  "title": "My first blog entry",
+  "text":  "Just trying this out...",
+  "date":  "2014/01/01"
+}
 
