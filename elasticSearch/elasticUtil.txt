@@ -142,3 +142,44 @@ PUT /website/blog/123
   "date":  "2014/01/01"
 }
 
+
+IDs de geração automática
+Se nossos dados não tiverem um ID natural, podemos deixar o Elasticsearch gerar um para nós automaticamente. A estrutura da solicitação muda:
+em vez de usar o PUT verbo ( “guardar este documento nesta URL”), usamos o POSTverbo ( “guardar este documento sob este URL”).
+
+Exemplo:
+
+POST /website/blog/
+{
+  "title": "My second blog entry",
+  "text":  "Still trying this out...",
+  "date":  "2014/01/01"
+}
+
+Recuperando um Documento:
+
+GET / site / blog / 123? pretty
+
+Adicionando prettyaos parâmetros de string de consulta para qualquer solicitação,
+como no exemplo anterior, faz com que Elasticsearch imprima bem oResposta JSON para torná-lo mais legível.
+
+Recuperando Parte de um Documento:
+
+Ou se quiser apenas o _sourcecampo sem metadados, você pode usar o _sourceendpoint.
+
+GET / website / blog / 123 / _source
+
+Verificar se existe um documento
+
+Se tudo o que você deseja fazer é verificar se um documento existe...
+
+curl -i -XHEAD http://localhost:9200/website/blog/123
+
+retorna um 200 se assim o doc existir, se não existir retorna
+
+Atualizando um documento inteiro
+
+
+
+
+
