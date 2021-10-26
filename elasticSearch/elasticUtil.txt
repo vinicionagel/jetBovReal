@@ -177,7 +177,55 @@ curl -i -XHEAD http://localhost:9200/website/blog/123
 
 retorna um 200 se assim o doc existir, se não existir retorna
 
-Atualizando um documento inteiro
+---------------Atualizando um documento inteiro---------------
+
+Os documentos no Elasticsearch são imutáveis ; não podemos mudá-los.Em vez disso, se precisarmos atualizar um documento existente,
+nós o reindexamos ou substituímos,que podemos fazer usando a mesma index.
+
+Exemplo atualização
+
+PUT /website/blog/123
+{
+  "title": "My first blog entry",
+  "text":  "I am starting to get the hang of this...",
+  "date":  "2014/01/02"
+}
+
+
+Internamente, o Elasticsearch marcou o documento antigo como excluído e adicionou um documento inteiramente novo.
+A versão antiga do documento não desaparece imediatamente, embora você não consiga acessá-la.
+O Elasticsearch limpa os documentos excluídos em segundo plano à medida que você continua a indexar mais dados.
+
+---------------Criando um Novo Documento---------------
+
+No entanto, se já temos um _idque queremos usar, então temos de dizer ElasticSearch que ele deve aceitar o nosso pedido índice apenas se um documento com o mesmo _index, _typee _idainda não existir.
+
+Exemplo de chamada:
+
+PUT /website/blog/123?op_type=create
+{ ... }
+
+OU
+
+PUT /website/blog/123/_create
+{ ... }
+
+Caso existir retorna um 409
+
+{
+  "error" : "DocumentAlreadyExistsException[[website][4] [blog][123]:
+             document already exists]",
+  "status" : 409
+}
+
+
+---------------Excluindo um Documento---------------
+
+A sintaxe para excluir um documento segue o mesmo padrão que já vimos, mas usa o DELETE método:
+
+DELETE /website/blog/123
+
+
 
 
 
