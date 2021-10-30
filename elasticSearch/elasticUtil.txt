@@ -218,12 +218,90 @@ Caso existir retorna um 409
   "status" : 409
 }
 
+------------Atualizações parciais de documentos------
+
+O updateAPI deve obedecer às mesmas regras. Externamente, parece que estamos atualizando parcialmente um documento no local.
+Internamente, no entanto, a updateAPI simplesmente gerencia o mesmo processo de recuperação-alteração-reindexação que já descrevemos.
+
+A forma mais simples da updatesolicitação aceita um documento parcial como docparâmetro, que apenas é mesclado com o documento existente.
+
+Exemplo:
+
+POST /website/blog/1/_update
+{
+   "doc" : {
+      "tags" : [ "testing" ],
+      "views": 0
+   }
+}
+
+---------------Usando scripts para fazer atualizações parciais---------------
+
+Para aqueles momentos em que a API não é suficiente, o Elasticsearch permite que você escreva sua própria lógica personalizada em um script.
+O script é compatível com muitas APIs, incluindo pesquisa, classificação, agregações e atualizações de documentos.
+Os scripts podem ser passados como parte da solicitação, recuperados do .scripts índice especial ou carregados do disco.
+A linguagem de script padrão é Groovy.
+
 
 ---------------Excluindo um Documento---------------
 
 A sintaxe para excluir um documento segue o mesmo padrão que já vimos, mas usa o DELETE método:
 
 DELETE /website/blog/123
+
+-----Recuperando vários documentos-----
+Por mais rápido que o Elasticsearch seja, ele pode ser ainda mais rápido.Combinar várias solicitações em uma evita a sobrecarga da rede de processar cada solicitação individualmente.
+Se você sabe que precisa recuperar vários documentos do Elasticsearch,
+é mais rápido recuperá-los todos em uma única solicitação usando o multi-get , ou mgetAPI, em vez de documento por documento.
+
+A mgetAPI espera uma docsmatriz, cadaelemento que especifica o _index... Exemplo:
+
+GET /_mget
+{
+   "docs" : [
+      {
+         "_index" : "website",
+         "_type" :  "blog",
+         "_id" :    2
+      },
+      {
+         "_index" : "website",
+         "_type" :  "pageviews",
+         "_id" :    1,
+         "_source": "views"
+      }
+   ]
+}
+
+O corpo da resposta também contém uma docsmatrizque contém uma resposta por documento...
+
+{
+   "docs" : [
+      {
+         "_index" :   "website",
+         "_id" :      "2",
+         "_type" :    "blog",
+         "found" :    true,
+         "_source" : {
+            "text" :  "This is a piece of cake...",
+            "title" : "My first external blog entry"
+         },
+         "_version" : 10
+      },
+      {
+         "_index" :   "website",
+         "_id" :      "1",
+         "_type" :    "pageviews",
+         "found" :    true,
+         "_version" : 2,
+         "_source" : {
+            "views" : 2
+         }
+      }
+   ]
+}
+
+
 
 
 
