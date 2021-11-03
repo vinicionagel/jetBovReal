@@ -304,8 +304,60 @@ O corpo da resposta também contém uma docsmatrizque contém uma resposta por d
 
 
 
+---Lidando com Conflitos---
+
+Ao atualizar um documento com a indexAPI,
+lemos o documento original, fazemos nossas alterações e, em seguida, reindexamos todo o documento de uma vez.
 
 
+No mundo do banco de dados, duas abordagens são comumente usadas para garantir que as mudanças não sejam perdidas ao fazer atualizações simultâneas:
+
+Controle de concorrência pessimista
+Amplamente usado por bancos de dados relacionais, essa abordagem pressupõe que mudanças conflitantes podem acontecer e,
+portanto, bloqueia o acesso a um recurso para evitar conflitos.
+Um exemplo típico é bloquear uma linha antes de ler seus dados, garantindo que apenas o encadeamento que colocou o bloqueio seja capaz de fazer alterações nos dados dessa linha.
+
+Controle de concorrência otimista
+Usado por Elasticsearch, essa abordagem pressupõe que é improvável que os conflitos ocorram e não impede que as operações sejam tentadas.
+No entanto, se os dados subjacentes foram modificados entre a leitura e a gravação, a atualização falhará. Cabe então ao aplicativo decidir como deve resolver o conflito.
+Por exemplo, ele pode tentar novamente a atualização, usando os dados novos, ou pode relatar a situação ao usuário.
+
+
+Um _version número que é incrementado sempre que um documento é alterado.
+Elasticsearch usa esse _versionnúmero para garantir que as alterações sejam aplicadas na ordem correta.
+Se uma versão mais antiga de um documento chegar após uma nova versão, ela pode ser simplesmente ignorada.
+
+---Controle de simultaneidade otimista*--
+
+
+Vamos criar uma nova postagem no blog:
+
+PUT /website/blog/1/_create
+{
+  "title": "My first blog entry",
+  "text":  "Just trying this out..."
+}
+
+O corpo da resposta nos diz que este documento recém-criado possui _version número 1.
+
+Agora, quando tentamos salvar nossas alterações reindexando o documento, especificamos o versionao qual nossas alterações devem ser aplicadas:
+
+
+PUT /website/blog/1?version=1 1
+{
+  "title": "My first blog entry",
+  "text":  "Starting to get the hang of this..."
+}
+
+Essa solicitação é bem-sucedida e o corpo da resposta nos diz que o _version foi incrementado para 2...
+
+
+No entanto, se tivéssemos de executar novamente a mesma solicitação de índice, ainda especificando version=1, Elasticsearch responderia com um 409 Conflictcódigo de resposta HTTP.
+
+Isso nos diz que o _versionnúmero atual do documento no Elasticsearch é 2, mas que especificamos que estávamos atualizando a versão 1.
+
+
+Todas as APIs que atualizam ou excluem um documento aceitam um versionparâmetro, o que permite que você aplique o controle de simultaneidade otimista apenas às partes do seu código onde faz sentido.
 
 
 
