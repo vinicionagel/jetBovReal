@@ -354,10 +354,60 @@ Essa solicitação é bem-sucedida e o corpo da resposta nos diz que o _version 
 
 No entanto, se tivéssemos de executar novamente a mesma solicitação de índice, ainda especificando version=1, Elasticsearch responderia com um 409 Conflictcódigo de resposta HTTP.
 
-Isso nos diz que o _versionnúmero atual do documento no Elasticsearch é 2, mas que especificamos que estávamos atualizando a versão 1.
+Isso nos diz que o _version número atual do documento no Elasticsearch é 2, mas que especificamos que estávamos atualizando a versão 1.
+
+Todas as APIs que atualizam ou excluem um documento aceitam um version parâmetro, o que permite que você aplique o controle de simultaneidade otimista apenas às partes do seu código onde faz sentido.
 
 
-Todas as APIs que atualizam ou excluem um documento aceitam um versionparâmetro, o que permite que você aplique o controle de simultaneidade otimista apenas às partes do seu código onde faz sentido.
+--------Usando versões de um sistema externo-----
+
+Se seu banco de dados principal já tiver números de versão - ou um valor como timestampesse pode ser usado como um número de versão - você pode reutilizar esses mesmos números de versão no Elasticsearch adicionando version_type=externalà string de consulta.
+Os números da versão devem ser inteiros maiores que zero e menores que cerca de 9.2e+18- um longvalor positivo em Java.
+
+Como o elastic verifica:
+
+Em vez de verificar se o atual _versioné o mesmo especificado na solicitação, o Elasticsearch verifica se o atual _versioné menor que a versão especificada.
+
+**Os números de versão externa podem ser especificados não apenas nas solicitações de indexação e exclusão, mas também na criação de novos documentos.
+
+Exemplo de criação com external:
+
+PUT /website/blog/2?version=5&version_type=external
+{
+  "title": "My first external blog entry",
+  "text":  "Starting to get the hang of this..."
+}
+
+Agora, atualizamos este documento, especificando um novo versionnúmero de 10:
+
+PUT /website/blog/2?version=10&version_type=external
+{
+  "title": "My first external blog entry",
+  "text":  "This is a piece of cake..."
+}
+**Se você executasse novamente esta solicitação, ela falharia com o mesmo erro de conflito que vimos antes, porque o número da versão externa especificada não é maior do que a versão atual no Elasticsearch.
+Dessa forma vai atualizando de acordo com o que é passado na version external.
+
+---Atualizações parciais de documentos
+
+Também dissemos que os documentos são imutáveis: não podem ser alterados, apenas substituídos. A updateAPI deve obedecer às mesmas regras.
+Externamente, parece que estamos atualizando parcialmente um documento no local.
+Internamente, no entanto, a updateAPI simplesmente gerencia o mesmo processo de recuperação-alteração-reindexação que já descrevemos
+
+A forma mais simples da update solicitação aceita um documento parcial como docparâmetro, que apenas é mesclado com o documento existente.
+
+Por exemplo, poderíamos adicionar um tagscampo e um viewscampo à postagem do nosso blog da seguinte maneira:
+
+POST /website/blog/1/_update
+{
+   "doc" : {
+      "tags" : [ "testing" ],
+      "views": 0
+   }
+}
+
+------Recuperando vários documentos
+
 
 
 
