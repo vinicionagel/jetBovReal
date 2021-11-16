@@ -409,5 +409,69 @@ POST /website/blog/1/_update
 ------Recuperando vários documentos
 
 
+A mgetAPI espera uma docsmatriz, cadaelemento que especifica o _index, _typee _id metadados do documento que você deseja recuperar.
+Você também pode especificar um _source parâmetro se quiser apenas recuperar um ou mais campos específicos:
+
+GET /_mget
+{
+   "docs" : [
+      {
+         "_index" : "website",
+         "_type" :  "blog",
+         "_id" :    2
+      },
+      {
+         "_index" : "website",
+         "_type" :  "pageviews",
+         "_id" :    1,
+         "_source": "views"
+      }
+   ]
+}
+
+O corpo da resposta também contém uma docs matriz que contém uma resposta por documento, na mesma ordem especificada na solicitação,
+resposta que esperaríamos de uma get solicitação individual...
+
+Exemplo chamada com vários documentos:
+
+Na verdade, se todos os documentos tiverem o mesmo _indexe _type, você poderá simplesmente passar uma matriz de em idsvez da docsmatriz completa :
+
+GET /website/blog/_mget
+{
+   "ids" : [ "2", "1" ]
+}
+
+Observe que o segundo documento que solicitamos não existe.
+Especificamos o tipo blog, mas o documento com ID 1é do tipo pageviews. Essa inexistência é relatada no corpo da resposta:
+
+
+{
+  "docs" : [
+    {
+      "_index" :   "website",
+      "_type" :    "blog",
+      "_id" :      "2",
+      "_version" : 10,
+      "found" :    true,
+      "_source" : {
+        "title":   "My first external blog entry",
+        "text":    "This is a piece of cake..."
+      }
+    },
+    {
+      "_index" :   "website",
+      "_type" :    "blog",
+      "_id" :      "1",
+      "found" :    false  1
+    }
+  ]
+}
+
+O código de status HTTP para a solicitação anterior é 200, embora um documento não tenha sido encontrado.
+Na verdade, ainda seria 200 se nenhum dos documentos solicitados fosse encontrado -  porque a mget própria solicitação foi concluída com êxito.
+Para determinar o sucesso ou falha dos documentos individuais, você precisa verificara found bandeira.
+
+
+
 
 
