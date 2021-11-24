@@ -472,6 +472,128 @@ Na verdade, ainda seria 200 se nenhum dos documentos solicitados fosse encontrad
 Para determinar o sucesso ou falha dos documentos individuais, você precisa verificara found bandeira.
 
 
+------------Bulk------------------
+
+Exemplo de bulk...
+
+POST /_bulk
+{ "delete": { "_index": "website", "_type": "blog", "_id": "123" }} 1
+{ "create": { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "title":    "My first blog post" }
+{ "index":  { "_index": "website", "_type": "blog" }}
+{ "title":    "My second blog post" }
+{ "update": { "_index": "website", "_type": "blog", "_id": "123", "_retry_on_conflict" : 3} }
+{ "doc" : {"title" : "My updated blog post"} }
+
+
+Observe como a deleteação não possui um corpo de solicitação; ele é seguido imediatamente por outra ação.
+
+A resposta do Elasticsearch contém a itemsmatriz, que lista o resultado de cada solicitação, na mesma ordem em que os solicitamos:
+
+{
+   "took": 4,
+   "errors": false, <<<< indica que todos foram executados com sucesso!
+   "items": [
+      {  "delete": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "123",
+            "_version": 2,
+            "status":   200,
+            "found":    true
+      }},
+      {  "create": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "123",
+            "_version": 3,
+            "status":   201
+      }},
+      {  "create": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "EiwfApScQiiy7TIKFxRCTw",
+            "_version": 1,
+            "status":   201
+      }},
+      {  "update": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "123",
+            "_version": 4,
+            "status":   200
+      }}
+   ]
+}}
 
 
 
+IMPORTANTE ---> Cada sub-solicitação é executada de forma independente, portanto, a falha de uma sub-solicitação não afetará o sucesso das outras.
+
+Se alguma das solicitações falhar, a errorsinalização de nível superior será definida como true
+
+Exemplo com erro:
+
+POST /_bulk
+{ "create": { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "title":    "Cannot create - it already exists" }
+{ "index":  { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "title":    "But we can update it" }
+
+Na resposta, podemos ver que não foi possível create documentar 123 porque já existe, mas a index solicitação subsequente , também no documento 123, foi bem-sucedida:
+
+{
+   "took": 3,
+   "errors": true, <<<< indica que teve erro
+   "items": [
+      {  "create": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "123",
+            "status":   409, <<< solicitacao com erro
+            "error":    "DocumentAlreadyExistsException <<<< exception
+                        [[website][4] [blog][123]:
+                        document already exists]"
+      }},
+      {  "index": {
+            "_index":   "website",
+            "_type":    "blog",
+            "_id":      "123",
+            "_version": 5,
+            "status":   200 <<<< outra requisição foi OK!
+      }}
+   ]
+}
+
+IMPORTANTEEEEEEE:
+
+Isso também significa que os bulk pedidos não são atômicos: eles não podem ser usados para implementar transações.
+Cada solicitação é processada separadamente, portanto, o sucesso ou a falha de uma solicitação não interfere nas outras.
+
+
+Talvez você esteja indexando dados de registro de indexação em lote no mesmo indexe com o mesmo type.
+Ter deespecificar os mesmos metadados para cada documento é um desperdício.
+Em vez disso, assim como para a mgetAPI, a bulksolicitação aceita um padrão /_indexou /_index/_typeno URL:
+
+
+--Exemplo bulk para o mesmo indice--
+
+POST /website/log/_bulk
+{ "index": {}}
+{ "event": "User logged in" }
+{ "index": { "_type": "blog" }}
+{ "title": "Overriding the default type" }
+
+
+Toda a solicitação em massa precisa ser carregada na memória pelo nó que recebe nossa solicitação,
+portanto, quanto maior a solicitação, menos memória disponível para outras solicitações...
+
+Existe um tamanho ideal de solicitação em massa. Acima desse tamanho,
+o desempenho não melhora mais e pode até cair. O tamanho ideal, entretanto, não é um número fixo.
+
+Felizmente, é fácil encontrar este ponto ideal: tente indexar documentos típicos em lotes de tamanho crescente.
+Quando o desempenho começa a cair, o tamanho do lote é muito grande.
+Um bom lugar para começar é com lotes de 1.000 a 5.000 documentos ou, se os seus documentos forem muito grandes, com lotes ainda menores.
+
+Muitas vezes, é útil ficar de olho no tamanho físico de suas solicitações em massa.
+Mil documentos de 1 KB são muito diferentes de mil documentos de 1 MB. Um bom tamanho em massa para começar a jogar é em torno de 5 a 15 MB.
