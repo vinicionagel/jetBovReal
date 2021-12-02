@@ -597,3 +597,47 @@ Um bom lugar para começar é com lotes de 1.000 a 5.000 documentos ou, se os se
 
 Muitas vezes, é útil ficar de olho no tamanho físico de suas solicitações em massa.
 Mil documentos de 1 KB são muito diferentes de mil documentos de 1 MB. Um bom tamanho em massa para começar a jogar é em torno de 5 a 15 MB.
+
+-------Encaminhando um documento para um fragmento----
+
+Quando você indexa um documento, ele é armazenado em um único fragmento primário.Como o Elasticsearch sabe a qual fragmento um documento pertence?
+Quando criamos um novo documento, como ele sabe se deve armazenar esse documento no fragmento 1 ou no fragmento 2?
+
+O processo não pode ser aleatório, pois podemos precisar recuperar o documento no futuro. Na verdade, é determinado por uma fórmula simples:
+
+shard = hash (roteamento)% number_of_primary_shards
+
+Todas as APIs de documentos ( get, index, delete, bulk, update, e mget) aceitar um routingparâmetroque pode ser usado para personalizar o mapeamento de documento para fragmento.
+Um valor de roteamento personalizado pode ser usado para garantir que todos os documentos relacionados - por exemplo,
+todos os documentos pertencentes ao mesmo usuário - sejam armazenados no mesmo fragmento
+
+
+--------Padrões de documentos múltiplos-------------
+
+Os padrões para as APIs mget e bulk são semelhantes aos de documentos individuais. A diferença é que o nó solicitante sabe em qual fragmento reside cada documento.
+Ele divide a solicitação de vários documentos em uma solicitação de vários documentos por fragmento e os encaminha em paralelo para cada nó participante.
+
+--------Por que o formato engraçado?--------
+
+Por que a bulk API exige o formato engraçado com os caracteres de nova linha, em vez de apenas enviar as solicitações agrupadas em uma matriz JSON, como a mget API?
+
+Se as solicitações individuais fossem agrupadas em uma matriz JSON, isso significaria que precisaríamos fazer o seguinte:
+
+Analise o JSON em uma matriz (incluindo os dados do documento, que podem ser muito grandes)
+
+Observe cada solicitação para determinar para qual fragmento ela deve ir
+
+Crie uma série de solicitações para cada fragmento
+
+Serialize essas matrizes no formato de transporte interno
+
+Envie os pedidos para cada fragmento
+
+Funcionaria, mas precisaria de muita RAM para manter cópias essencialmente dos mesmos dados e criaria muito mais estruturas de dados que a Java Virtual Machine (JVM) teria para gastar tempo coletando lixo.
+
+Em vez disso, o Elasticsearch alcança o buffer de rede, onde a solicitação bruta foi recebida, e lê os dados diretamente. Ele usa os caracteres de nova linha para identificar e analisar apenas as pequenas action/metadatalinhas a fim de decidir qual fragmento deve lidar com cada solicitação.
+
+Essas solicitações brutas são encaminhadas diretamente para o fragmento correto. Não há cópia redundante de dados, nem estruturas de dados perdidas. Todo o processo de solicitação é tratado na menor quantidade de memória possível.
+
+
+
