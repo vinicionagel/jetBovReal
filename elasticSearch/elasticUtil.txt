@@ -639,5 +639,73 @@ Em vez disso, o Elasticsearch alcança o buffer de rede, onde a solicitação br
 
 Essas solicitações brutas são encaminhadas diretamente para o fragmento correto. Não há cópia redundante de dados, nem estruturas de dados perdidas. Todo o processo de solicitação é tratado na menor quantidade de memória possível.
 
+-----------------Buscas elasticSearch---------------------------------
 
 
+Até agora, aprendemos como usar o Elasticsearch como um armazenamento simples de documentos distribuídos no estilo NoSQL.
+Podemos jogar documentos JSON no Elasticsearch e recupere cada um por ID.
+Mas o verdadeiro poder do Elasticsearch está em sua capacidade de extrair sentido do caos - transformar Big Data em Big Information.
+
+Esse é o motivo pelo qual usamos documentos JSON estruturados, em vez de blobs amorfos de dados.
+Elasticsearch não apenas armazena o documento, mas também indexa o conteúdo do documento para torná-lo pesquisável.
+
+Cada campo em um documento é indexado e pode ser consultado. E não é só isso.
+Durante uma única consulta, o Elasticsearch pode usar todos esses índices para retornar resultados
+
+Embora muitas pesquisas funcionem apenas a toque de caixa, para usar o Elasticsearch em todo o seu potencial, você precisa entender três assuntos:
+
+Mapeamento:
+    Como os dados em cada campo são interpretados
+
+Análise:
+    Como o texto completo é processado para torná-lo pesquisável
+
+Consultar DSL:
+    A linguagem de consulta poderosa e flexível usada pelo Elasticsearch
+
+--> Transformar em elasticSample.http: https://gist.github.com/clintongormley/8579281
+
+
+
+Capítulo 5. Pesquisando - As ferramentas básicas
+Até agora, aprendemos como usar o Elasticsearch como um armazenamento simples de documentos distribuídos no estilo NoSQL. Podemosjogue documentos JSON no Elasticsearch e recupere cada um por ID. Mas o verdadeiro poder do Elasticsearch está em sua capacidade de extrair sentido do caos - transformar Big Data em Big Information.
+
+Esse é o motivo pelo qual usamos documentos JSON estruturados, em vez de blobs amorfos de dados. Elasticsearch não apenas armazena o documento, mas também indexa o conteúdo do documento para torná-lo pesquisável.
+
+Cada campo em um documento é indexado e pode ser consultado .E não é só isso. Durante uma única consulta, o Elasticsearch pode usar todos esses índices para retornar resultados em uma velocidade de tirar o fôlego. Isso é algo que você nunca poderia considerar fazer com um banco de dados tradicional.
+
+Uma pesquisa pode ser qualquer uma das seguintes:
+
+Uma consulta estruturada em campos concretoscomo genderou age, classificado por um campo como join_date, semelhante ao tipo de consulta que você poderia construir em SQL
+
+Uma consulta de texto completo, que encontra todos os documentos que correspondem às palavras-chave da pesquisa e os retorna classificados por relevância
+
+Uma combinação dos dois
+
+Embora muitas pesquisas funcionem apenas a partir de a caixa, para usar o Elasticsearch em todo o seu potencial, você precisa entender três assuntos:
+
+Mapeamento
+Como os dados em cada campo são interpretados
+
+Análise
+Como o texto completo é processado para torná-lo pesquisável
+
+Consultar DSL
+A linguagem de consulta poderosa e flexível usada pelo Elasticsearch
+
+Cada um deles é um grande assunto por si só, e os explicamos em detalhes na Parte II . Os capítulos desta seção apresentam os conceitos básicos de todos os três - apenas o suficiente para ajudá-lo a obter uma compreensão geral de como a pesquisa funciona.
+
+Começaremos explicando a searchAPI em sua forma mais simples.
+
+DADOS DE TESTE
+Os documentos que usaremos para fins de teste neste capítulo podem ser encontrados neste resumo: https://gist.github.com/clintongormley/8579281 .
+
+Você pode copiar os comandos e colá-los em seu shell para acompanhar este capítulo.
+
+Alternativamente, se você estiver na versão online deste livro, você pode clicar aqui para abrir no Sense ( sense_widget.html? Snippets / 050_Search / Test_data.json ).
+
+------------------A Busca Vazia------------------
+
+A forma mais básica da API de pesquisa é a pesquisa vazia, que não especifica nenhuma consulta, mas simplesmente retorna todos os documentos em todos os índices do cluster:
+
+GET /_search
