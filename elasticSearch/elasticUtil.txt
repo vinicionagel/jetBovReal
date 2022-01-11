@@ -709,3 +709,46 @@ Alternativamente, se você estiver na versão online deste livro, você pode cli
 A forma mais básica da API de pesquisa é a pesquisa vazia, que não especifica nenhuma consulta, mas simplesmente retorna todos os documentos em todos os índices do cluster:
 
 GET /_search
+
+A seção mais importante da resposta é hits, quecontém o totalnúmero de documentos que corresponderam à
+nossa consulta e uma hits matriz contendo os 10 primeiros desses documentos correspondentes - os resultados.
+
+Cada elemento também tem um _score. Essa é a pontuação de relevância , que é uma medida de quão bem o documento corresponde à consulta.
+São retornados primeiro com os documentos mais relevantes; ou seja, em ordem decrescente de _score;
+O tookvalor nos diz quantos milissegundos toda a solicitação de pesquisa;
+
+
+O timed_out valor diznos informa se a consulta expirou. Exemplo:
+
+GET /_search?timeout=10ms
+
+
+---------------Multi-índice, Multitipo-------------
+
+Ao não limitar nossa pesquisa a um índice ou tipo específico, pesquisamos em todos os documentos do cluster. O Elasticsearch encaminhou a solicitação de pesquisa em
+paralelo para um primário ou réplica de cada shard no cluster, reuniu os resultados para selecionar os 10 principais gerais e os retornou para nós.
+
+Normalmente, no entanto, você vai desejar pesquisar em um ou mais índices específicos e provavelmente em um ou mais tipos específicos.
+Podemos fazer isso especificando o índice e digitando a URL, da seguinte forma:
+
+
+/_search
+Pesquise todos os tipos em todos os índices
+
+/gb/_search
+Pesquisar todos os tipos no gbíndice
+
+/gb,us/_search
+Pesquise todos os tipos nos índices gbeus
+
+/g*,u*/_search
+Pesquise todos os tipos em qualquer índice começando com gou começando comu
+
+/gb/user/_search
+Tipo de pesquisa userno gbíndice
+
+/gb,us/user,tweet/_search
+Tipos de pesquisa usere tweetnos índices gbeus
+
+/_all/user,tweet/_search
+Tipos de pesquisa usere tweetem todos os índices
