@@ -752,3 +752,32 @@ Tipos de pesquisa usere tweetnos índices gbeus
 
 /_all/user,tweet/_search
 Tipos de pesquisa usere tweetem todos os índices
+
+---------------Paginação---------------
+
+Da mesma forma que o SQL usa a LIMIT palavra-chave para retornar uma única “página” de resultados, o Elasticsearch aceitaos parâmetros frome size:
+
+Se você quiser mostrar cinco resultados por página, as páginas 1 a 3 podem ser solicitadas da seguinte forma:
+
+GET /_search?size=5
+GET /_search?size=5&from=5
+GET /_search?size=5&from=10
+
+
+Cuidado com a paginação muito profunda ou solicitando muitos resultados de uma só vez. Os resultados são classificados antes de serem retornados.
+Mas lembre-se de que uma solicitação de pesquisa geralmente abrange vários fragmentos.
+Cada fragmento gera seus próprios resultados classificados, que precisam ser classificados centralmente para garantir que a ordem geral esteja correta.
+
+DEEP PAGING EM SISTEMAS DISTRIBUÍDOS
+Para entender porque a paginação profunda é problemática, vamos imaginar que estamos pesquisando em um único índice com cinco fragmentos primários.
+Quando solicitamos a primeira página de resultados (resultados de 1 a 10), cada fragmento produz seus próprios 10 principais resultados e os retorna ao nó solicitante ,
+que classifica todos os 50 resultados para selecionar os 10 principais gerais.
+
+Agora imagine que pedimos a página 1.000 – resultados de 10.001 a 10.010. Tudo funciona da mesma maneira, exceto que cada fragmento deve produzir seus 10.010 principais resultados.
+O nó solicitante então classifica todos os 50.050 resultados e descarta 50.040 deles!
+
+Você pode ver que, em um sistema distribuído, o custo da classificação dos resultados cresce exponencialmente quanto mais aprofundamos a paginação.
+Há uma boa razão para que os mecanismos de pesquisa na web não retornem mais de 1.000 resultados para qualquer consulta.
+
+
+---------------Pesquisa Lite---------------
