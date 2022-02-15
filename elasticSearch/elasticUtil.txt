@@ -781,3 +781,95 @@ Há uma boa razão para que os mecanismos de pesquisa na web não retornem mais 
 
 
 ---------------Pesquisa Lite---------------
+Quando você indexa um documento, o Elasticsearch pega os valores de string de todos os seus campos e os concatena em uma grande string,
+que ele indexa como o _allcampo especial.Por exemplo, quando indexamos este documento:
+
+{
+    "tweet":    "However did I manage before Elasticsearch?",
+    "date":     "2014-09-14",
+    "name":     "Mary Jones",
+    "user_id":  1
+}
+é como se tivéssemos adicionado um campo extra chamado _allcom este valor:
+
+"However did I manage before Elasticsearch? 2014-09-14 Mary Jones 1"
+A pesquisa de string de consulta usa o _allcampo, a menos que outro nome de campo tenha sido especificado.
+
+---------Consultas mais complicadas-------------
+
+
+A próxima consulta procura tweets, usando os seguintes critérios:
+
+O namecampo contém mary ou john
+
+O date é maior que 2014-09-10
+
+O _allcampo contém uma das palavras aggregations ou geo
+
+GET http://localhost:9200/_search?q=%2Bname%3A(mary+john)+%2Bdate%3A%3E2014-09-10+%2B(aggregations+geo)
+
+Como você pode ver nos exemplos anteriores, essa pesquisa de string de consulta lite é surpreendentemente poderosa.Sua sintaxe de consulta,
+que é explicada em detalhes nos documentos de referência de sintaxe de string de consulta ,
+nos permite expressar consultas bastante complexas de forma sucinta. Isso o torna ótimo para consultas descartáveis da linha de comando ou durante o desenvolvimento.
+
+Por fim, a pesquisa de string de consulta permite que qualquer usuário execute consultas potencialmente lentas e pesadas em qualquer campo em seu índice,
+possivelmente expondo informações privadas ou até mesmo deixando seu cluster de joelhos!
+
+DICA
+Por esses motivos, não recomendamos a exposição de pesquisas de string de consulta diretamente a seus usuários, a menos que sejam usuários avançados aos quais possa confiar seus dados e seu cluster.
+
+
+-------------Capítulo 6. Mapeamento e Análise----------------
+
+
+Enquanto brincamos com os dados em nosso índice, notamos algo estranho. Algo parece estar quebrado: temos 12 tweets em nossos índices, e apenas um deles contém a data 2014-09-15, mas dê uma olhada nos totalhits para as seguintes consultas:
+
+GET /_search?q=2014              # 12 results
+GET /_search?q=2014-09-15        # 12 results !
+GET /_search?q=date:2014-09-15   # 1  result
+GET /_search?q=date:2014         # 0  results !
+
+
+O Elasticsearch gerou um mapeamento dinamicamente para nós, com base no que ele poderia adivinhar sobre nossos tipos de campo.
+A resposta nos mostra que o datecampo foi reconhecido como um campo do tipo date.
+O _allcampo não é mencionado porque é um campo padrão, mas sabemos que o _allcampo é do tipo string.
+
+Mas, de longe, a maior diferença é entre os camposque representam valores exatos (que podem incluir stringcampos) e campos que representam texto completo.
+Essa distinção é realmente importante - é o que separa um mecanismo de pesquisa de todos os outros bancos de dados.
+
+-------------Valores exatos versus texto completo----------------
+
+Os dados no Elasticsearch podem ser divididos em dois tipos: valores exatos e texto completo.
+
+Os valores exatos são exatamente o que parecem. Os exemplos são uma data ou um ID de usuário,
+mas também podem incluir strings exatas, como um nome de usuário ou um endereço de e-mail.
+O valor exato "Foo" não é o mesmo que o valor exato "foo". O valor exato 2014 não é o mesmo que o valor exato 2014-09-15.
+
+O texto completo, por outro lado, refere-sea dados textuais – geralmente escritos em alguma linguagem humana – como o texto de um tweet ou o corpo de um e-mail.
+
+
+Os valores exatos são fáceis de consultar. A decisão é binária; um valor corresponde à consulta ou não. Esse tipo de consulta é fácil de expressar com SQL:
+
+WHERE name    = "John Smith"
+  AND user_id = 2
+  AND date    > "2014-09-15"
+
+Consultar dados de texto completo é muito mais sutil.
+Não estamos apenas perguntando: “Este documento corresponde à consulta”, mas “Quão bem este documento corresponde à consulta?”
+Em outras palavras, quão relevante é este documento para a consulta dada?
+
+Raramente queremos corresponder exatamente todo o campo de texto completo. Em vez disso, queremos pesquisar nos campos de texto.
+Não apenas isso, mas esperamos que a pesquisa entenda nossa intenção :
+
+
+Uma pesquisa por UK também deve retornar documentos que mencionem o United Kingdom.
+
+Uma pesquisa por jump também deve corresponder a jumped, jumps, jumpinge talvez até leap.
+
+johnny walker deve corresponder Johnnie Walker, e johnnie depp deve corresponder Johnny Depp.
+
+Fox news hunting deve retornar notícias sobre caça na Fox News, enquanto fox hunting news deve retornar notícias sobre caça à raposa.
+
+Para facilitar esses tipos de consultas em campos de texto completo, o Elasticsearch primeiro analisa o texto e, em seguida, usa os resultados para criar um índice invertido
+
+----------------Índice invertido-------------------
