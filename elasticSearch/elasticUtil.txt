@@ -872,4 +872,59 @@ Fox news hunting deve retornar notícias sobre caça na Fox News, enquanto fox h
 
 Para facilitar esses tipos de consultas em campos de texto completo, o Elasticsearch primeiro analisa o texto e, em seguida, usa os resultados para criar um índice invertido
 
-----------------Índice invertido-------------------
+------------Capítulo 6. Mapeamento e Análise------------
+
+Enquanto brincamos com os dados em nosso índice, notamos algo estranho.
+Algo parece estar quebrado: temos 12 tweets em nossos índices, e apenas um deles contém a data 2014-09-15, mas dê uma olhada nos total hits para as seguintes consultas:
+
+GET /_search?q=2014              # 12 results
+GET /_search?q=2014-09-15        # 12 results !
+GET /_search?q=date:2014-09-15   # 1  result
+GET /_search?q=date:2014         # 0  results !
+
+Mas, de longe, a maior diferença é entre os campos que representam valores exatos (que podem incluir string campos)
+e campos que representam texto completo.
+Essa distinção é realmente importante - é o que separa um mecanismo de pesquisa de todos os outros bancos de dados.
+
+--------------Valores exatos versus texto completo-------------------------
+
+Os dados no Elasticsearch podem ser divididos em dois tipos: valores exatos e texto completo.
+
+Os valores exatos são exatamente o que parecem. Os exemplos são uma data ou um ID de usuário, mas também podem incluir strings exatas, como um nome de usuário ou um
+endereço de e-mail. O valor exato Foonão é o mesmo que o valor exato foo. O valor exato 2014não é o mesmo que o valor exato 2014-09-15.
+
+O texto completo, por outro lado, refere-sea dados textuais – geralmente escritos em alguma linguagem humana – como o texto de um tweet ou o corpo de um e-mail.
+
+O texto completo é muitas vezes referido como dados não estruturados, que é um nome impróprio —
+a linguagem natural é altamente estruturada. O problema é que as regras das linguagens naturais são complexas, o que as torna difíceis para os computadores analisarem corretamente.
+Por exemplo, considere esta frase:
+
+"Maio é divertido, mas junho me aborrece."
+
+Refere-se a meses ou a pessoas?
+
+Os valores exatos são fáceis de consultar. A decisão é binária; um valor corresponde à consulta ou não. Esse tipo de consulta é fácil de expressar com SQL:
+
+WHERE name    = "John Smith"
+  AND user_id = 2
+  AND date    > "2014-09-15"
+
+
+Consultar dados de texto completo é muito mais sutil.
+Não estamos apenas perguntando: “Este documento corresponde à consulta”, mas “Quão bem este documento corresponde à consulta?”
+Em outras palavras, quão relevante é este documento para a consulta dada?
+
+Raramente queremos corresponder exatamente todo o campo de texto completo. Em vez disso, queremos pesquisar nos campos de texto. Não apenas isso, mas esperamos que a pesquisa entenda nossa intenção:
+
+Uma pesquisa por UK também deve retornar documentos que mencionem o United Kingdom.
+
+Uma pesquisa por jump também deve corresponder a jumped, jumps, jumpinge talvez até leap.
+
+johnny walkerdeve corresponder Johnnie Walker, e johnnie depp deve corresponder Johnny Depp.
+
+fox news hunting deve retornar notícias sobre caça na Fox News, enquanto fox hunting news deve retornar notícias sobre caça à raposa.
+
+Para facilitar esses tipos de consultas em campos de texto completo, o Elasticsearch primeiro analisa o texto e, em seguida, usa os resultados para criar um índice invertido
+
+
+---------------Índice invertido----------------------
