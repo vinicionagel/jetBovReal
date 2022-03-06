@@ -928,3 +928,88 @@ Para facilitar esses tipos de consultas em campos de texto completo, o Elasticse
 
 
 ---------------Índice invertido----------------------
+
+O Elasticsearch usa uma estrutura chamadaum índice invertido , projetado para permitir pesquisas de texto completo muito rápidas.
+Um índice invertido consiste em uma lista de todas as palavras únicas que aparecem em qualquer documento e, para cada palavra, uma lista dos documentos em que ela aparece.
+
+Por exemplo, digamos que temos dois documentos, cada um com um contentcampo contendo o seguinte:
+
+- A ligeira raposa marrom saltou sobre o cão preguiçoso
+
+- Raposas marrons rápidas saltam sobre cães preguiçosos no verão
+
+Content campo de cada documento emwords (que chamamos de termos , ou tokens ), crie uma lista ordenada de todos os termos exclusivos e, em seguida, liste em qual documento cada termo aparece.
+
+Termo Doc_1 Doc_2
+-------------------------
+Rápido | | X
+O | X |
+marrom | X | X
+cão | X |
+cães | | X
+raposa | X |
+raposas | | X
+em | | X
+saltou | X |
+preguiçoso | X | X
+salto | | X
+sobre | X | X
+rápido | X |
+verão | | X
+o | X |
+------------------------
+
+Agora, se quisermos pesquisar por Rápido marrom, basta encontrar os documentos em que cada termo aparece:
+
+Termo Doc_1 Doc_2
+-------------------------
+marrom | X | X
+rápido | X |
+------------------------
+Total | 2 | 1
+
+Ambos os documentos correspondem, mas o primeiro documento tem mais correspondências do que o segundo.
+Se aplicarmos um algoritmo de similaridade ingênuo que apenas conta o número de termos correspondentes,
+então podemos dizer que o primeiro documento é uma correspondência melhor - é mais relevante para nossa consulta - do que o segundo documento.
+
+Mas existem alguns problemas com nosso índice invertido atual:
+
+Rápido rápido aparecem como termos separados, enquanto o usuário provavelmente pensa neles como a mesma palavra.
+
+raposa e raposas são bastante semelhantes, assim como cão e cães;Eles compartilham a mesma palavra raiz.
+
+saltou e pulo, embora não sejam da mesma palavra raiz, são semelhantes em significado. São sinônimos.
+
+Se normalizarmos os termos em um padrãoformato, podemos encontrar documentos que contêm termos que não são exatamente os mesmos que o usuário solicitou,
+mas são semelhantes o suficiente para ainda serem relevantes. Por exemplo:
+
+"Rápido" pode ser minúsculo para se tornar "rápido".
+
+raposas espode ser desmembrado --reduzido à sua forma raiz- para se tornar raposa. Da mesma forma, cachoros poderia ser derivado de cachoro.
+
+salto e pulo são sinônimos e podem ser indexados como um único termo salto.
+
+
+Termo Doc_1 Doc_2
+-------------------------
+marrom | X | X
+cão | X | X
+raposa | X | X
+em | | X
+salto | X | X
+preguiçoso | X | X
+sobre | X | X
+rápido | X | X
+verão | | X
+o | X | X
+------------------------
+
+Mas ainda não chegamos lá. Nossa busca por ainda+ rapidos +raposas falharia, porque não temos mais o termo exato em nosso índice.
+No entanto, se aplicarmos as mesmas regras de normalização que usamos no campo para nossa string de consulta, ela se tornaria uma consulta para , que corresponderia a ambos os documentos!
+
+
+-------------------------------Análise e analisadores------------------------------
+
+
+
+
