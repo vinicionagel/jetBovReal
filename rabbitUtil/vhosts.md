@@ -80,3 +80,97 @@ spring:
 
 Traduzimos cada conexão como um tenant com um vHost, assim por diante.
 
+## Rabbit com exchange com routekey
+
+Como mostra a imagem o routekey traz um tipo de strategy, há um ponto de entrada 
+e dependendo a routekey vai para determinada queue...
+
+![routekey](./routekey.png)
+
+A implementação é bem simples o que facilita a implementação
+
+```java
+@Configuration
+public class RabbitMQDirectConfig {
+
+    @Bean
+    Queue marketingQueue() {
+        return new Queue("marketingQueue", false);
+    }
+
+    @Bean
+    Queue financeQueue() {
+        return new Queue("financeQueue", false);
+    }
+
+    @Bean
+    Queue adminQueue() {
+        return new Queue("adminQueue", false);
+    }
+
+    @Bean
+    DirectExchange exchange() {
+        return new DirectExchange("direct-exchange");
+    }
+
+    @Bean
+    Binding marketingBinding(Queue marketingQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(marketingQueue).to(exchange).with("marketing");
+    }
+
+    @Bean
+    Binding financeBinding(Queue financeQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(financeQueue).to(exchange).with("finance");
+    }
+
+    @Bean
+    Binding adminBinding(Queue adminQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(adminQueue).to(exchange).with("admin");
+    }
+
+} 
+```
+
+Exemplo de envio para fila
+
+
+```java
+@RestController
+@RequestMapping(value = "/javainuse-rabbitmq/direct/")
+public class RabbitMQDirectWebController {
+
+	@Autowired
+	private AmqpTemplate amqpTemplate;
+
+	@GetMapping(value = "/producer")
+	public String producer(@RequestParam("exchangeName") String exchange, @RequestParam("routingKey") String routingKey,
+			@RequestParam("messageData") String messageData) {
+
+		amqpTemplate.convertAndSend(exchange, routingKey, messageData);
+
+		return "Message sent to the RabbitMQ Successfully";
+	}
+
+}
+```
+
+Bem simples só dizer para qual routingKey será enviada e o rabbit faz todo o trabalho
+
+O consumer também é bem simples só aponta pra determinada fila, conforme exemplo:
+
+```java
+
+public class TesteConsumer {
+
+    @RabbitListener(queues = "#{autoDeleteQueue1.name}")
+    public void receive1(String in) throws InterruptedException {
+        receive(in, 1);
+    }
+
+    @RabbitListener(queues = "#{autoDeleteQueue2.name}")
+    public void receive2(String in) throws InterruptedException {
+        receive(in, 2);
+    }
+}
+
+```
