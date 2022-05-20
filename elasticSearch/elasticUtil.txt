@@ -1008,8 +1008,51 @@ Mas ainda não chegamos lá. Nossa busca por ainda+ rapidos +raposas falharia, p
 No entanto, se aplicarmos as mesmas regras de normalização que usamos no campo para nossa string de consulta, ela se tornaria uma consulta para , que corresponderia a ambos os documentos!
 
 
--------------------------------Análise e analisadores------------------------------
+-------------------------------Tipos de campo simples principais------------------------------
+Fragmento:string
+
+Número inteiro: byte, short, integer,long
+
+Ponto flutuante: float,double
+
+Boleano:boolean
+
+Encontro:date
 
 
+-------------------------------Personalizando mapeamentos de campo------------------------------
+
+Enquanto os tipos de dados de campo básicos sãosuficiente para muitos casos,
+muitas vezes você precisará personalizar o mapeamentopara campos individuais,
+especialmente campos de string. Os mapeamentos personalizados permitem que você faça o seguinte:
+
+Distinguir entre campos de string de texto completo e campos de string de valor exato
+
+Use analisadores específicos de idioma
+
+Otimizar um campo para correspondência parcial
+
+Especificar formatos de data personalizados
 
 
+O atributo mais importante de um campo é o type.
+Para campos que não sejam stringcampos, você raramente precisará mapear algo além de type:
+
+Os campos de tipo stringsão, por padrão, considerados como contendo texto completo.
+Ou seja, seu valor será repassadoum analisador antes de ser indexado
+e uma consulta de texto completo no campo passará a string de consulta por um analisador antes de pesquisar.
+
+O valor padrão de indexpara um stringcampo é analyzed. Se quisermos mapear o campo como um valor exato, precisamos defini-lo como not_analyzed:
+
+{
+    "tag": {
+        "type":     "string",
+        "index":    "not_analyzed"
+    }
+}
+
+Os outros tipos simples (como long, double, dateetc) também aceitam o indexparâmetro,
+mas os únicos valores relevantes são noe not_analyzed, pois seus valores nunca são analisados.
+
+
+------------------analisador--------------------
