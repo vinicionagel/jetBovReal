@@ -1056,3 +1056,116 @@ mas os únicos valores relevantes são noe not_analyzed, pois seus valores nunca
 
 
 ------------------analisador--------------------
+
+
+Para analyzedcampos de string, useo analyzeratributo para especificar qual analisador aplicar no momento da pesquisa e no momento do índice.
+Por padrão, o Elasticsearch usa o standardanalisador, mas você pode alterar isso especificando um dos analisadores integrados, como whitespace, simple ou english
+
+----------------Atualizando um mapeamento--------------------
+
+Você pode especificar o mapeamento para um tipo quando você criar um índice.
+Como alternativa, você pode adicionar o mapeamento para um novo tipo (ou atualizar o mapeamento para um tipo existente) posteriormente,
+usando o ponto de /_mapping extremidade.
+
+Embora você possa adicionar a um mapeamento existente, não pode alterá -lo. Se já existir um campo no mapeamento, os dados desse campo provavelmente já foram indexados. ]
+Se você alterar o mapeamento de campo, os dados já indexados estarão errados e não poderão ser pesquisados adequadamente.
+
+------------------------Tipos de campos principais complexos-----------------
+
+Além dos tipos de dados escalares simples que mencionamos,
+JSON também tem null valores, matrizes e objetos, todos suportados pelo Elasticsearch.
+
+-------------------Campos de vários valores----------------------------------
+
+Obs:
+
+O _sourcecampo que você recebe de volta contém exatamente o mesmo documento JSON que você indexou.
+
+Matrizes:
+
+Não há mapeamento especial necessário para matrizes.Qualquer campo pode conter zero, um ou mais valores,
+da mesma forma que um campo de texto completo é analisado para produzir vários termos.
+
+No entanto, os arrays são indexados — tornados pesquisáveis
+como campos de vários valores, que não são ordenados.No momento da pesquisa, você não pode se referir
+a “o primeiro elemento” ou “o último elemento”. Em vez disso, pense em uma matriz como um pacote de valores.
+
+--------------Objetos de vários níveis----------------------------
+
+
+O Elasticsearch detectará novos campos de objeto
+dinamicamente e mapeie-os como type object, com cada campo interno listado em properties:
+
+No mapeamento fica algo como:
+
+{
+  "gb": {
+    "tweet": { 1
+      "properties": {
+        "tweet":            { "type": "string" },
+        "user": { 2
+          "type":             "object",
+          "properties": {
+            "id":           { "type": "string" },
+            "gender":       { "type": "string" },
+            "age":          { "type": "long"   },
+            "name":   { 2
+              "type":         "object",
+              "properties": {
+                "full":     { "type": "string" },
+                "first":    { "type": "string" },
+                "last":     { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+--------------Como os objetos internos são indexados------------
+
+Lucene não entende objetos internos.Um documento Lucene consiste em uma lista simples de pares chave-valor.
+Para que o Elasticsearch indexe objetos internos de maneira útil, ele converte nosso documento em algo assim:
+
+{
+    "tweet":            [elasticsearch, flexible, very],
+    "user.id":          [@johnsmith],
+    "user.gender":      [male],
+    "user.age":         [26],
+    "user.name.full":   [john, smith],
+    "user.name.first":  [john],
+    "user.name.last":   [smith]
+}
+
+No documento simplificado simples anterior, não há nenhum campo chamado user e nenhum campo chamado user.name.
+O Lucene indexa apenas valores escalares ou simples, não estruturas de dados complexas.
+
+-------------------------Matrizes de objetos internos---------------
+
+Finalmente, considere como um array contendo objetos internos seriam indexados. Digamos que temos uma followers matriz que se parece com isso:
+
+{
+    "followers": [
+        { "age": 35, "name": "Mary White"},
+        { "age": 26, "name": "Alex Jones"},
+        { "age": 19, "name": "Lisa Smith"}
+    ]
+}
+
+Este documento será achatado como descrevemos anteriormente, mas o resultado ficará assim:
+
+{
+    "followers.age":    [19, 26, 35],
+    "followers.name":   [alex, jones, lisa, smith, mary, white]
+}
+
+A correlação entre {age: 35}e {name: Mary White}foi perdida, pois cada campo de vários valores é apenas um pacote de valores, não uma matriz ordenada.
+Isso é suficiente para perguntarmos: “Existe algum seguidor com 26 anos?”
+
+Mas não podemos obter uma resposta precisa para isso: “Existe um seguidor que tem 26 anos e que se chama Alex Jones ?”
+
+
+----------Capítulo 7. Pesquisa de corpo inteiro--------------------
+
