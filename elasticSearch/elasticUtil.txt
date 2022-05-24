@@ -1169,3 +1169,78 @@ Mas não podemos obter uma resposta precisa para isso: “Existe um seguidor que
 
 ----------Capítulo 7. Pesquisa de corpo inteiro--------------------
 
+Os autores do Elasticsearch preferem usar GET para uma solicitação de pesquisa porque acham que descreve a ação — recuperar informações — melhor do que o POST verbo.
+No entanto, como GET um corpo de solicitação não é universalmente compatível, a searchAPI também aceita POST pedidos:
+
+POST /_search
+{
+  "from": 30,
+  "size": 10
+}
+
+----------------Consulta DSL-----------------------------------
+
+A consulta DSL é uma pesquisa flexível e expressiva linguagem que o Elasticsearch usa para expor a maior parte do poder do Lucene por meio de uma interface JSON simples.
+É o que você deve usar para escrever suas consultas em produção. Isso torna suas consultas mais flexíveis, mais precisas, mais fáceis de ler e mais fáceis de depurar.
+
+Para usar o Query DSL, passe uma query no query parâmetro:
+
+GET /_search
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+-------------------Estrutura de uma Cláusula de Consulta------------
+
+Uma cláusula de consulta normalmentetem esta estrutura:
+
+{
+    QUERY_NAME: {
+        ARGUMENT: VALUE,
+        ARGUMENT: VALUE,...
+    }
+}
+
+Se fizer referência a um campo específico, terá esta estrutura:
+
+{
+    QUERY_NAME: {
+        FIELD_NAME: {
+            ARGUMENT: VALUE,
+            ARGUMENT: VALUE,...
+        }
+    }
+}
+
+A solicitação de pesquisa completa ficaria assim:
+
+GET /_search
+{
+    "query": {
+        "match": {
+            "tweet": "elasticsearch"
+        }
+    }
+}
+
+--------------------Combinando várias cláusulas-----------------------------
+
+Cláusulas de consulta são blocos de construção simplesque podem ser combinados entre si para criar consultas complexas. As cláusulas podem ser as seguintes:
+
+Cláusulas folha (como a matchcláusula) quesão usados para comparar um campo (ou campos) com uma string de consulta.
+
+Cláusulas compostas que são usadas para combinar outras cláusulas de consulta.
+Por exemplo, uma bool cláusula permite combinar outras cláusulas que must correspondam, must_not correspondam ou should correspondam, se possível:
+
+{
+    "bool": {
+        "must":     { "match": { "tweet": "elasticsearch" }},
+        "must_not": { "match": { "name":  "mary" }},
+        "should":   { "match": { "tweet": "full text" }}
+    }
+}
+
+
+
