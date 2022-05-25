@@ -1242,5 +1242,44 @@ Por exemplo, uma bool cláusula permite combinar outras cláusulas que must corr
     }
 }
 
+-------------------Consultas e filtros-------------------------------------
+
+Embora nos refiramos à DSL de consulta, na realidade existem duas DSLs: a DSL de consulta e a DSL de filtro
+
+Um filtro faz uma pergunta sim|não decada documento e é usado para campos que contêm valores exatos
+
+Uma consulta é semelhante a um filtro, mas também solicita a pergunta: Quão bem este documento corresponde?
+
+Uma consulta calcula a relevância de cada documentoé para a consulta e atribui a ela uma relevância _score,
+que é usada posteriormente para classificar os documentos correspondentes por relevância.
+Esse conceito de relevância é bem adequado para pesquisa de texto completo, onde raramente há uma resposta completamente “correta”.
+
+--------------Diferenças de desempenho--------------------------------
+
+A saída da maioria das cláusulas de filtro - um simpleslista dos documentos que correspondem ao filtro é rápido de calcular e fácil de armazenar em cache na memória,
+usando apenas 1 bit por documento. Esses filtros em cache podem ser reutilizados com eficiência para solicitações subsequentes.
+
+As consultas precisam não apenas encontrar documentos correspondentes, mas também calculam a relevância de cada documento,
+o que normalmente torna as consultas mais pesadas do que os filtros. Além disso, os resultados da consulta não podem ser armazenados em cache.
+
+Graças ao índice invertido, uma consulta simples que corresponde a apenas alguns documentos pode ter um desempenho tão bom ou melhor do que um filtro em cache que abrange milhões de documentos.
+Em geral, no entanto, um filtro em cache superará uma consulta e o fará de forma consistente.
+
+O objetivo dos filtros é reduzir o número de documentos que precisam ser examinados pela consulta.
+
+Quando usar qual
+
+Como regra geral, use cláusulas de consulta para pesquisa de texto completo ou para
+qualquer condição que deva afetar a pontuação de relevância e use cláusulas de filtro para todo o resto.
+
+--------------------Filtro de termo-------------------------------------
+
+O term filtro é usado para filtrar porvalores exatos, sejam eles números, datas, booleanos ou not_analyzed campos de string de valor exato
+
+{ "term": { "age":    26           }}
+{ "term": { "date":   "2014-09-01" }}
+{ "term": { "public": true         }}
+{ "term": { "tag":    "full_text"  }}
+
 
 
