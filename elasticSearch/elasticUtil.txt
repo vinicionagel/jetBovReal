@@ -1281,5 +1281,86 @@ O term filtro é usado para filtrar porvalores exatos, sejam eles números, data
 { "term": { "public": true         }}
 { "term": { "tag":    "full_text"  }}
 
+---------------Filtro de intervalo-------------------------------------
+
+O range filtro permite que você encontrenúmeros ou datas que se enquadram em um intervalo especificado:
+
+{
+    "range": {
+        "age": {
+            "gte":  20,
+            "lt":   30
+        }
+    }
+}
+
+Os operadores que ele aceita são os seguintes:
+
+-gt-
+Maior que
+-gte-
+Maior que ou igual a
+lt
+Menor que
+lte
+Menos que ou igual a
+
+-------------------existe e está faltando Filtros------------------
+
+
+Os filtros existse sãomissingusado para localizar documentos nos quais o campo especificado possui um ou mais valores
+( exists) ou não possui valores ( missing). É de natureza semelhante a IS_NULL(missing) e NOT IS_NULL(exists) em SQL:
+
+{
+    "exists":   {
+        "field":    "title"
+    }
+}
+
+Esses filtros são frequentemente usados aplicar uma condição somente se um campo estiver presente e para aplicar uma condição diferente se estiver ausente.
+
+-------------------------filtro booleano----------------------------------
+
+O bool filtro é usado para combinar várias cláusulas de filtro usando lógica booleana. Ele aceita três parâmetros:
+
+must
+Essas cláusulas devem corresponder, como and.
+
+must_not
+Essas cláusulas não devem corresponder, como not.
+
+should
+Pelo menos uma dessas cláusulas deve corresponder, como or.
+
+Cada um desses parâmetros pode aceitar uma única cláusula de filtro ou uma matriz de cláusulas de filtro:
+
+{
+    "bool": {
+        "must":     { "term": { "folder": "inbox" }},
+        "must_not": { "term": { "tag":    "spam"  }},
+        "should": [
+                    { "term": { "starred": true   }},
+                    { "term": { "unread":  true   }}
+        ]
+    }
+}
+
+-------------------match_all Consulta--------------------------------------
+
+A match_allconsulta simplesmente corresponde a todos os documentos. É a consulta padrão usada se nenhuma consulta tiver sido especificada:
+
+{ "match_all": {}}
+
+Essa consulta é frequentemente usada em combinação com um filtro, por exemplo, para recuperar todos os emails na pasta da caixa de entrada.
+Todos os documentos são considerados igualmente relevantes, portanto, todos recebem um neutro _score de 1.
+
+-----------------Consulta de correspondência-------------------------------
+
+A match consulta deve ser o padrão consulta que você acessa sempre que deseja consultar um valor de texto completo ou exato em praticamente qualquer campo.
+
+Se você executar uma match consulta em um campo de texto completo, ele analisará a string de consulta usando o analisador correto para esse campo antes de executar a pesquisa:
+
+{ "match": { "tweet": "About Search" }}
+
 
 
