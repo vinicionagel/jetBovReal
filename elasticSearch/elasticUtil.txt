@@ -1362,5 +1362,28 @@ Se você executar uma match consulta em um campo de texto completo, ele analisar
 
 { "match": { "tweet": "About Search" }}
 
+Se você usá-lo em um campo contendo um valor exato,como um número, uma data, um booleano ou um not_analyzed campo de string, ele procurará esse valor exato:
+
+{ "match": { "age":    26           }}
+{ "match": { "date":   "2014-09-01" }}
+{ "match": { "public": true         }}
+{ "match": { "tag":    "full_text"  }}
+
+
+Para pesquisas de valor exato, você provavelmente deseja usar um filtro em vez de uma consulta, pois um filtro será armazenado em cache.
+
+Ao contrário da pesquisa de string de consulta que mostramos em “Search Lite ” , a match consulta não usa uma sintaxe de consulta como +user_id:2 +tweet:search.
+Ele apenas procura as palavras que são especificadas.
+
+----------------------------Consulta multi_match--------------------------------
+
+A multi_match consulta permitepara executar a mesma matchconsulta em vários campos:
+
+{
+    "multi_match": {
+        "query":    "full text search",
+        "fields":   [ "title", "body" ]
+    }
+}
 
 
