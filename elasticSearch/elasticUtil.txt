@@ -1387,3 +1387,113 @@ A multi_match consulta permitepara executar a mesma matchconsulta em vários cam
 }
 
 
+--------------------------bool Consulta------------------------------------------
+
+A bool consulta, como o boolfiltro, é usado para combinar várias cláusulas de consulta. No entanto, existem algumas diferenças.
+Lembre-se de que, enquanto os filtros fornecem respostas binárias de sim/não, as consultas calculam uma pontuação de relevância.
+
+A bool consulta combina a cláusula _score from each must ou correspondente. should Esta consulta aceita os seguintes parâmetros:
+
+must
+Cláusulas que devem corresponder para que o documento seja incluído.
+
+must_not
+Cláusulas que não devem corresponder para que o documento seja incluído.
+
+should
+Se essas cláusulas corresponderem, elas aumentarão o _score; caso contrário, eles não têm efeito. Eles são usados simplesmente para refinar
+a pontuação de relevância para cada documento.
+
+A consulta a seguir encontra documentos cujo titl e campo corresponde à string de consulta how to make millions e que não estão marcados como spam.
+
+Documentos que correspondam a ambas as condições terão uma classificação ainda mais alta:
+
+{
+    "bool": {
+        "must":     { "match": { "title": "how to make millions" }},
+        "must_not": { "match": { "tag":   "spam" }},
+        "should": [
+            { "match": { "tag": "starred" }},
+            { "range": { "date": { "gte": "2014-01-01" }}}
+        ]
+    }
+}
+
+Se não houver must cláusulas, pelo menos uma should cláusula deve corresponder.
+No entanto, se houver pelo menos uma must cláusula, nenhuma should cláusula será necessária para corresponder.
+
+
+-------------------------Filter---------------------------------------------------
+
+filter
+
+A cláusula (consulta) deve aparecer nos documentos correspondentes. No entanto ao contrário must da pontuação da consulta será ignorada.
+As cláusulas de filtro são executadas no contexto de filtro, o que significa que a pontuação é ignorada e as cláusulas são consideradas para armazenamento em cache.
+
+Exemplo:
+
+
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"term" : { "name" : "Mary" }}
+      ],
+      "filter": [
+        {"term": {
+          "user_id": 2
+        }},
+        {"term": {
+          "date": "2014-09-15"
+        }}
+      ]
+    }
+  }
+}
+
+https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-bool-query.html
+
+Ou seja o filter é tudo que bate com aquilo, utilizado pra data equivalentes, tipos, estados, coisas exatas e datas.
+Exemplo com data:
+
+/tweet/_validate/query?explain --< utilizado para validar
+
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {"term": {
+          "user_id": 2
+        }},
+        {"range" : {
+          "date" : { "gte" : "2011-09-23", "lte" : "2020-09-23" }
+        }}
+      ]
+    }
+  }
+}
+
+
+----------------------Uma consulta como filtro-----------------------------
+
+Ocasionalmente, você desejará usar uma consulta enquanto estiver no contexto do filtro.
+Isto pode ser conseguido com o query filtro, queapenas envolve uma consulta.
+O exemplo a seguir mostra uma maneira de excluir e-mails que parecem spam:
+
+GET /_search
+{
+    "query": {
+        "filtered": {
+            "filter":   {
+                "bool": {
+                    "must":     { "term":  { "folder": "inbox" }},
+                    "must_not": {
+                        "query": { 1
+                            "match": { "email": "urgent business proposal" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
