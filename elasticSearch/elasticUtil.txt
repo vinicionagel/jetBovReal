@@ -1497,3 +1497,79 @@ GET /_search
         }
     }
 }
+
+------------------------Validando consultas-------------------------------
+
+As consultas podem se tornar bastante complexas e, especialmente quando combinado com diferentes analisadores e mapeamentos de campo,
+pode se tornar um pouco difícil de seguir.
+A validate-query API pode ser usada para verificar se uma consulta é válida.
+
+GET /gb/tweet/_validate/query
+{
+   "query": {
+      "tweet" : {
+         "match" : "really powerful"
+      }
+   }
+}
+
+----------------------Noções básicas sobre erros--------------------------
+
+Descobrir por que é inválido, adicione o explain parâmetropara a string de consulta:
+
+GET /gb/tweet/_validate/query?explain
+{
+   "query": {
+      "tweet" : {
+         "match" : "really powerful"
+      }
+   }
+}
+
+
+O explain sinalizador fornece mais informações sobre por que uma consulta é inválida.
+
+Aparentemente, confundimos o tipo de consulta ( match) com o nome do campo ( tweet):
+
+{
+  "valid" :     false,
+  "_shards" :   { ... },
+  "explanations" : [ {
+    "index" :   "gb",
+    "valid" :   false,
+    "error" :   "org.elasticsearch.index.query.QueryParsingException:
+                 [gb] No query registered for [tweet]"
+  } ]
+}
+
+
+------------------Noções básicas sobre consultas--------------------------------
+
+O uso do explain parâmetro tem a vantagem adicional de retornar uma descrição legível por humanos da consulta (válida),
+o que pode ser útil para entender exatamente como sua consulta foi interpretada pelo Elasticsearch:
+
+GET /_validate/query?explain
+{
+   "query": {
+      "match" : {
+         "tweet" : "really powerful"
+      }
+   }
+}
+
+{
+  "valid" :         true,
+  "_shards" :       { ... },
+  "explanations" : [ {
+    "index" :       "us",
+    "valid" :       true,
+    "explanation" : "tweet:really tweet:powerful"
+  }, {
+    "index" :       "gb",
+    "valid" :       true,
+    "explanation" : "tweet:realli tweet:power"
+  } ]
+}
+
+No explanation, você pode ver como a match consulta da string de consulta really powerful
+foi reescrita como duas consultas de termo único no tweet campo, uma para cada termo.
