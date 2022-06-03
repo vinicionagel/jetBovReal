@@ -1573,3 +1573,85 @@ GET /_validate/query?explain
 
 No explanation, você pode ver como a match consulta da string de consulta really powerful
 foi reescrita como duas consultas de termo único no tweet campo, uma para cada termo.
+
+----------------------Capítulo 8. Classificação e Relevância-------------------
+
+
+Por padrão, os resultados são retornados classificados por relevância — com os documentos mais relevantes primeiro.
+Mais adiante neste capítulo, explicaremos o que queremos dizer com relevância e como ela é calculada,
+mas vamos começar examinando o sort parâmetro e como usá-lo.
+
+----------------------Ordenação----------------------------------------------
+
+Para classificar por relevância, precisamos representar a relevância como um valor. No Elasticsearch,
+a pontuação de relevância é representada pelo número de ponto flutuante retornado nos resultados da pesquisa como _score,
+portanto, a ordem de classificação padrão é _score decrescente.
+
+GET /_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "term" : {
+                    "user_id" : 1
+                }
+            }
+        }
+    }
+}
+
+Os filtros não influenciam _score, e a consulta ausente mas implícita match_all apenas define o _score valor neutro de 1 para todos os documentos.
+
+
+------------------------Classificando por valores de campo------------------------
+
+Nesse caso, provavelmente faz sentido classificar os tweets por recência, com os tweets mais recentes primeiro. Podemos fazer isso com o sort parâmetro:
+
+GET /_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : { "term" : { "user_id" : 1 }}
+        }
+    },
+    "sort": { "date": { "order": "desc" }}
+}
+
+Saída:
+
+"hits" : {
+    "total" :           6,
+    "max_score" :       null, 1
+    "hits" : [ {
+        "_index" :      "us",
+        "_type" :       "tweet",
+        "_id" :         "14",
+        "_score" :      null, 1
+        "_source" :     {
+             "date":    "2014-09-24",
+             ...
+        },
+        "sort" :        [ 1411516800000 ] 2
+    },
+    ...
+}
+
+O _score não é calculado porque não está sendo usado para ordenação.
+
+O valor do date campo, expresso em milissegundos desde a época, é retornado nos sort valores.
+
+A primeira é que temos um novo elemento em cada resultado chamado sort, que contém os valores que foram usados para classificação.
+Neste caso, classificamos em date, que internamente é indexado como milissegundos desde a época.
+O número longo 1411516800000 é equivalente à string de data 2014-09-24 00:00:00 UTC.
+
+A segunda é que o _score e max_score são ambos null. Calcular o _score pode ser bastante caro, e normalmente seu único propósito é ordenar.
+Se você quiser que o _score cálculo seja feito de qualquer maneira, você pode definir o track_scores parâmetro para true.
+
+Como atalho, você pode especifique apenas o nome do campo para classificar:
+
+    "sort": "number_of_children"
+
+Os campos serão ordenados em ordem crescente por padrão e o _scorevalor em ordem decrescente.
+
+--------------------Classificação multinível-----------------------
+
