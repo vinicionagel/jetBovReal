@@ -1655,3 +1655,47 @@ Os campos serão ordenados em ordem crescente por padrão e o _scorevalor em ord
 
 --------------------Classificação multinível-----------------------
 
+Talvez queiramos combinar o _score de uma query com date, e mostre todos os resultados correspondentes classificados primeiro por data e depois
+por relevância(score_):
+
+GET /_search
+{
+    "query" : {
+        "filtered" : {
+            "query":   { "match": { "tweet": "manage text search" }},
+            "filter" : { "term" : { "user_id" : 2 }}
+        }
+    },
+    "sort": [
+        { "date":   { "order": "desc" }},
+        { "_score": { "order": "desc" }}
+    ]
+}
+
+A ordem é importante. Os resultados são classificados primeiro pelo primeiro critério.
+Somente os resultados cujo primeiro sortvalor é idêntico serão classificados pelo segundo critério e assim por diante.
+
+--------------------Classificando em campos de vários valores-------------------
+
+Ao classificar em campos com mais de um valor, lembre-se que os valores não possuem nenhuma ordem intrínseca;
+um campo multivalor é apenas um pacote de valores. Em qual você escolhe classificar?
+
+Para números e datas, você pode reduzir um campo de vários valores a um único valor usando os mode min , max, avgou de classificação .sum
+Por exemplo, você pode classificar pela data mais antiga em cada datescampo usando o seguinte:
+
+"sort": {
+    "dates": {
+        "order": "asc",
+        "mode":  "min"
+    }
+}
+
+-----------------------Classificação de Strings e Multicampos---------------------
+
+Os campos de string analisados também são campos de vários valores, mas classificá-los raramente fornece os resultados desejados.
+Se você analisar uma string como fine old art, resultará em três termos.
+Provavelmente queremos classificar em ordem alfabética no primeiro termo, depois no segundo termo e assim por diante, mas o Elasticsearch não tem essas informações à disposição no momento da classificação.
+
+
+Para classificar em um campo de string, esse campo deve conter apenas um termo: a not_analyzed string inteira.
+Mas é claro que ainda precisamos que o campo esteja analyzedpara poder consultá-lo como texto completo.
