@@ -1699,3 +1699,94 @@ Provavelmente queremos classificar em ordem alfabética no primeiro termo, depoi
 
 Para classificar em um campo de string, esse campo deve conter apenas um termo: a not_analyzed string inteira.
 Mas é claro que ainda precisamos que o campo esteja analyzedpara poder consultá-lo como texto completo.
+
+A abordagem ingênua para indexar a mesma string de duas maneiras seria incluir dois campos separados no documento:
+um analyzed para pesquisa e outro not_analyzed para classificação.
+
+Mas armazenar a mesma string duas vezes no _source campo é desperdício de espaço.
+O que realmente queremos fazer é passar em um único campo, mas indexá-lo de duas maneiras diferentes.
+Todos os tipos de campos principais (strings, números, booleanos, datas) aceitam um fields parâmetro que permite transformar um mapeamento simples como:
+
+"tweet": {
+    "type":     "string",
+    "analyzer": "english"
+}
+
+em um mapeamento de vários campos como este:
+
+"tweet": { 1
+    "type":     "string",
+    "analyzer": "english",
+    "fields": {
+        "raw": { 2
+            "type":  "string",
+            "index": "not_analyzed"
+        }
+    }
+}
+
+1: O tweet campo principal é exatamente o mesmo de antes: um analyzedcampo de texto completo.
+
+2: O novo tweet.raw subcampo é not_analyzed.
+
+Agora, ou pelo menos assim que reindexamos nossos dados, podemos usar o tweet campo para pesquisa e o tweet.rawcampo para classificação:
+
+GET /_search
+{
+    "query": {
+        "match": {
+            "tweet": "elasticsearch"
+        }
+    },
+    "sort": "tweet.raw"
+}
+
+A classificação em um campo de texto completo analyzed pode usar muita memória. Consulte “Dados de campo” para obter mais informações.
+
+-----------------------Mudança de tipo String para text e keyword-------------------
+
+Para evitar esses problemas, o stringcampo foi dividido em dois novos tipos: text,
+que deve ser usado para pesquisa de texto completo, e keyword, que deve ser usado para pesquisa por palavra-chave.
+
+Como consequência, será possível realizar pesquisa de texto completo em foo e pesquisa de palavras-chave e agregações usando o foo.keywordcampo.
+
+
+------------------------O que é relevância?---------------------------
+
+A pontuação de relevância de cada documento é representada por um número de ponto flutuante positivo chamado _score.
+Quanto maior o _score, mais relevante o documento.
+
+Uma cláusula de consulta gera um _scorepara cada documento. Como essa pontuação é calculada depende do tipo de cláusula de consulta.
+Cláusulas de consulta diferentes são usadas para propósitos diferentes: uma fuzzy consulta pode determinar o _score cálculo da similaridade da ortografia da palavra encontrada com o termo de pesquisa original;
+uma terms consulta incorporaria a porcentagem de termos encontrados.
+No entanto, o que geralmente queremos dizer com relevância é o algoritmo que usamos para calcular a semelhança entre
+o conteúdo de um campo de texto completo e uma string de consulta de texto completo.
+
+O algoritmo de similaridade padrão usado no Elasticsearch é conhecido como frequência de termo/frequência de documento inversa,
+ou TF/IDF , que leva em consideração os seguintes fatores em conta:
+
+
+Frequência do prazo
+Com que frequência o termo aparece no campo? Quanto mais vezes, mais relevante.
+Um campo contendo cinco menções do mesmo termo tem maior probabilidade de ser relevante do que um campo contendo apenas uma menção.
+
+Frequência inversa do documento
+Com que frequência cada termo aparece no índice? Quanto mais frequente, menos relevante.
+Os termos que aparecem em muitos documentos têm um peso menor do que os termos mais incomuns.
+
+Norma de comprimento de campo
+Qual o comprimento do campo? Quanto mais longo, menos provável é que as palavras no campo sejam relevantes.
+Um termo que aparece em um title campo curto tem mais peso do que o mesmo termo que aparece em um content campo longo.
+
+Individualas consultas podem combinar a pontuação TF/IDF com outros fatores, como o termo proximidade em consultas de frase ou semelhança de termo em consultas difusas.
+
+A relevância não é apenas sobre a pesquisa de texto completo, no entanto.
+Também pode ser aplicado a cláusulas sim/não, onde quanto mais cláusulas corresponderem, maior será o _score.
+
+Quando várias cláusulas de consulta são combinadas usando uma consulta composta como a bool consulta,
+a _score de cada uma dessas cláusulas de consulta é combinada para calcular o total _score do documento.
+
+----------------------Entendendo a pontuação--------------------------------------
+
+
+
