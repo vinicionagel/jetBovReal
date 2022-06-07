@@ -1788,5 +1788,76 @@ a _score de cada uma dessas cláusulas de consulta é combinada para calcular o 
 
 ----------------------Entendendo a pontuação--------------------------------------
 
+Ao depurar uma consulta complexa, pode ser difícil entender exatamente como a _score foi calculado.
+O Elasticsearch tem a opção de produzir uma explicação com cada resultado da pesquisa, definindo o explain parâmetropara true.
 
+GET /_search?explain
+{
+   "query"   : { "match" : { "tweet" : "honeymoon" }}
+}
+
+
+O explain parâmetro adiciona uma explicação de como _score foi calculado a cada resultado.
+
+Primeiro, temos os metadados que são retornados em solicitações de pesquisa normais:
+
+{
+    "_index" :      "us",
+    "_type" :       "tweet",
+    "_id" :         "12",
+    "_score" :      0.076713204,
+    "_source" :     { ... trimmed ... },
+
+
+Ele adiciona informações sobre o estilhaço e o nó de origem do documento,
+o que é útil saber porque as frequências de termo e documento são calculadas por estilhaço, e não por índice:
+
+   "_shard" :      1,
+    "_node" :       "mzIVYCsqSWCG_M_ZffSs9Q",
+
+
+Em seguida, fornece o _explanation. Cada A entrada contém um description que informa que tipo de cálculo está sendo executado,
+um value que fornece o resultado do cálculo e o detailsde quaisquer subcálculos necessários:
+
+"_explanation": { 1
+   "description": "weight(tweet:honeymoon in 0)
+                  [PerFieldSimilarity], result of:",
+   "value":       0.076713204,
+   "details": [
+      {
+         "description": "fieldWeight in 0, product of:",
+         "value":       0.076713204,
+         "details": [
+            {  2
+               "description": "tf(freq=1.0), with freq of:",
+               "value":       1,
+               "details": [
+                  {
+                     "description": "termFreq=1.0",
+                     "value":       1
+                  }
+               ]
+            },
+            { 3
+               "description": "idf(docFreq=1, maxDocs=1)",
+               "value":       0.30685282
+            },
+            { 4
+               "description": "fieldNorm(doc=0)",
+               "value":        0.25,
+            }
+         ]
+      }
+   ]
+}
+
+1 - Resumo do cálculo de pontuação parahoneymoon
+
+2 - Frequência do prazo
+
+3 - Frequência inversa do documento
+
+4 - Norma de comprimento de campo
+
+A primeira parte é o resumo do cálculo. Diz-nos que calculou o peso — oTF/IDF—do termo honeymoonno campo tweet, para documento 0. (Este é um ID de documento interno e, para nossos propósitos, pode ser ignorado.)
 
