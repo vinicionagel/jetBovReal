@@ -1859,5 +1859,80 @@ um value que fornece o resultado do cálculo e o detailsde quaisquer subcálculo
 
 4 - Norma de comprimento de campo
 
-A primeira parte é o resumo do cálculo. Diz-nos que calculou o peso — oTF/IDF—do termo honeymoonno campo tweet, para documento 0. (Este é um ID de documento interno e, para nossos propósitos, pode ser ignorado.)
+A primeira parte é o resumo do cálculo.
+Diz-nos que calculou o peso — oTF/IDF—do termo honeymoonno campo tweet, para documento 0.
+(Este é um ID de documento interno e, para nossos propósitos, pode ser ignorado.)
+
+Frequência do prazo
+Quantas vezes o termo honeymoon apareceu no tweetcampo neste documento?
+
+Frequência inversa do documento
+Quantas vezes o termo honeymoon apareceu no tweetcampo de todos os documentos do índice?
+
+Norma de comprimento de campo
+Qual é o comprimento do tweetcampo neste documento? Quanto maior o campo, menor esse número.
+
+
+As explicações para consultas mais complicadas podem parecer muito complexas, mas na verdade elas contêm apenas mais dos mesmos cálculos que aparecem no exemplo anterior.
+Essas informações podem ser inestimáveis para depurar por que os resultados da pesquisa aparecem na ordem em que aparecem.
+
+DICA
+A saída explain pode ser difícil de ler em JSON, mas é mais fácil quando formatada como YAML. Basta adicionar format=yaml à string de consulta.
+
+
+
+----------------------Entendendo por que um documento corresponde-----------------------------
+
+
+Embora a explain opção adicione uma explicação para cada resultado, você pode usar a explain API para entender por que um
+determinado documento correspondeu ou, mais importante, por que não correspondeu.
+
+O caminho para a solicitação é /index/type/id/_explain, como no seguinte:
+
+GET /us/tweet/12/_explain
+{
+   "query" : {
+      "filtered" : {
+         "filter" : { "term" :  { "user_id" : 2           }},
+         "query" :  { "match" : { "tweet" :   "honeymoon" }}
+      }
+   }
+}
+
+------------------Dados de campo------------------------------------------------------------
+
+Quando você classifica em um campo, o Elasticsearch precisa acessar o valor desse campo para cada documento que corresponda à consulta.
+O índice invertido, que funciona muito bem na busca, não é a estrutura ideal para ordenar os valores dos campos:
+
+* Ao pesquisar, precisamos mapear um termo para uma lista de documentos.
+
+* Ao classificar, precisamos mapear um documento para seus termos. Em outras palavras, precisamos “desinverter” o índice invertido.
+
+Para tornar a classificação eficiente, o Elasticsearch carrega todos os valores do campo que você deseja classificar na memória.
+Isso é conhecido como fielddata.
+
+O Elasticsearch não carrega apenas os valores dos documentos que correspondem a uma consulta específica.
+Ele carrega os valores de cada documento em seu índice , independentemente do documento type.
+
+
+O motivo pelo qual o Elasticsearch carrega todos os valores na memória é que a desinversão do índice do disco é lenta.
+Mesmo que você precise dos valores de apenas alguns documentos para a solicitação atual, provavelmente precisará acessar os valores de outros documentos na próxima solicitação,
+portanto, faz sentido carregar todos os valores na memória de uma só vez e manter eles lá.
+
+Fielddata é usado em vários lugares no Elasticsearch:
+
+- Classificando em um campo
+
+- Agregações em um campo
+
+- Certos filtros (por exemplo, filtros de geolocalização)
+
+- Scripts que se referem a campos
+
+Claramente, isso pode consumir muita memória, especialmente para campos de string de alta cardinalidade — campos de string que têm muitos valores exclusivos — como o corpo de um email.
+Felizmente, memória insuficiente é um problema que pode ser resolvido pelo dimensionamento horizontal, adicionando mais nós ao cluster.
+
+Dados de campo e estar ciente de que eles podem consumir muita memória.
+
+------------------------Capítulo 9. Execução de Pesquisa Distribuída------------------------
 
