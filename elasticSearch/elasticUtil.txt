@@ -1936,3 +1936,17 @@ Dados de campo e estar ciente de que eles podem consumir muita memória.
 
 ------------------------Capítulo 9. Execução de Pesquisa Distribuída------------------------
 
+A pesquisa requer um modelo de execução mais complicado porque não sabemos quais documentos corresponderão à consulta: eles podem estar em qualquer fragmento do cluster.
+Uma solicitação de pesquisa deve consultar uma cópia de cada fragmento no índice ou índices nos quais estamos interessados para ver se eles têm algum documento correspondente.
+
+Mas encontrar todos os documentos correspondentes é apenas metade da história.
+Os resultados de vários fragmentos devem ser combinados em uma única lista classificada antes que a search API possa retornar uma “página” de resultados.
+Por esse motivo, a pesquisa é executada em um processo de duas fases chamado query then fetch.
+
+------------------------Fase de consulta----------------------------------------------------
+
+Durante a fase de consulta inicial , A consulta é transmitida para uma cópia de estilhaço (um estilhaço primário ou de réplica) de cada estilhaço no índice.
+Cada fragmento executa a pesquisa localmente ecria uma fila de prioridade de documentos correspondentes.
+
+
+

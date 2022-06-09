@@ -1,4 +1,5 @@
 ### docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.8.19
+### https://blog.ruanbekker.com/blog/2018/04/29/running-a-3-node-elasticsearch-cluster-with-docker-compose-on-your-laptop-for-testing/
 curl -H 'Content-Type: application/json' -XPOST 'http://localhost:9200/_bulk?pretty' -d '
 
 { "create": { "_index": "user", "_type": "doc", "_id": "1" }}
