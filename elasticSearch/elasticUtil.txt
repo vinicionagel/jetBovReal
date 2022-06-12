@@ -1949,4 +1949,39 @@ Durante a fase de consulta inicial , A consulta é transmitida para uma cópia d
 Cada fragmento executa a pesquisa localmente ecria uma fila de prioridade de documentos correspondentes.
 
 
+Uma fila de prioridade é apenas uma lista ordenada que contém os n principais documentos correspondentes. O tamanho da fila de prioridade depende dos parâmetros de paginação frome size.
+Por exemplo, a seguinte solicitação de pesquisa exigiria uma fila de prioridade grande o suficiente para conter 100 documentos:
+
+GET /_search
+{
+    "from": 90,
+    "size": 10
+}
+
+A fase de consulta consiste nas três etapas a seguir:
+
+1 - O cliente envia uma search solicitação para Node 3, que cria uma fila de prioridade vazia de tamanho from + size.
+
+2 - Node 3 encaminha a solicitação de pesquisa para uma cópia primária ou de réplica de cada estilhaço no índice.
+Cada fragmento executa a consulta localmente e adiciona os resultados em uma fila de prioridade classificada local de tamanho from + size.
+
+3 - Cada fragmento retorna os IDs de documentos e os valores de classificação de todos os documentos em sua fila de prioridade para o nó coordenador,
+Node 3, que mescla esses valores em sua própria fila de prioridade para produzir uma lista de resultados classificada globalmente.
+
+Quando uma solicitação de pesquisa é enviada a um nó, esse nó se torna o nó coordenador.
+É o trabalho desse nó transmitir a solicitação de pesquisa para todos os shards envolvidos e reunir suas respostas em um conjunto de resultados classificado globalmente que ele pode retornar ao cliente.
+
+A primeira etapa é transmitir a solicitação para uma cópia de fragmentação de cada nó no índice.
+Assim como as solicitações de documentos , as GETsolicitações de pesquisa podem ser tratadas por um estilhaço primário ou por qualquer uma de suas réplicas.
+É assim que mais réplicas (quando combinadas com mais hardware) podem aumentar o rendimento da pesquisa.
+
+Um nó de coordenação fará o round-robin em todas as cópias de fragmentos em solicitações subsequentes para distribuir a carga.
+
+O fragmento carrega os corpos do documento — o _source campo — e, se solicitado, enriquece os resultados com metadados e destaque de trecho de pesquisa .
+Uma vez que o nó coordenador recebe todos os resultados, ele os reúne em uma única resposta que retorna ao cliente.
+
+
+
+
+
 
