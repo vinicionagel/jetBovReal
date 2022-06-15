@@ -1981,6 +1981,86 @@ O fragmento carrega os corpos do documento — o _source campo — e, se solicit
 Uma vez que o nó coordenador recebe todos os resultados, ele os reúne em uma única resposta que retorna ao cliente.
 
 
+---------------Opções de pesquisa-------------------------
+
+
+-----tipo de busca----
+
+Enquanto query_then_fetch é o padrão tipo de pesquisa, outros tipos de pesquisa podem ser especificados para fins específicos, por exemplo:
+
+GET /_search?search_type=count
+
+count:
+
+O count tipo de pesquisa tem apenas uma query fase.
+Ele pode ser usado quando você não precisa de resultados de pesquisa, apenas uma contagem de documentos ou agregações em documentos que correspondam à consulta.
+
+query_and_fetch:
+
+O query_and_fetch tipo de pesquisa combina as fases de consulta e busca em uma única etapa.
+Essa é uma otimização interna que é usada quando uma solicitação de pesquisa é direcionada apenas a um único estilhaço, como quando um routing valor foi especificado.
+Embora você possa optar por usar esse tipo de pesquisa manualmente, quase nunca é útil fazê-lo.
+
+dfs_query_then_fetchedfs_query_and_fetch:
+
+Os dfs tipos de pesquisa tem uma fase de pré-consulta que busca as frequências de termos de todos os shards envolvidos para calcular as frequências de termos globais.
+
+scan:
+
+O scan tipo de pesquisa é usado em conjunto com a scroll API para recuperar um grande número de resultados com eficiência.
+Ele faz isso desativando a classificação.
+
+
+
+-------digitalizar e rolar-----------
+
+scroll:
+
+Uma pesquisa rolada nos permite faça uma pesquisa inicial e continue extraindo lotes de resultados do Elasticsearch até que não haja mais resultados.
+É um pouco como um cursor emum banco de dados tradicional.
+
+Uma pesquisa rolada tira um instantâneo no tempo.
+Ele não vê nenhuma alteração feita no índice depois que a solicitação de pesquisa inicial foi feita.
+Ele faz isso mantendo os arquivos de dados antigos por perto, para que possa preservar sua “visão” sobre a aparência do índice no momento em que foi iniciado.
+
+scan:
+
+A parte cara da paginação profunda é a classificação global dos resultados, mas se desabilitarmos a classificação, podemos retornar todos os documentos de forma bastante barata.
+Para fazer isso, usamos o scantipo de pesquisa.
+Scan instrui o Elasticsearch a não fazer nenhuma classificação, mas apenas retornar o próximo lote de resultados de cada fragmento que ainda tem resultados a serem retornados.
+
+GET /old_index/_search?search_type=scan&scroll=1m 1-
+{
+    "query": { "match_all": {}},
+    "size":  1000
+}
+*1 - Mantenha o pergaminho aberto por 1 minuto.
+
+A resposta a esta solicitação não inclui nenhum hit, mas inclui um _scroll_id, que é um longo codificado em Base-64.
+Agora podemos passar _scroll_id para o _search/scroll end-point para recuperar o primeiro lote de resultados:
+
+GET /_search/scroll?scroll=1m 1
+c2Nhbjs1OzExODpRNV9aY1VyUVM4U0NMd2pjWlJ3YWlBOzExOTpRNV9aY1VyUVM4U0 2
+NMd2pjWlJ3YWlBOzExNjpRNV9aY1VyUVM4U0NMd2pjWlJ3YWlBOzExNzpRNV9aY1Vy
+UVM4U0NMd2pjWlJ3YWlBOzEyMDpRNV9aY1VyUVM4U0NMd2pjWlJ3YWlBOzE7dG90YW
+xfaGl0czoxOw==
+
+1 - Mantenha o pergaminho aberto por mais um minuto.
+
+
+2 - O _scroll_id pode ser passado no corpo, na URL ou como parâmetro de consulta.
+
+Observe que especificamos novamente ?scroll=1m. O tempo de expiração da rolagem é atualizado toda vez que executamos uma solicitação de rolagem, portanto,
+ele precisa nos dar apenas tempo suficiente para processar o lote atual de resultados, não todos os documentos que correspondem à consulta.
+
+A resposta a essa solicitação de rolagem inclui o primeiro lote de resultados.
+Embora tenhamos especificado um sizede 1.000, recebemos muitos outros documentos.
+Ao digitalizar, o size é aplicado a cada fragmento, para que você receba de volta o máximo de size * number_of_primary_shards documentos em cada lote.
+
+A solicitação de rolagem também retorna um novo arquivo _scroll_id.
+Toda vez que fazemos a próxima solicitação de rolagem, devemos passar o _scroll_id retornado pela solicitação de rolagem anterior.
+
+-------------------------------Capítulo 10. Gerenciamento de Índice-------------------------------------------------------
 
 
 
