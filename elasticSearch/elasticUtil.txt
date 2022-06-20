@@ -2062,6 +2062,42 @@ Toda vez que fazemos a próxima solicitação de rolagem, devemos passar o _scro
 
 -------------------------------Capítulo 10. Gerenciamento de Índice-------------------------------------------------------
 
+---------Criando um índice-------------
+extra:
+
+https://opster.com/analysis/elasticsearch-updated-breaker-settings-parent/
+
+O índice é criado com as configurações padrão e novos campos são adicionados ao mapeamento de tipo usando o mapeamento dinâmico.
+
+Para isso, temos que criar o índice manualmente, passando qualquer configuração ou mapeamento de tipo no corpo da requisição, como segue:
+
+PUT /my_index
+{
+    "settings": { ... any settings ... },
+    "mappings": {
+        "type_one": { ... any mappings ... },
+        "type_two": { ... any mappings ... },
+        ...
+    }
+}
+
+Na verdade, se você quiser, você pode impedir a criação automática de índices adicionando a seguinte configuração ao config/elasticsearch.yml arquivo em cada nó:
+
+action.auto_create_index: false
+
+----------------Como excluir um índice---------------------
 
 
+Para excluir um índice, useo seguinte pedido:
+
+DELETE /my_index
+
+Você pode excluir vários índices com isso:
+
+DELETE /index_one,index_two
+DELETE /index_*
+
+Você pode até excluir todos os índices com isso:
+
+DELETE /_all
 
