@@ -2101,3 +2101,17 @@ Você pode até excluir todos os índices com isso:
 
 DELETE /_all
 
+----------------------Como a Lucene vê os documentos---------------
+
+Um documento no Lucene consiste em uma lista simples de pares de valor de campo.
+Um campo deve ter pelo menos um valor, mas qualquer campo pode conter vários valores.
+Da mesma forma, um único valor de string pode ser convertido em vários valores pelo processo de análise.
+O Lucene não se importa se os valores são strings, números ou datas—todos os valores são tratados apenas como bytes opacos.
+
+Quando indexamos um documento no Lucene, os valores de cada campo são adicionados ao índice invertido do campo associado.
+Opcionalmente, os valores originais também podem ser armazenados inalterados para que possam ser recuperados posteriormente.
+
+-----------------------Como os tipos são implementados-----------------
+
+Um índice pode ter vários tipos, cada um com seu próprio mapeamento, e documentos de qualquer um desses tipos podem ser armazenados no mesmo índice.
+Como o Lucene não tem nenhum conceito de tipos de documentos, o nome do tipo de cada documento é armazenado com o documento em um campo de meta dados chamado _type.
