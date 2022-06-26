@@ -2115,3 +2115,108 @@ Opcionalmente, os valores originais também podem ser armazenados inalterados pa
 
 Um índice pode ter vários tipos, cada um com seu próprio mapeamento, e documentos de qualquer um desses tipos podem ser armazenados no mesmo índice.
 Como o Lucene não tem nenhum conceito de tipos de documentos, o nome do tipo de cada documento é armazenado com o documento em um campo de meta dados chamado _type.
+
+A Lucene também não tem noção de mapeamentos.
+Os mapeamentos são a camada que o Elasticsearch usa para mapear documentos JSON complexos nos documentos simples e simples que o Lucene espera receber.
+
+
+------------------Capítulo 11. Dentro de um fragmento--------------------
+
+ É por isso que dizemos que o Elasticsearch tem pesquisa quase em tempo real: as alterações do documento não são visíveis para pesquisa imediatamente, mas ficarão visíveis em 1 segundo.
+
+
+ Isso pode ser confuso para novos usuários: eles indexam um documento e tentam procurá-lo, mas ele simplesmente não está lá. A maneira de contornar isso é realizar uma atualização manual, com a refreshAPI:
+
+ POST /_refresh 1
+ POST /blogs/_refresh 2
+
+ 1 - Atualize todos os índices.
+
+ 2 - Atualize apenas o blogs índice.
+
+
+ DICA
+ Embora uma atualização seja muito mais leve que uma confirmação, ela ainda tem um custo de desempenho.
+ Uma atualização manual pode ser útil ao escrever testes, mas não faça uma atualização manual sempre que indexar um documento em produção; vai prejudicar seu desempenho.
+ Em vez disso, seu aplicativo precisa estar ciente da natureza quase em tempo real do Elasticsearch e fazer concessões para isso.
+
+ Nem todos os casos de uso exigem uma atualização a cada segundo.
+ Talvez você esteja usando o Elasticsearch para indexar milhões de arquivos de log e prefira otimizar a velocidade do índice em vez da pesquisa quase em tempo real.
+
+
+ Você pode reduzir a frequência de atualizações por índice configurando o refresh_interval:
+
+ PUT /my_logs
+ {
+   "settings": {
+     "refresh_interval": "30s" 1
+   }
+ }
+
+
+--------------Parte II. Pesquisar em profundidade---------------
+
+A pesquisa não é apenas uma pesquisa de texto completo: uma grande parte dos seus dados serão valores estruturados, como datas e números.
+Começaremos explicando como combinar pesquisa estruturadacom pesquisa de texto completo da maneira mais eficiente.
+
+-----------Capítulo 12. Pesquisa Estruturada------------------
+
+A pesquisa estruturada é sobre interrogardados que possuem estrutura inerente.
+Datas, horas e números são todos estruturados: eles têm um formato preciso no qual você pode realizar operações lógicas.
+
+---------------Encontrando valores exatos---------------------
+
+Ao trabalhar com valores exatos,você estará trabalhando com filtros.
+Os filtros são importantes porque são muito, muito rápidos.
+Os filtros não calculam a relevância (evitando toda a fase de pontuação) e são facilmente armazenados em cache e devem ser usados com a maior frequência possível.
+
+----------------Termo Filtro com Números-------------------
+
+Vamos explorar o "term" filtro primeiro porque você vai usá-lo com freqüência.
+Este filtro é capaz de lidar com números, booleanos, datas e texto.
+
+Nosso objetivo é encontrar todos os produtos com um determinado preço.
+Você pode estar familiarizado com SQL se estiver vindo de um banco de dados relacional.
+Se expressássemos essa consulta como uma consulta SQL, ficaria assim:
+
+SELECT document
+FROM   products
+WHERE  price = 20
+
+Na DSL de consulta do Elasticsearch, usamos um termfiltro para realizar a mesma coisa. O termfiltro procurará o valor exato que especificamos.
+Por si só, um term filtro é simples.
+Ele aceita um nome de campo e o valor que desejamos encontrar:
+
+{
+    "term" : {
+        "price" : 20
+    }
+}
+
+O term filtro não é muito útil por si só, no entanto. Conforme discutido em “Query DSL” ,
+a searchAPI espera um query, não um filter. Para usar nosso termfiltro,precisamos envolvê-lo com uma filtered consulta:
+
+GET /my_store/products/_search
+{
+    "query" : {
+        "filtered" : { 1
+            "query" : {
+                "match_all" : {} 2
+            },
+            "filter" : {
+                "term" : { 3
+                    "price" : 20
+                }
+            }
+        }
+    }
+}
+
+1
+A filteredconsulta aceita a querye a filter.
+
+2
+A match_all é usado para retornar todos os documentos correspondentes. Este é o comportamento padrão, portanto, em exemplos futuros, simplesmente omitiremos a query seção.
+
+3
+O termfiltro que vimos anteriormente. Observe como ele é colocado dentro da filter cláusula.
