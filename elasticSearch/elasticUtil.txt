@@ -2220,3 +2220,162 @@ A match_all é usado para retornar todos os documentos correspondentes. Este é 
 
 3
 O termfiltro que vimos anteriormente. Observe como ele é colocado dentro da filter cláusula.
+
+Nas versões mais novas ficou assim:
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {} 1
+      },
+      "filter": {
+        "term": {
+          "user_id": "2"
+        }
+      }
+    }
+  },
+  "_source": [
+    "tweet" 2
+  ]
+}
+
+1 = Aqui definimos que queremos sempre sem calcular o score.
+2 = O campo _source tras somente os campos que vc quer, se colocar um campo que não existe traz nenhum.
+
+Agora se mudarmos para o name:
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "term": {
+          "name": "John Smith"
+        }
+      }
+    }
+  },
+  "_source": [
+    "tweet"
+  ]
+}
+
+Não traz resultado, porque é necessário informar caso o campo seja text o keyword
+...
+    "filter": {
+        "term": {
+          "name.keyword": "John Smith"
+        }
+...
+
+Dessa forma vai trazer.
+
+-----------------------------------Combinando Filtros-------------------------------
+
+O bool filtro é composto por três seções:
+
+{
+   "bool" : {
+      "must" :     [],
+      "should" :   [],
+      "must_not" : [],
+   }
+}
+
+must
+Todas essas cláusulas devem corresponder. O equivalente de AND.
+
+must_not
+Todas essas cláusulas não devem corresponder. O equivalente de NOT.
+
+should
+Pelo menos uma dessas cláusulas deve corresponder. O equivalente de OR.
+
+
+Exemplo com should(or):
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "bool": {
+          "should": [
+            {
+              "term": {
+                "date": "2014-09-24"
+              }
+            },
+            {
+              "term": {
+                "name": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+
+Exemplo com must(and):
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "date": "2014-09-24"
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+Para reduzir pode ser utilizado em vez do match_all o constant_score, conforme exemplo:
+
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "date": "2014-09-22"
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+ }

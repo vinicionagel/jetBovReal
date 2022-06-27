@@ -123,3 +123,119 @@ GET http://localhost:9200/_search?q=%2Bname%3A(mary+john)+%2Bdate%3A%3E2014-09-1
 ###
 #Verificar indice
 GET http://localhost:9200/tweet
+
+
+###
+#Exemplo chamada com filter e match all
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "term": {
+          "user_id": 2
+        }
+      }
+    }
+  },
+  "_source": [
+    "tweet"
+  ]
+}
+
+###
+#Exemplo chamada com filter should(or)
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "bool": {
+          "should": [
+            {
+              "term": {
+                "date": "2014-09-24"
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+###
+#Exemplo chamada com filter must (and)
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "date": "2014-09-24"
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+###
+#Exemplo chamada com filter constant score
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "date": "2014-09-22"
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
