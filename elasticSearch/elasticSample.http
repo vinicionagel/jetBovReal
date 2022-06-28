@@ -239,3 +239,31 @@ Content-Type: application/json
     }
   }
 }
+
+###
+#Exemplo chamada com filter constant score e varios terms
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "terms": {
+                "date": ["2014-09-22", "2014-09-18"]
+              }
+            },
+            {
+              "term": {
+                "name.keyword": "John Smith"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -2379,3 +2379,96 @@ Para reduzir pode ser utilizado em vez do match_all o constant_score, conforme e
     }
   }
  }
+
+------------------Encontrando vários valores exatos----------------------------------
+
+Em vez de usar vários termfiltros, você pode usar um único terms filtro (observe o s no final).
+O terms filtro é simplesmente a versão plural do termfiltro singular.
+
+Parece quase idêntico a uma baunilha termtambém. Em vez de especificar um único preço, agora estamos especificando uma matriz de valores:
+
+{
+    "terms" : {
+        "price" : [20, 30]
+    }
+}
+
+
+--------------------------Contém, mas não é igual--------------------------------------------
+
+É importante entender que terme termssão contém operações, não é igual a . O que isso significa?
+
+Se você tiver um filtro de termo para { "term" : { "tags" : "search" } }, ele corresponderá aos dois documentos a seguir:
+
+{ "tags" : ["search"] }
+{ "tags" : ["search", "open_source"] } 1
+1
+Este documento é devolvido, mesmo que tenha termos diferentes de search.
+
+Lembre-se de como o termfiltro funciona: ele verifica o índice invertido de todos os documentos que contêm um termo e, em seguida, constrói um bitset. Em nosso exemplo simples, temos o seguinte índice invertido:
+
+OBSERVAÇÃO
+A natureza de um índice invertido também significa que toda a igualdade de campo é bastante difícil de calcular.
+Como você determinaria se um documento específico contém apenas o termo de sua solicitação? Você teria que encontrar o termo no índice invertido, extrair os IDs do documento e, em seguida, varrer todas as linhas do índice invertido ,
+procurando esses IDs para ver se um documento tem outros termos.
+
+Como você pode imaginar, isso seria tremendamente ineficiente e caro.
+Por essa razão, terme termssão devem conter operações, não devem ser exatamente iguais a .
+
+
+-----------------Igual a Exatamente-----------------------------------------------------
+
+Se você deseja esse comportamento - igualdade de campo inteiro - a melhor maneira de realizá-lo envolve a indexação de um campo secundário.
+Nesse campo, você indexa o número de valores que seu campo contém.
+Usando nossos dois documentos anteriores, agora incluímos um campo que mantém o número de tags:
+
+{ "tags" : ["search"], "tag_count" : 1 }
+{ "tags" : ["search", "open_source"], "tag_count" : 2 }
+
+Depois de indexar as informações de contagem, você pode construir um bool filtro que aplique o número apropriado de termos:
+
+
+{
+    "query": {
+        "filtered" : {
+            "filter" : {
+                 "bool" : {
+                    "must" : [
+                        { "term" : { "tags" : "search" } }, 1
+                        { "term" : { "tag_count" : 1 } } 2
+                    ]
+                }
+            }
+        }
+    }
+}
+
+1
+Encontre todos os documentos que possuem o termo search.
+
+2
+Mas certifique-se de que o documento tenha apenas uma tag.
+
+Essa consulta agora corresponderá apenas ao documento que possui uma única marca que é search, em vez de qualquer documento que contenha search.
+
+---------------------Gamas-------------------------------
+
+Até agora procuramos apenas números exatos. Na prática, filtrar por intervalos geralmente é mais útil.
+
+"range" : {
+    "price" : {
+        "gt" : 20,
+        "lt" : 40
+    }
+}
+
+O rangefiltro suporta tanto intervalos inclusivos quanto exclusivos, por meio de combinações das seguintes opções:
+
+gt: >maior que
+
+lt: <menos de
+
+gte: >=maior ou igual a
+
+lte: <=menor ou igual a
+
