@@ -2472,3 +2472,37 @@ gte: >=maior ou igual a
 
 lte: <=menor ou igual a
 
+
+----------------------Intervalos em datas--------------------------
+
+O rangefiltro pode ser usado na datacampos também:
+
+"range" : {
+    "timestamp" : {
+        "gt" : "2014-01-01 00:00:00",
+        "lt" : "2014-01-07 00:00:00"
+    }
+}
+
+Quando usado em campos de data, o rangefiltrosuporta operações matemáticas de data .
+Por exemplo, se quisermos encontrar todos os documentos que tenham um carimbo de data/hora em algum momento da última hora:
+
+"range" : {
+    "timestamp" : {
+        "gt" : "now-1h"
+    }
+}
+
+A matemática de data também pode ser aplicada a datas reais, em vez de um espaço reservado como agora.
+Basta adicionar um ( ||) após a data e segui-lo com uma expressão matemática de data:
+
+"range" : {
+    "timestamp" : {
+        "gt" : "2014-01-01 00:00:00",
+        "lt" : "2014-01-01 00:00:00||+1M" 1
+    }
+}
+
+1
+Menos de 1º de janeiro de 2014 mais um mês
+
