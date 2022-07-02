@@ -30,5 +30,7 @@ curl -H 'Content-Type: application/json' -XPOST 'http://localhost:9200/_bulk?pre
 { "date" : "2014-09-23", "name" : "Mary Jones", "tweet" : "So yes, I am an Elasticsearch fanboy", "user_id" : 2 }
 { "create": { "_index": "tweet", "_type": "doc", "_id": "14" }}
 { "date" : "2014-09-24", "name" : "John Smith", "tweet" : "How many more cheesy tweets do I have to write?", "user_id" : 1 }
+{ "create": { "_index": "tweet", "_type": "doc", "_id": "15" }}
+{ "date" : null, "name" : "John Smith", "tweet" : "How many more cheesy tweets do I have to write?", "user_id" : 1 }
 
 '

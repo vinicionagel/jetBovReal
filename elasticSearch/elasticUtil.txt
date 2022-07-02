@@ -2506,3 +2506,63 @@ Basta adicionar um ( ||) após a data e segui-lo com uma expressão matemática 
 1
 Menos de 1º de janeiro de 2014 mais um mês
 
+--------------------------Lidando com valores nulos---------------------
+Em última análise, isso significa que um null, [] (uma matriz vazia) e [null] são todos equivalentes.
+O campo de tags é definido como nulo.
+
+Eles simplesmente não existem no índice invertido!
+
+Obviamente, o mundo não é simples, e os dados muitas vezes estão faltando campos, ou contêm
+nulos explícitos ou matrizes vazias. Para lidar com essas situações, o Elasticsearch tem algumas
+ferramentas para trabalhar com valores nulos ou ausentes.
+
+-------------exists Filter-----------------------
+
+A primeira ferramenta em seu arsenal é o filtro existente . Este filtro retornará documentos que
+ter qualquer valor no campo especificado.
+
+Em sql seria algo como:
+
+SELECT tags
+FROM posts
+WHERE tags IS NOT NULL
+
+
+No Elasticsearch, usamos o filtro existente :
+
+
+"must": [
+            {"exists" : { "field" : "date" }}
+  ]
+
+Os resultados são fáceis de entender. Qualquer documento que tenha termos no campo de date foi
+retornado como uma ocorrência.
+
+----------------Filtro ausente---------------------------
+
+O filtro ausente é essencialmente o inverso de existe: ele retorna documentos onde não há valor para
+um determinado campo, muito parecido com este SQL:
+
+SELECT tags
+FROM posts
+WHERE tags IS NULL
+
+Vamos trocar o filtro existente por um filtro ausente do nosso exemplo anterior:
+
+"bool": {
+          "must_not": [
+             {"exists" : { "field" : "date" }}
+          ]
+        }
+
+ Obs: Quando nulo significa nulo
+
+Às vezes, você precisa ser capaz de distinguir entre um campo que não tem um valor e um
+campo que foi explicitamente definido como nulo. Com o comportamento padrão que vimos
+anteriormente, isso é impossível; os dados são perdidos. Felizmente, existe uma opção que
+podemos definir que substitui valores nulos explícitos por um valor de espaço reservado de nossa escolha.
+
+Ao especificar o mapeamento para um campo de string, numérico, booleano ou de data, você
+também pode definir um valor_nulo que será usado sempre que um valor nulo explícito for
+encontrado. Um campo sem valor ainda será excluído do índice invertido.
+

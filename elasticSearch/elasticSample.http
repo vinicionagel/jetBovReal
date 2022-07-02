@@ -270,7 +270,28 @@ Content-Type: application/json
 
 
 ###
-#Exemplo chamada com filter constant score e range date
+#Exemplo chamada com filter exists
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+
+  "query": {
+    "constant_score": {
+      "filter": {
+        "bool": {
+          "must": [
+            {"exists" : { "field" : "date" }}
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+###
+#Exemplo chamada com filter must_not exists
 GET http://localhost:9200/tweet/_search
 Content-Type: application/json
 
@@ -279,18 +300,8 @@ Content-Type: application/json
     "constant_score": {
       "filter": {
         "bool": {
-          "must": [
-            {"range": {
-              "date" : {
-                "gt" : "2014-09-15",
-                "lt" : "2014-09-24"
-              }
-            }},
-            {
-              "term": {
-                "name.keyword": "John Smith"
-              }
-            }
+          "must_not": [
+            {"exists" : { "field" : "date" }}
           ]
         }
       }
