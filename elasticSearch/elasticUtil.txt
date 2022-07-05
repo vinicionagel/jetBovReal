@@ -2555,7 +2555,7 @@ Vamos trocar o filtro existente por um filtro ausente do nosso exemplo anterior:
           ]
         }
 
- Obs: Quando nulo significa nulo
+Obs: Quando nulo significa nulo
 
 Às vezes, você precisa ser capaz de distinguir entre um campo que não tem um valor e um
 campo que foi explicitamente definido como nulo. Com o comportamento padrão que vimos
@@ -2566,3 +2566,95 @@ Ao especificar o mapeamento para um campo de string, numérico, booleano ou de d
 também pode definir um valor_nulo que será usado sempre que um valor nulo explícito for
 encontrado. Um campo sem valor ainda será excluído do índice invertido.
 
+
+----------------existe/ausente em objetos------------------------
+
+Os filtros existentes e ausentes também funcionam em objetos internos, não apenas nos tipos principais.
+
+você pode verificar a existência de name.first e name.last, mas também apenas name
+Dissemos que um objeto como o anterior é nivelado internamente em uma estrutura de valor de campo simples, mais ou menos assim:
+
+
+{
+ "name.first" : "John",
+ "name.last" : "Smith"
+}
+
+Então, como podemos usar um filtro existente ou ausente no campo de nome , que realmente não
+existe no índice invertido?
+
+A razão pela qual funciona é que um filtro como
+
+{
+ "exists" : { "field" : "name" }
+}
+
+é realmente executado como
+
+{
+ "bool": {
+ "should": [
+ { "exists": { "field": { "name.first" }}},
+ { "exists": { "field": { "name.last" }}}
+ ]
+ }
+ }
+
+Isso também significa que se first e last estivessem vazios, o namespace seria
+não existe
+
+----Tudo sobre cache----------------------------
+
+Em seu coração está um bitset representando quais documentos correspondem ao filtro.
+O Elasticsearch armazena em cache esses bitssets de forma agressiva para uso posterior. Uma vez
+armazenados em cache, esses conjuntos de bits podem ser reutilizados sempre que o mesmo filtro for usado,
+sem a necessidade de reavaliar todo o filtro novamente.
+
+Esses conjuntos de bits em cache são “inteligentes”: eles são atualizados de forma incremental. À medida que
+você indexa novos documentos, apenas esses novos documentos precisam ser adicionados aos conjuntos de
+bits existentes, em vez de ter que recalcular todo o filtro em cache repetidamente. Os filtros são em tempo real
+como o resto do sistema; você não precisa se preocupar com a expiração do cache.
+
+
+Cache de filtro independente
+
+Cada filtro é calculado e armazenado em cache independentemente, independentemente de onde é usado. Se duas
+consultas diferentes usarem o mesmo filtro, o mesmo bitset de filtro será reutilizado. Da mesma forma, se uma
+única consulta usar o mesmo filtro em vários locais, apenas um bitset será calculado e reutilizado.
+
+
+Vejamos esta consulta de exemplo, que procura e-mails que são um dos seguintes:
+
+"bool": {
+ "should": [
+ { "bool": {
+ "must": [
+ { "term": { "folder": "inbox" }},1
+ { "term": { "read": false }}
+ ]
+ }},
+ { "bool": {
+ "must_not": {
+ "term": { "folder": "inbox" } 1
+ },
+ "must": {
+ "term": { "important": true }
+ }
+ }}
+ ]
+ }
+
+1 - Esses dois filtros são idênticos e usarão o mesmo bitset.
+
+Embora uma das cláusulas de caixa de entrada seja uma cláusula must e a outra seja uma cláusula must_not , as
+duas cláusulas são idênticas. Isso significa que o bitset é calculado uma vez para a primeira cláusula que é
+executada e, em seguida, o bitset armazenado em cache é usado para a outra cláusula. Quando essa consulta é
+executada pela segunda vez, o filtro da caixa de entrada já está armazenado em cache e, portanto, ambas as
+cláusulas usarão o bitset armazenado em cache.
+
+Isso combina muito bem com a capacidade de composição da consulta DSL. É fácil mover os filtros ou reutilizar o
+mesmo filtro em vários locais na mesma consulta. Isso não é apenas conveniente para o desenvolvedor – tem
+benefícios diretos de desempenho.
+
+
+-------------Controlando o cache A maioria---------------
