@@ -2658,3 +2658,99 @@ benefícios diretos de desempenho.
 
 
 -------------Controlando o cache A maioria---------------
+
+A maioria dos filtros folha — aqueles que lidam diretamente com campos como o termo filtro — são armazenados em cache,
+enquanto os filtros compostos, como o filtro bool , não.
+
+Os filtros folha precisam consultar o índice invertido no disco, então faz sentido armazená-los em cache. Os filtros compostos, por outro lado, usam
+lógica de bits rápida para combinar os conjuntos de bits resultantes de suas cláusulas internas, por isso é eficiente recalcular sempre.
+
+Certos filtros folha, no entanto, não são armazenados em cache por padrão, porque não faz sentido fazer isso:
+
+Filtros de script:
+Os resultados dos filtros de script não pode ser armazenado em cache porque o significado do script é opaco para o Elasticsearch.
+
+Filtros de geolocalização:
+Para filtrar resultados com base na geolocalização de um usuário específico
+
+Intervalos de datas:
+Intervalos de datas que usam a função now (por exemplo , "now-1h") resultam em valores com precisão
+de milissegundos. Toda vez que o filtro é executado, agora retorna um novo horário.
+
+Às vezes, a estratégia de cache padrão não está correta. Talvez você tenha uma expressão bool complicada
+que é reutilizada várias vezes na mesma consulta. Ou você tem um filtro em um campo de data que nunca
+será reutilizado. A estratégia de cache padrão pode ser substituída em quase qualquer filtro definindo o
+sinalizador _cache :
+
+{
+    "range" : {
+        "timestamp" : {
+            "gt" : "2014-01-02 16:15:14" 1
+        },
+    "_cache": false Desative o cache deste filtro
+    }
+}
+
+1 - É improvável que reutilizemos esse timestamp exato.
+
+2 - Desative o cache deste filtro.
+
+----------Order dos filtros----------------------------------
+
+A ordem dos filtros em uma cláusula bool é importante para o desempenho. Filtros mais específicos devem
+ser colocados antes de filtros menos específicos para excluir tantos documentos quanto possível, o mais
+cedo possível.
+
+Se a Cláusula A puder corresponder a 10 milhões de documentos e a Cláusula B puder corresponder apenas
+a 100 documentos, a Cláusula B deverá ser colocada antes da Cláusula A.
+
+GET /logs/2014-01/_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+                    "timestamp" : {
+                        "gt" : "now-1h"
+                    }
+                }
+            }
+        }
+    }
+}
+
+Este filtro não é armazenado em cache porque usa a função now , cujo valor muda a cada milissegundo. Isso
+significa que temos que examinar o valor de um mês de eventos de log toda vez que executarmos essa consulta!
+
+Poderíamos tornar isso muito mais eficiente combinando-o com um filtro em cache: podemos excluir a maioria dos
+dados do mês adicionando um filtro que usa um ponto fixo no tempo, como meia-noite da noite passada:
+
+"bool": {
+    "must": [
+        { "range" : {
+            "timestamp" : {
+            "gt" : "now-1h/d" 1
+        }
+    }},
+        { "range" : {
+            "timestamp" : {
+            "gt" : "now-1h" 2
+        }
+    }}
+ ]
+}
+
+1 - Este filtro é armazenado em cache porque usa agora arredondado para meia-noite
+
+2 - Este filtro não é armazenado em cache porque usa agora sem arredondamento.
+
+A cláusula now-1h/d arredonda para a meia-noite anterior e, portanto, exclui todos os documentos criados antes de hoje.
+
+O bitset resultante é armazenado em cache porque now é usado com arredondamento, o que significa que ele
+é executado apenas uma vez por dia, quando o valor de meia-noite-última noite muda. A cláusula now-1h não é
+armazenada em cache porque agora produz um tempo com precisão de milissegundos mais próximo. No entanto,
+graças ao primeiro filtro, este segundo filtro precisa apenas verificar os documentos que foram criados desde a meianoite.
+
+A ordem dessas cláusulas é importante. Essa abordagem funciona apenas porque a cláusula desde meia-noite vem
+antes da cláusula de última hora. Se fosse o contrário, a cláusula de última hora precisaria examinar todos os
+documentos no índice, em vez de apenas os documentos criados desde a meia-noite
