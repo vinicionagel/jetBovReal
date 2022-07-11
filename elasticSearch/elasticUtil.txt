@@ -2754,3 +2754,51 @@ graças ao primeiro filtro, este segundo filtro precisa apenas verificar os docu
 A ordem dessas cláusulas é importante. Essa abordagem funciona apenas porque a cláusula desde meia-noite vem
 antes da cláusula de última hora. Se fosse o contrário, a cláusula de última hora precisaria examinar todos os
 documentos no índice, em vez de apenas os documentos criados desde a meia-noite
+
+
+----------------Pesquisa de texto completo--------------------------------
+
+Como pesquisar em campos de texto completo para encontrar os documentos mais relevantes.
+
+
+Os dois aspectos mais importantes da pesquisa de texto completo são os seguintes:
+
+Relevância:
+
+A capacidade de classificar os resultados de acordo com a relevância deles para a consulta fornecida, se
+a relevância é calculada usando TF/IDF (consulte “O que é relevância?” na página 115), proximidade com
+uma geolocalização, similaridade difusa ou algum outro algoritmo
+
+Análise:
+
+O processo de conversão de um bloco de texto em tokens normalizados distintos.
+
+Assim que falamos sobre relevância ou análise, estamos no território das consultas, e não dos filtros.
+
+------Baseado em Termo versus Texto Completo-----------
+
+Embora todas as consultas executem algum tipo de cálculo de relevância, nem todas as consultas têm uma
+fase de análise. Além de consultas especializadas como as consultas bool ou function_score , que não operam
+em texto, as consultas textuais podem ser divididas em duas famílias:
+
+Consultas baseadas em termos:
+
+Consultas como o termo ou consultas difusas são consultas de baixo nível que não têm fase de análise.
+Eles operam em um único termo. Uma consulta de termo para o termo que Foo procura esse termo exato no índice invertido
+e calcula o _score de relevância TF/IDF para cada documento que contém o termo.
+
+É importante lembrar que o termo query procura no índice invertido apenas o termo exato; ele não
+corresponderá a nenhuma variante como foo ou FOO
+
+Consultas de texto completo:
+
+Consultas como match ou query_string são consultas de alto nível que entendem o mapeamento de um campo:
+
+-Se você usá-los para consultar um campo de data ou inteiro , eles tratarão a string de consulta como uma data ou um inteiro, respectivamente.
+
+-Se você consultar um campo de string de valor exato (not_analyzed) , eles tratarão toda a string de consulta como um único termo.
+
+-Se você consultar um campo de texto completo (analisado) , eles passarão primeiro a string de consulta pelo analisador apropriado para produzir a lista de termos a serem consultados.
+
+
+
