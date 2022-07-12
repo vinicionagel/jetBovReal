@@ -2801,4 +2801,29 @@ Consultas como match ou query_string são consultas de alto nível que entendem 
 -Se você consultar um campo de texto completo (analisado) , eles passarão primeiro a string de consulta pelo analisador apropriado para produzir a lista de termos a serem consultados.
 
 
+Se você quiser usar uma consulta em um campo de valor exato não_analisado, pense se realmente deseja uma consulta ou um filtro.
 
+GET /_search
+
+  "query": {
+    "constant_score": {
+        "filter": {
+            "bool": {
+                "must": [
+                    {
+                      "term": { "gender": "female" }
+                    }
+                ]
+            }
+        }
+    }
+}
+
+-------------------A consulta de correspondência--------------------------
+
+A consulta de correspondência é a consulta principal – a primeira consulta que você deve acessar sempre
+que precisar consultar qualquer campo. É uma consulta de texto completo de alto nível, o que significa que
+sabe como lidar com campos de texto completo e campos de valor exato.
+
+Dito isso, o principal caso de uso para a consulta de correspondência é para pesquisa de texto completo. Então, vamos dar
+uma olhada em como a pesquisa de texto completo funciona com um exemplo simples.
