@@ -2827,3 +2827,138 @@ sabe como lidar com campos de texto completo e campos de valor exato.
 
 Dito isso, o principal caso de uso para a consulta de correspondência é para pesquisa de texto completo. Então, vamos dar
 uma olhada em como a pesquisa de texto completo funciona com um exemplo simples.
+
+----------------Uma consulta de palavra única-----------------------------
+
+
+
+
+GET /my_index/my_type/_search
+{
+ "query": {
+    "match": {
+        "title": "QUICK!"
+        }
+    }
+}
+
+
+O Elasticsearch executa a consulta de correspondência anterior da seguinte maneira:
+
+1. Verifique o tipo de campo.
+
+O campo de título é um campo de string de texto completo (analisado) , o que significa que a string de consulta
+também deve ser analisada.
+
+2. Analise a string de consulta
+
+A string de consulta RÁPIDO! é passado pelo analisador padrão, o que resulta em um único termo rápido. Como
+temos apenas um único termo, a consulta de correspondência pode ser executada como uma única consulta de
+termo de baixo nível.
+
+3. Encontre documentos correspondentes.
+
+O termo consulta procura rapidamente no índice invertido.
+
+4. Pontue cada doc.
+
+O termo query calcula a relevância _score para cada documento correspondente, combinando a frequência do
+termo (com que frequência quick aparece no campo de título de cada documento), com a frequência inversa do
+documento (com que frequência quick aparece no campo de título em todos os documentos do index) e o
+comprimento de cada campo (campos mais curtos são considerados mais relevantes)
+
+"hits": [
+{
+ "_id": "1",
+ "_score": 0.5, - 1
+ "_source": {
+ title": "The quick brown fox"
+  }
+ },
+ {
+  "_id": "3",
+  "_score": 0.44194174,  - 2
+  "_source": {
+  "title": "The quick brown fox jumps over the quick dog"
+  }
+ },
+ {
+  "_id": "2",
+  "_score": 0.3125, - 2
+  "_source": {
+  "title": "The quick brown fox jumps over the lazy dog"
+  }
+ }
+ ]
+ }
+
+
+ O documento 1 é mais relevante porque seu campo de título é curto, o que significa que rápido representa uma
+ grande parte de seu conteúdo.
+
+ O documento 3 é mais relevante que o documento 2 porque rápido aparece duas vezes.
+
+
+ ------------------Consultas de várias palavras----------------------
+
+ Se pudéssemos pesquisar apenas uma palavra de cada vez, a pesquisa de texto completo seria bastante inflexível.
+ Felizmente, a consulta de correspondência torna as consultas de várias palavras igualmente simples:
+
+ GET /my_index/my_type/_search
+ {
+  "query": {
+    "match": {
+        "title": "BROWN DOG!"
+        }
+    }
+ }
+
+
+ A consulta anterior retorna todos os quatro documentos na lista de resultados:
+
+
+
+ {
+  "hits": [
+  {
+  "_id": "4",
+  "_score": 0.73185337, 1
+  "_source": {
+  "title": "Brown fox brown dog"
+  }
+  },
+  {
+  "_id": "2",
+
+  "_score": 0.47486103, 2
+   "_source": {
+   "title": "The quick brown fox jumps over the lazy dog"
+   }
+   },
+   {
+   "_id": "3",
+   "_score": 0.47486103, 2
+   "_source": {
+   "title": "The quick brown fox jumps over the quick dog"
+   }
+   },
+   {
+   "_id": "1",
+   "_score": 0.11914785, 3
+   "_source": {
+   "title": "The quick brown fox"
+   }
+   }
+   ]
+  }
+
+   1 - O documento 4 é o mais relevante porque contém "marrom" duas vezes e "cachorro"
+
+   2 - Os documentos 2 e 3 contêm brown e dog uma vez cada, e o campo de título tem o mesmo tamanho em
+       ambos os documentos, portanto, eles têm a mesma pontuação
+
+   3 - O documento 1 corresponde, embora contenha apenas marrom, não cachorro.
+
+Como a consulta de correspondência precisa procurar dois termos—["brown","dog"]—internamente , ela precisa
+executar duas consultas de termos e combinar seus resultados individuais no resultado geral. Para fazer isso,
+ele agrupa as consultas de dois termos em uma consulta bool
