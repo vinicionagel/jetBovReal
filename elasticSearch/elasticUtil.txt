@@ -2961,4 +2961,90 @@ comprimento de cada campo (campos mais curtos são considerados mais relevantes)
 
 Como a consulta de correspondência precisa procurar dois termos—["brown","dog"]—internamente , ela precisa
 executar duas consultas de termos e combinar seus resultados individuais no resultado geral. Para fazer isso,
-ele agrupa as consultas de dois termos em uma consulta bool
+ele agrupa as consultas de dois termos em uma consulta bool.
+
+O importante a tirar disso é que qualquer documento cujo campo de título contenha pelo menos um dos termos
+especificados corresponderá à consulta. Quanto mais termos corresponderem, mais relevante será o documento.
+
+
+------------Melhorando a precisão A------------------
+
+A correspondência de qualquer documento que contenha qualquer um dos termos de consulta pode resultar em
+uma longa cauda de resultados aparentemente irrelevantes. É uma abordagem de espingarda para pesquisar.
+Talvez queiramos mostrar apenas documentos que contenham todos os termos de consulta. Em outras
+palavras, em vez de brown OR dog, queremos retornar apenas documentos que correspondam a brown AND dog.
+
+GET /my_index/my_type/_search
+{
+    "query": {
+        "match": {
+            "title": { 1
+                "query": "BROWN DOG!",
+                "operator": "and"
+            }
+        }
+    }
+}
+
+1 - A estrutura da consulta de correspondência deve mudar um pouco para acomodar o parâmetro
+    do operador .
+
+Essa consulta excluiria o documento 1, que contém apenas um dos dois termos.
+
+----------------Controlando a precisão-----------------------
+
+A escolha entre tudo e qualquer um é um pouco preto ou branco demais. E se o usuário especificar
+cinco termos de consulta e um documento contiver apenas quatro deles? Definir operador para e excluiria este documento.
+
+Às vezes, é exatamente isso que você deseja, mas para a maioria dos casos de uso de pesquisa de texto completo,
+você deseja incluir documentos que possam ser relevantes, mas excluir aqueles que provavelmente não serão relevantes.
+Em outras palavras, precisamos de algo intermediário.
+
+A consulta de correspondência suporta o parâmetro Minimum_should_match , que permite
+especificar o número de termos que devem corresponder para que um documento seja considerado
+relevante. Embora você possa especificar um número absoluto de termos, geralmente faz sentido especificar uma porcentagem.
+
+GET /my_index/my_type/_search
+{
+ "query": {
+    "match": {
+        "title": {
+            "query": "quick brown dog",
+            "minimum_should_match": "75%"
+        }
+    }
+ }
+}
+
+Quando especificado como uma porcentagem, Minimum_should_match faz a coisa certa: no exemplo anterior com três termos, 75% seriam arredondados para 66,6%, ou dois dos três termos.
+Independentemente do que você definir, pelo menos um termo deve corresponder para que um documento seja considerado uma correspondência.
+
+O parâmetro Minimum_should_match é flexível e regras diferentes podem ser aplicadas dependendo do número de termos que o usuário inserir.
+
+Para entender completamente como a consulta de correspondência lida com consultas de várias palavras,
+precisamos ver como combinar várias consultas com a consulta bool .
+
+----------Combinando consultas----------
+
+Os filtros tomam uma decisão binária: este documento deve ou não ser incluído na lista de resultados? As
+consultas, no entanto, são mais sutis. Eles decidem não apenas se devem incluir um documento, mas
+também a relevância desse documento.
+Os resultados da consulta anterior incluem qualquer documento cujo campo de título contenha o termo
+quick, exceto aqueles que também contenham lazy. Até agora, isso é bastante semelhante ao modo como
+o filtro bool funciona.
+Como o filtro equivalente, a consulta bool aceita várias cláusulas de consulta nos parâmetros must,
+must_not e should . Por exemplo:
+
+GET /my_index/my_type/_search //TODO transformar
+{
+ "query": {
+ "bool": {
+ "must": { "match": { "title": "quick" }},
+ "must_not": { "match": { "title": "lazy" }},
+ "should": [
+ { "match": { "title": "brown" }},
+ { "match": { "title": "dog" }}
+ ]
+ }
+ }
+}
