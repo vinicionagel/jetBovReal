@@ -3035,7 +3035,7 @@ o filtro bool funciona.
 Como o filtro equivalente, a consulta bool aceita várias cláusulas de consulta nos parâmetros must,
 must_not e should . Por exemplo:
 
-GET /my_index/my_type/_search //TODO transformar
+GET /my_index/my_type/_search //TODO transformar página 204
 {
  "query": {
  "bool": {
