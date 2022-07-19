@@ -3035,7 +3035,7 @@ o filtro bool funciona.
 Como o filtro equivalente, a consulta bool aceita várias cláusulas de consulta nos parâmetros must,
 must_not e should . Por exemplo:
 
-GET /my_index/my_type/_search //TODO transformar página 204
+GET /my_index/my_type/_search //
 {
  "query": {
  "bool": {
@@ -3045,6 +3045,63 @@ GET /my_index/my_type/_search //TODO transformar página 204
  { "match": { "title": "brown" }},
  { "match": { "title": "dog" }}
  ]
+ }
+ }
+}
+
+Os resultados da consulta anterior incluem qualquer documento cujo campo de título contenha o termo quick, exceto aqueles que também contenham lazy. Até agora, isso é bastante semelhante ao modo comoo filtro bool funciona.
+
+
+A diferença vem com as duas cláusulas devem , que dizem que: um documento não precisa conter marrom ou cachorro, mas se contiver, deve ser considerado mais relevante:
+
+{
+ "hits": [
+ {
+ "_id": "3",
+ "_score": 0.70134366, - 1
+ "_source": {
+  "title": "The quick brown fox jumps over the quick dog"
+  }
+  },
+  {
+  "_id": "1",
+  "_score": 0.3312608,
+  "_source": {
+  "title": "The quick brown fox"
+  }
+  }
+  ]
+ }
+
+
+1 - Documento 3 pontua mais alto porque contém marrom e cachorro.
+
+
+-------Cálculo de pontuação--------------
+
+A consulta booleana calcula o _score de relevância para cada documento adicionando o _score de todas as cláusulas must e must correspondentes e , em seguida, dividindo pelo número total de cláusulas must e should.
+
+As cláusulas must_not não afetam a pontuação; sua única finalidade é excluir documentos que de outra forma poderiam ter sido incluídos.
+
+-------Controlando a Precisão-----------
+
+Todas as cláusulas must devem corresponder e todas as cláusulas must_not não devem corresponder, mas quantas cláusulas devem corresponder ? Por padrão, nenhuma das cláusulas devem corresponder,
+com uma exceção: se não houver cláusulas devem , pelo menos uma cláusula deve corresponder.
+
+Assim como podemos controlar a precisão da consulta de correspondência , podemos controlar quantas cláusulas devem corresponder usando o parâmetro Minimum_should_match ,
+seja como um número absoluto ou como uma porcentagem:
+
+
+GET /my_index/my_type/_search
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "brown" }},
+ { "match": { "title": "fox" }},
+ { "match": { "title": "dog" }}
+ ],
+ "minimum_should_match": 2
  }
  }
 }

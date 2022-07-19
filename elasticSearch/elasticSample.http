@@ -308,3 +308,21 @@ Content-Type: application/json
     }
   }
 }
+
+###
+#Exemplo chamada com should com vários argumentos
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "from": 0,
+  "size": 10,
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "tweet": "Elasticsearch" }},
+        { "match": { "tweet": "API" }}
+      ]
+    }
+  }
+}
