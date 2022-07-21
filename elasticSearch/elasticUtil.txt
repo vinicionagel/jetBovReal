@@ -3101,7 +3101,56 @@ GET /my_index/my_type/_search
  { "match": { "title": "fox" }},
  { "match": { "title": "dog" }}
  ],
- "minimum_should_match": 2
+ "minimum_should_match": 2 - 1
  }
  }
 }
+
+1 - Isso também pode ser expresso em porcentagem.
+
+Os resultados incluiriam apenas documentos cujo campo de título contenha "marrom" E "raposa", "marrom" E
+"cachorro" ou "raposa" E "cachorro". Se um documento contiver todos os três, será considerado mais relevante do que aqueles que contenham apenas dois dos três.
+
+-----Como o jogo usa bool------------
+
+Até agora, você provavelmente já percebeu que as consultas de correspondência de várias palavras simplesmente
+envolvem as consultas de termo geradas em uma consulta bool . Com o operador ou padrão , cada consulta de termo
+é adicionada como uma cláusula should , portanto, pelo menos uma cláusula deve corresponder. Essas duas consultas
+são equivalentes:
+
+{
+ "match": { "title": "brown fox"}
+}
+
+{
+ "bool": {
+ "should": [
+ { "term": { "title": "brown" }},
+ { "term": { "title": "fox" }}
+ ]
+ }
+}
+
+Com o operador and , todas as consultas de termos são adicionadas como cláusulas must , portanto, todas as
+cláusulas devem corresponder. Essas duas consultas são equivalentes:
+
+{
+ "match": {
+ "title": {
+ "query": "brown fox",
+ "operator": "and"
+ }
+ }
+}
+
+{
+ "bool": {
+ "must": [
+ { "term": { "title": "brown" }},
+ { "term": { "title": "fox" }}
+ ]
+ }
+}
+
+E se o parâmetro Minimum_should_match for especificado, ele é passado diretamente para a consulta bool , tornando
+essas duas consultas equivalentes
