@@ -3154,3 +3154,71 @@ cláusulas devem corresponder. Essas duas consultas são equivalentes:
 
 E se o parâmetro Minimum_should_match for especificado, ele é passado diretamente para a consulta bool , tornando
 essas duas consultas equivalentes
+
+
+{
+ "match": {
+ "title": {
+ "query": "quick brown fox",
+ "minimum_should_match": "75%"
+ }
+ }
+}
+{
+ "bool": {
+ "should": [
+ { "term": { "title": "brown" }},
+ { "term": { "title": "fox" }},
+ { "term": { "title": "quick" }}
+ ],
+ "minimum_should_match": 2 -1
+ }
+}
+
+1 - Como há apenas três cláusulas, o valor Minimum_should_match de 75% na consulta de correspondência é
+arredondado para 2. Pelo menos duas das três cláusulas devem corresponder.
+
+É claro que normalmente escreveríamos esses tipos de consultas usando a consulta de correspondência , mas entender
+como a consulta de correspondência funciona internamente permite que você assuma o controle do processo quando
+precisar. Algumas coisas não podem ser feitas com uma única consulta de correspondência , como dar mais peso a
+alguns termos de consulta do que a outros. Veremos um exemplo disso na próxima seção.
+
+
+---------------------Impulsionando cláusulas de consulta--------------
+
+É claro que a consulta bool não se restringe a combinar consultas simples de correspondência de uma palavra . Ele
+pode combinar qualquer outra consulta, incluindo outras consultas booleanas . É comumente usado para ajustar a
+_score de relevância para cada documento combinando as pontuações de várias consultas distintas.
+
+
+Imagine que queremos pesquisar documentos sobre “pesquisa de texto completo”, mas queremos dar mais peso a
+documentos que também mencionam “Elasticsearch” ou “Lucene”. Por mais peso, queremos dizer que documentos que
+mencionam “Elasticsearch” ou “Lucene” receberão um _score de relevância maior do que aqueles que não o fizerem, o
+que significa que eles aparecerão mais alto na lista de resultados.
+
+Uma simples consulta bool nos permite escrever essa lógica bastante complexa da seguinte forma:
+
+GET /_search
+{
+ "query": {
+ "bool": {
+  "must": {
+  "match": {
+  "content": { 1
+  "query": "full text search",
+  "operator": "and"
+  }
+  }
+  },
+  "should": [ 2
+  { "match": { "content": "Elasticsearch" }},
+  { "match": { "content": "Lucene" }}
+  ]
+  }
+ } //TODO pagina 206 e fazer essa consulta com o elastic 6.8
+
+
+ 1 - O campo de conteúdo deve conter todas as palavras completa, texto e pesquisa.
+
+ 2 - Se o campo de conteúdo também contiver Elasticsearch ou Lucene, o documento receberá
+     um _score mais alto.
