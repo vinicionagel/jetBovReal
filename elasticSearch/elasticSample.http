@@ -345,3 +345,58 @@ Content-Type: application/json
     }
   }
 }
+
+###
+#Imagine que queremos pesquisar documentos sobre “pesquisa de texto completo”, mas queremos dar mais peso a
+#documentos que também mencionam “Elasticsearch” ou “Lucene”. Por mais peso, queremos dizer que documentos que
+#mencionam “Elasticsearch” ou “Lucene” receberão um _score de relevância maior do que aqueles que não o fizerem, o
+#que significa que eles aparecerão mais alto na lista de resultados.
+#Exemplo chamada com minimum_should_match
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match": {
+          "tweet": {
+            "query": "full text search",
+            "operator": "and"
+          }
+        }
+      },
+      "should": [
+        { "match": { "tweet": "Elasticsearch" }},
+        { "match": { "tweet": "Lucene" }}
+      ]
+    }
+  }
+}
+
+###
+#Boosting consulta com full text
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+
+      "should": [
+        { "match": {
+          "tweet": {
+            "query": "Elasticsearch",
+            "boost": 3
+          }
+        }},
+        { "match": {
+          "tweet": {
+            "query": "easy",
+            "boost": 2
+          }
+        }}
+      ]
+    }
+  }
+}

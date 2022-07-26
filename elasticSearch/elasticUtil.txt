@@ -3215,10 +3215,67 @@ GET /_search
   { "match": { "content": "Lucene" }}
   ]
   }
- } //TODO pagina 206 e fazer essa consulta com o elastic 6.8
+ }
+ }
 
 
  1 - O campo de conteúdo deve conter todas as palavras completa, texto e pesquisa.
 
  2 - Se o campo de conteúdo também contiver Elasticsearch ou Lucene, o documento receberá
      um _score mais alto.
+
+Mas e se quisermos dar mais peso aos documentos que contêm Lucene e ainda mais peso aos
+documentos que contêm Elasticsearch?
+
+Podemos controlar o peso relativo de qualquer cláusula de consulta especificando um valor de
+reforço , cujo padrão é 1. Um valor de reforço maior que 1 aumenta o peso relativo dessa cláusula.
+Assim, poderíamos reescrever a consulta anterior da seguinte forma:
+
+
+GET /_search
+{
+ "query": {
+ "bool": {
+ "must": {
+ "match": { - 1
+ "content": {
+ "query": "full text search",
+ "operator": "and"
+ }
+ }
+ },
+ "should": [
+ { "match": {
+ "content": {
+ "query": "Elasticsearch",
+ "boost": 3 - 2
+ }
+ }},
+ { "match": {
+    "content": {
+     "query": "Lucene",
+     "boost": 2 - 3
+     }
+     }}
+     ]
+     }
+     }
+ }
+
+1 - Essas cláusulas usam o aumento padrão de 1
+
+2 - Esta cláusula é a mais importante, pois tem o maior impulso
+
+3 - Essa cláusula é mais importante que o padrão, mas não tão importante quanto a cláusula Elasticsearch.
+
+O parâmetro boost é usado para aumentar o peso relativo de uma cláusula (com um boost maior que 1) ou diminuir o peso relativo (com um boost entre 0 e 1),
+mas o aumento ou diminuição não é linear. Em outras palavras, um aumento de 2 não resulta no dobro de pontuação.
+
+Em vez disso, o novo _score é normalizado após a aplicação do aumento. Cada tipo de consulta tem seu próprio algoritmo de normalização e os
+detalhes estão além do escopo deste livro. Basta dizer que um valor de aumento mais alto resulta em um _score mais alto.
+
+Se você estiver implementando seu próprio modelo de pontuação não baseado em TF/IDF e precisar de mais controle sobre o processo de
+aumento, poderá usar a consulta function_score para manipular o aumento de um documento sem a etapa de normalização.
+
+-------------------Análise de controle---------------------- //TODO 209
+
