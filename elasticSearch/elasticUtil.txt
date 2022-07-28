@@ -3277,5 +3277,57 @@ detalhes estão além do escopo deste livro. Basta dizer que um valor de aumento
 Se você estiver implementando seu próprio modelo de pontuação não baseado em TF/IDF e precisar de mais controle sobre o processo de
 aumento, poderá usar a consulta function_score para manipular o aumento de um documento sem a etapa de normalização.
 
--------------------Análise de controle---------------------- //TODO 209
+-------------------Análise de controle---------------------- //
+
+As consultas podem encontrar apenas os termos que realmente existem no índice invertido, portanto, é
+importante garantir que o mesmo processo de análise seja aplicado ao documento no momento do índice
+e à string da consulta no momento da pesquisa para que os termos da consulta correspondam os termos
+no índice invertido.
+
+Embora digamos documento, os analisadores são determinados por campo. Cada campo pode ter um
+analisador diferente, seja configurando um analisador específico para aquele campo ou caindo de volta aos padrões de tipo, índice ou nó. Na hora do índice,
+o valor de um campo é analisado usando o analisador configurado ou padrão para esse campo.
+
+PUT /my_index/_mapping/my_type
+{
+ "my_type": {
+ "properties": {
+ "english_title": {
+ "type": "string",
+ "analyzer": "english"
+ }
+ }
+ }
+}
+
+
+GET /my_index/_analyze?field=my_type.title 1
+Foxes
+GET /my_index/_analyze?field=my_type.english_title 2
+Foxes
+
+1 - O título do campo , que usa o analisador padrão padrão , retornará o termo raposas
+
+2 - O campo english_title, que utiliza o analisador inglês , retornará o termo fox.
+
+Isso significa que, se executarmos uma consulta de termo de baixo nível para o termo exato fox, o campo
+english_title corresponderia, mas o campo title não.
+
+As consultas de alto nível, como a consulta de correspondência, entendem os mapeamentos de campo e podem aplicar o analisador correto para cada campo consultado. Podemos ver isso em ação com a
+API de consulta de validação:
+
+GET /my_index/my_type/_validate/query?explain
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "Foxes"}},
+ { "match": { "english_title": "Foxes"}}
+ ]
+ }
+ }
+}
+
+Isso significa que, se executarmos uma consulta de termo de baixo nível para o termo exato fox, o campo
+english_title corresponderia, mas o campo title não. //TODO 210
 
