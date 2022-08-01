@@ -3329,5 +3329,50 @@ GET /my_index/my_type/_validate/query?explain
 }
 
 Isso significa que, se executarmos uma consulta de termo de baixo nível para o termo exato fox, o campo
-english_title corresponderia, mas o campo title não. //TODO 210
+english_title corresponderia, mas o campo title não.
+
+As consultas de alto nível, como a consulta de correspondência, entendem os mapeamentos de campo e podem aplicar o analisador correto para cada campo consultado.
+Podemos ver isso em ação com a API de consulta de validação:
+
+
+GET /my_index/my_type/_validate/query?explain
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "Foxes"}},
+ { "match": { "english_title": "Foxes"}}
+ ]
+ }
+ }
+}
+
+A consulta de correspondência usa o analisador apropriado para cada campo para garantir que ela procure cada termo no formato correto para esse campo.
+
+
+---------------Analisadores padrão---------------------
+
+
+Embora possamos especificar um analisador no nível do campo, como determinamos qual analisador
+é usado para um campo se nenhum for especificado no nível do campo?
+
+Os analisadores podem ser especificados em vários níveis. O Elasticsearch trabalha em cada nível até encontrar um analisador que possa ser usado. Na hora do índice, a ordem é a seguinte:
+
+• O analisador definido no mapeamento de campo, senão
+• O analisador definido no campo _analyzer do documento, senão
+• O analisador padrão para o tipo, cujo padrão é
+• O analisador denominado default nas configurações de índice, cujo padrão é
+• O analisador denominado default no nível do nó, que tem como padrão
+• O analisador padrão
+
+Na hora da busca, a sequência é um pouco diferente:
+
+• O analisador definido na própria consulta, senão
+• O analisador definido no mapeamento de campo, senão
+• O analisador padrão para o tipo, cujo padrão é
+• O analisador denominado default nas configurações de índice, cujo padrão é
+• O analisador denominado default no nível do nó, que tem como padrão
+• O analisador padrão
+
+//TODO 211
 
