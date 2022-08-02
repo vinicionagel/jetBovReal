@@ -3427,4 +3427,4 @@ etapa DFS extra a todas as consultas executadas.
 
 
 Frequentemente, precisamos pesquisar as mesmas ou diferentes strings de consulta em um ou mais campos, o que significa
-que precisamos combinar várias cláusulas de consulta e suas pontuações de relevância de uma maneira que faça sentido.
+que precisamos combinar várias cláusulas de consulta e suas pontuações de relevância de uma maneira que faça sentido. //TODO 217
