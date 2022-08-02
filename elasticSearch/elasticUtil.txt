@@ -3374,5 +3374,57 @@ Na hora da busca, a sequência é um pouco diferente:
 • O analisador denominado default no nível do nó, que tem como padrão
 • O analisador padrão
 
-//TODO 211
+-------------Conguring Analyzers in Practice------------------
 
+
+Antes vamos fazer um rápido desvio para explicar por que criamos nosso índice de teste com apenas um shard primário.
+
+De vez em quando, um novo usuário abre um problema alegando que a classificação por relevância está quebrada e oferece uma reprodução curta:
+o usuário indexa alguns documentos, executa uma consulta simples e encontra resultados aparentemente menos relevantes aparecendo acima de resultados mais relevantes.
+
+Para entender por que isso acontece, vamos imaginar que criamos um índice com dois shards primários
+e indexamos dez documentos, seis dos quais contêm a palavra foo. Pode acontecer que o fragmento 1
+contenha três dos documentos foo e o fragmento 2 contenha os outros três. Em outras palavras, nossos
+documentos são bem distribuídos.
+
+A frequência do termo conta o número de vezes que um termo aparece no campo que estamos
+consultando no documento atual. Quanto mais vezes aparecer, mais relevante é este documento. A
+frequência inversa de documentos leva em consideração a frequência com que um termo aparece
+como uma porcentagem de todos os documentos no índice. Quanto mais frequentemente o termo
+aparece, menos peso ele tem.
+
+No entanto, por motivos de desempenho, o Elasticsearch não calcula o IDF em todos os documentos
+no índice. Em vez disso, cada fragmento calcula um IDF local para os documentos contidos nesse
+fragmento.
+
+Como nossos documentos são bem distribuídos, o IDF para ambos os estilhaços será o mesmo.
+
+Agora imagine que cinco dos documentos foo estão no fragmento 1 e o sexto documento está no
+fragmento 2. Nesse cenário, o termo foo é muito comum em um fragmento (e, portanto, de pouca
+importância), mas raro no outro fragmento (e muito mais importante). Essas diferenças no IDF podem
+produzir resultados incorretos.
+
+Na prática, isso não é um problema. As diferenças entre IDF local e global diminuem quanto mais
+documentos você adiciona ao índice. Com volumes de dados do mundo real, os IDFs locais logo se
+equilibram. O problema não é que a relevância está quebrada, mas que há poucos dados.
+
+Para fins de teste, há duas maneiras de contornar esse problema. A primeira é criar um índice com um
+fragmento primário, como fizemos na seção que apresenta a consulta de correspondência . Se você
+tiver apenas um estilhaço, o IDF local será o IDF global.
+
+A segunda solução é adicionar ?search_type=dfs_query_then_fetch às suas solicitações de pesquisa.
+O dfs significa Distributed Frequency Search e diz ao Elasticsearch para primeiro recuperar o IDF local
+de cada fragmento para calcular o IDF global em todo o índice.
+
+--Dica:
+
+Não use dfs_query_then_fetch em produção. Realmente não é
+necessário. Apenas ter dados suficientes garantirá que suas frequências
+de semestre sejam bem distribuídas. Não há motivo para adicionar essa
+etapa DFS extra a todas as consultas executadas.
+
+--------------Pesquisa de vários campos-------------------------------
+
+
+Frequentemente, precisamos pesquisar as mesmas ou diferentes strings de consulta em um ou mais campos, o que significa
+que precisamos combinar várias cláusulas de consulta e suas pontuações de relevância de uma maneira que faça sentido.
