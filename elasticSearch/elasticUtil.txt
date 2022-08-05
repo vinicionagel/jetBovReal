@@ -3427,4 +3427,36 @@ etapa DFS extra a todas as consultas executadas.
 
 
 Frequentemente, precisamos pesquisar as mesmas ou diferentes strings de consulta em um ou mais campos, o que significa
-que precisamos combinar várias cláusulas de consulta e suas pontuações de relevância de uma maneira que faça sentido. //TODO 217
+que precisamos combinar várias cláusulas de consulta e suas pontuações de relevância de uma maneira que faça sentido.
+
+Talvez estejamos procurando um livro chamado Guerra e paz de um autor chamado Leo Tolstói. Talvez
+estejamos pesquisando na documentação do Elasticsearch por “mínimo deve corresponder”, que pode
+estar no título ou no corpo de uma página. Ou talvez estejamos procurando usuários com nome John e
+sobrenome Smith.
+
+
+
+-------------Diferença entre "match" e "terms" -----------------
+
+Match trata de valores apróximados.
+
+e term para valores exatos, cuidado com campos que possuem 2 tipificação.
+
+-----------Várias strings de consulta---------------------------
+
+A consulta multicampo mais simples de se lidar é aquela em que podemos mapear termos de pesquisa
+para campos específicos. Se sabemos que Guerra e Paz é o título e Leo Tolstoy é o autor, é fácil escrever
+cada uma dessas condições como uma cláusula de correspondência e combiná-las com uma consulta
+bool:
+
+GET /_search
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "War and Peace" }},
+ { "match": { "author": "Leo Tolstoy" }}
+ ]
+ }
+ }
+} //TODO 218 ajustar consulta e fazer...
