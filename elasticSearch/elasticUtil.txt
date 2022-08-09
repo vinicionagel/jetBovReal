@@ -3459,4 +3459,46 @@ GET /_search
  ]
  }
  }
-} //TODO 218 ajustar consulta e fazer...
+}
+
+A consulta bool tem uma abordagem mais correspondências-é-melhor, portanto, a pontuação de cada cláusula de
+correspondência será adicionada para fornecer a _score final para cada documento.
+Por que colocamos as cláusulas do tradutor dentro de uma consulta booleana separada? Todas as quatro consultas
+de correspondência são cláusulas should , então por que simplesmente não colocamos as cláusulas do tradutor no
+mesmo nível das cláusulas do título e do autor?
+Documentos que correspondem a ambas as cláusulas terão pontuação mais alta do que documentos que correspondam a
+apenas uma cláusula.
+
+Claro, você não está restrito a usar apenas cláusulas de correspondência: a consulta booliana pode envolver
+qualquer outro tipo de consulta, incluindo outras consultas boolianas . Poderíamos adicionar uma cláusula para
+especificar que preferimos ver versões do livro que foram traduzidas por traduções específicas.
+
+
+GET /_search
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "War and Peace" }},
+ { "match": { "author": "Leo Tolstoy" }},
+ { "bool": {
+ "should": [
+ { "match": { "translator": "Constance Garnett" }},
+ { "match": { "translator": "Louise Maude" }}
+ ]
+ }}
+ ]
+ }
+ }
+}
+
+Por que colocamos as cláusulas do tradutor dentro de uma consulta booleana separada? Todas as quatro consultas
+de correspondência são cláusulas should , então por que simplesmente não colocamos as cláusulas do tradutor no
+mesmo nível das cláusulas do título e do autor?
+
+A resposta está em como a pontuação é calculada. A consulta booliana executa cada consulta de correspondência,
+soma suas pontuações, multiplica pelo número de cláusulas correspondentes e divide pelo número total de
+cláusulas. Cada cláusula no mesmo nível tem o mesmo peso. Na consulta anterior, a consulta booliana que contém
+as cláusulas do tradutor conta para um terço da pontuação total. Se tivéssemos colocado as cláusulas do tradutor
+no mesmo nível do título e do autor, elas teriam reduzido a contribuição das cláusulas do título e do autor para um
+quarto cada.

@@ -400,3 +400,41 @@ Content-Type: application/json
     }
   }
 }
+
+###
+#Multi text search sample
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "tweet": "How many" }},
+        { "match": { "author": "John Smith" }}
+      ]
+    }
+  }
+}
+
+###
+#Multi text search sample
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "tweet": "How many" }},
+        { "match": { "author": "John Smith" }},
+        { "bool": {
+          "should": [
+            { "match": { "tweet": "cheesy tweets" }},
+            { "match": { "tweet": "have write" }}
+          ]
+        }}
+      ]
+    }
+  }
+}
