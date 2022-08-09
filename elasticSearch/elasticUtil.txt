@@ -3502,3 +3502,5 @@ cláusulas. Cada cláusula no mesmo nível tem o mesmo peso. Na consulta anterio
 as cláusulas do tradutor conta para um terço da pontuação total. Se tivéssemos colocado as cláusulas do tradutor
 no mesmo nível do título e do autor, elas teriam reduzido a contribuição das cláusulas do título e do autor para um
 quarto cada.
+
+//TODO 218
