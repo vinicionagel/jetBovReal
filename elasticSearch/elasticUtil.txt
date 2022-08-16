@@ -3503,4 +3503,81 @@ as cláusulas do tradutor conta para um terço da pontuação total. Se tivésse
 no mesmo nível do título e do autor, elas teriam reduzido a contribuição das cláusulas do título e do autor para um
 quarto cada.
 
-//TODO 218
+-------------------Priorizando cláusulas-------------------
+
+É provável que uma divisão de até um terço entre cláusulas não seja o que precisamos para a consulta anterior.
+Provavelmente estamos mais interessados nas cláusulas do título e do autor do que nas cláusulas do tradutor.
+Precisamos ajustar a consulta para tornar as cláusulas de título e autor relativamente mais importantes.
+
+A arma mais simples em nosso arsenal de ajuste é o parâmetro boost . Para aumentar o peso dos
+campos título e autor , dê a eles um valor de aumento maior que 1:
+
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": {  - 1
+ "title": {
+ "query": "War and Peace",
+ "boost": 2
+ }}},
+ { "match": { - 1
+ "author": {
+ "query": "Leo Tolstoy",
+ "boost": 2
+ }}},
+ { "bool": { - 2
+ "should": [
+ { "match": { "translator": "Constance Garnett" }},
+ { "match": { "translator": "Louise Maude" }}
+ ]
+ }}
+ ]
+ }
+ }
+}
+
+
+Explicação:
+
+1 - As cláusulas de título e autor têm um valor de reforço de 2.
+
+2 - A cláusula bool aninhada tem o aumento padrão de 1.
+
+O “melhor” valor para o parâmetro de aumento é mais facilmente determinado por tentativa e erro:
+defina um valor de aumento , execute consultas de teste, repita. Um intervalo razoável para aumento
+fica entre 1 e 10, talvez 15. Aumentos maiores que isso têm pouco mais impacto porque as pontuações
+são normalizadas.
+
+--------String de consulta única--------------
+
+A consulta bool é a base das consultas multicláusulas. Funciona bem para muitos casos, especialmente
+quando você consegue mapear diferentes strings de consulta para campos individuais.
+
+É irônico que o formulário de pesquisa de vários campos seja conhecido como Pesquisa Avançada -
+pode parecer avançado para o usuário, mas é muito mais simples de implementar.
+
+Não existe uma abordagem simples e única para consultas multipalavras e multicampos. Para obter os melhores
+resultados, é preciso conhecer seus dados e saber usar as ferramentas adequadas.
+
+--------Conheça seus dados-----------------
+
+Quando sua única entrada de usuário é uma única string de consulta, você encontrará três cenários com frequência:
+
+Melhores:
+campos Ao pesquisar palavras que representam um conceito, como “raposa marrom”, as palavras significam
+mais juntas do que individualmente. Campos como o título e o corpo, embora relacionados, podem ser
+considerados concorrentes entre si.
+Todas essas são consultas de várias palavras e vários campos, mas cada uma requer uma estratégia diferente.
+Esses outros campos atuam como sinais para aumentar a pontuação de relevância de cada documento
+correspondente. Quanto mais campos corresponderem, melhor.
+Os documentos devem ter o maior número possível de palavras no mesmo campo, e a pontuação deve vir
+do campo de melhor correspondência.
+
+A maioria:
+dos campos Uma técnica comum para ajustar a relevância é indexar os mesmos dados em vários campos,
+cada um com sua própria cadeia de análise.
+O campo principal pode conter palavras em sua forma derivada, sinônimos e palavras sem diacríticos ou acentos. Ele é usado para combinar o maior número possível de documentos.
+
+
+//TODO 220

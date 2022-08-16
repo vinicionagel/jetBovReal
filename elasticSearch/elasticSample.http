@@ -418,7 +418,7 @@ Content-Type: application/json
 }
 
 ###
-#Multi text search sample
+#Multi text search sample with boost
 GET http://localhost:9200/tweet/_search
 Content-Type: application/json
 
@@ -426,7 +426,10 @@ Content-Type: application/json
   "query": {
     "bool": {
       "should": [
-        { "match": { "tweet": "How many" }},
+        { "match": { "tweet": {
+          "query": "How many",
+          "boost": 2
+        } }},
         { "match": { "author": "John Smith" }},
         { "bool": {
           "should": [
@@ -437,4 +440,26 @@ Content-Type: application/json
       ]
     }
   }
+}
+
+###
+#Multi text search sample with boost
+GET http://localhost:9200/tweet/_search
+Content-Type: application/json
+
+{
+"query": {
+"bool": {
+"should": [
+{ "match": { "tweet": "How many" }},
+{ "match": { "author": "John Smith" }},
+{ "bool": {
+"should": [
+{ "match": { "tweet": "cheesy tweets" }},
+{ "match": { "tweet": "have write" }}
+]
+}}
+]
+}
+}
 }
