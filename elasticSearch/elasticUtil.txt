@@ -3579,5 +3579,61 @@ dos campos Uma técnica comum para ajustar a relevância é indexar os mesmos da
 cada um com sua própria cadeia de análise.
 O campo principal pode conter palavras em sua forma derivada, sinônimos e palavras sem diacríticos ou acentos. Ele é usado para combinar o maior número possível de documentos.
 
+Campos cruzados:
 
+Para algumas entidades, as informações de identificação estão espalhadas por vários campos, cada um dos
+quais contém apenas uma parte do todo:
+
+• Pessoa: first_name e last_name
+
+• Livro: título, autor e descrição
+
+• Endereço: rua, cidade, país e código postal
+
+Neste caso, queremos encontrar o maior número possível de palavras em qualquer um dos campos listados
+Precisamos pesquisar em vários campos como se fossem um grande campo.
+
+Todas essas são consultas de várias palavras e vários campos, mas cada uma requer uma estratégia diferente.
+Esses outros campos atuam como sinais para aumentar a pontuação de relevância de cada documento
+correspondente. Quanto mais campos corresponderem, melhor.
+
+Os documentos devem ter o maior número possível de palavras no mesmo campo, e a pontuação deve vir
+do campo de melhor correspondência.
+Examinaremos cada estratégia no restante deste capítulo.
 //TODO 220
+
+---------------------Melhores campos------------------------
+
+Imagine que temos um site que permite aos usuários pesquisar postagens de blog, como estes dois documentos:
+
+PUT /my_index/my_type/1
+{
+ "title": "Quick brown rabbits",
+ "body": "Brown rabbits are commonly seen."
+}
+PUT /my_index/my_type/2
+{
+ "title": "Keeping pets healthy",
+ "body": "My quick brown fox eats rabbits on a regular basis."
+}
+
+
+O usuário digita as palavras “Raposa marrom” e clica em Pesquisar. Não sabemos com antecedência se os
+termos de pesquisa do usuário serão encontrados no título ou no campo do corpo da postagem, mas é provável
+que o usuário esteja pesquisando palavras relacionadas. Aos nossos olhos, o documento 2 parece ser a melhor
+correspondência, pois contém as duas palavras que estamos procurando.
+
+Agora executamos a seguinte consulta booleana:
+
+{
+ "query": {
+ "bool": {
+ "should": [
+ { "match": { "title": "Brown fox" }},
+ { "match": { "body": "Brown fox" }}
+ ]
+ }
+ }
+}
+
+//TODO 221
