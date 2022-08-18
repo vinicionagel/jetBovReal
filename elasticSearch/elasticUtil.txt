@@ -3600,7 +3600,6 @@ correspondente. Quanto mais campos corresponderem, melhor.
 Os documentos devem ter o maior número possível de palavras no mesmo campo, e a pontuação deve vir
 do campo de melhor correspondência.
 Examinaremos cada estratégia no restante deste capítulo.
-//TODO 220
 
 ---------------------Melhores campos------------------------
 
