@@ -463,3 +463,57 @@ Content-Type: application/json
 }
 }
 }
+
+###
+#Multi text search sample with boost
+PUT http://localhost:9200/my_index/my_type/1
+Content-Type: application/json
+
+{
+  "title": "Quick brown rabbits",
+  "body": "Brown rabbits are commonly seen."
+}
+
+###
+#Multi text search sample with boost
+PUT http://localhost:9200/my_index/my_type/2
+Content-Type: application/json
+
+{
+  "title": "Keeping pets healthy",
+  "body": "My quick brown fox eats rabbits on a regular basis."
+}
+
+###
+#Multi text search sample with boost
+GET http://localhost:9200/my_index/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "title": "Brown fox" }},
+        { "match": { "body": "Brown fox" }}
+      ]
+    }
+  }
+}
+
+
+###
+#Disjunction Max
+GET http://localhost:9200/my_index/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "dis_max": {
+      "queries": [
+        { "match": { "title": "Brown fox" }},
+        { "match": { "body": "Brown fox" }}
+      ]
+    }
+  }
+}
+
