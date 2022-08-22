@@ -3821,3 +3821,5 @@ Isso nos dá os seguintes resultados:
  correspondência para cada campo e os envolve em uma consulta dis_max . Esta consulta dis_max
  2. Multiplique a pontuação de cada uma das outras cláusulas correspondentes pelo desempate.
  3. Some todos eles e normalize.
+
+ //TODO 225
