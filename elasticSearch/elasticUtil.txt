@@ -3822,4 +3822,28 @@ Isso nos dá os seguintes resultados:
  2. Multiplique a pontuação de cada uma das outras cláusulas correspondentes pelo desempate.
  3. Some todos eles e normalize.
 
- //TODO 225
+--------------Usando curingas em nomes de campo---------------------------------------------
+
+
+o Os nomes de campo podem ser especificados com curingas: qualquer campo que corresponda ao padrão
+curinga será incluído na pesquisa. Você pode corresponder nos campos book_title, cap ter_title e section_title , com o seguinte:
+
+{
+ "multi_match": {
+ "query": "Quick brown fox",
+ "fields": "*_title"
+ }
+}
+
+-----------------Impulsionando campos individuais------------------------------------------
+
+Campos individuais podem ser aumentados usando a sintaxe de acento circunflexo (^) : basta adicionar ^boost após o nome do campo, onde boost é um número de ponto flutuante:
+
+{
+ "multi_match": {
+ "query": "Quick brown fox",
+ "fields": [ "*_title", "chapter_title^2" ]
+ }
+}
+
+//TODO 227.
