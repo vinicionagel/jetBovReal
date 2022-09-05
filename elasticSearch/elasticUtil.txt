@@ -3842,8 +3842,58 @@ Campos individuais podem ser aumentados usando a sintaxe de acento circunflexo (
 {
  "multi_match": {
  "query": "Quick brown fox",
- "fields": [ "*_title", "chapter_title^2" ]
+ "fields": [ "*_title", "chapter_title^2" ] 1 -
  }
 }
 
-//TODO 227.
+1 - O campo Chapter_title tem um aumento de 2, enquanto os campos book_title e section_title têm um
+    aumento padrão de 1.
+
+-------------A maioria dos campos---------------------
+
+A pesquisa de texto completo é uma batalha entre rechamada – retornando todos os documentos relevantes
+– e precisão – não retornando documentos irrelevantes. O objetivo é apresentar ao usuário os documentos
+mais relevantes na primeira página de resultados.
+
+
+Para melhorar a recuperação, lançamos a rede ampla - incluímos não apenas documentos que correspondem
+exatamente aos termos de pesquisa do usuário, mas também documentos que acreditamos serem pertinentes
+à consulta. Se um usuário pesquisar por "raposa marrom rápida", um documento que contenha raposas
+rápidas pode ser um resultado razoável a ser retornado.
+
+Se o único documento pertinente que temos é aquele que contém raposas rápidas, ele aparecerá no topo da
+lista de resultados. Mas é claro que, se tivermos 100 documentos que contenham as palavras quick brown
+fox, então o documento fast foxes pode ser considerado menos relevante, e gostaríamos de empurrá-lo mais
+para baixo na lista. Depois de incluir muitas partidas em potencial, precisamos garantir que as melhores
+cheguem ao topo.
+
+Uma técnica comum para ajustar a relevância do texto completo é indexar o mesmo texto de várias maneiras,
+cada uma das quais fornece um sinal de relevância diferente. O campo principal conteria termos em sua
+forma de correspondência mais ampla para corresponder ao maior número possível de documentos. Por
+exemplo, poderíamos fazer o seguinte:
+
+• Use um leme para indexar saltos, saltos e saltados como sua forma raiz: salto
+
+Então não importa se o usuário procura jumped; ainda poderíamos combinar documentos contendo
+saltos.
+
+• Inclua sinônimos como pulo, pulo e pulo.
+
+Remova diacríticos ou acentos: por exemplo, ésta, está e esta seriam todos indexado sem acentos como esta.
+
+No entanto, se tivermos dois documentos, um dos quais contém jumped e o outro jumping, o usuário provavelmente
+esperaria que o primeiro documento tivesse uma classificação mais alta, pois contém exatamente o que foi digitado.
+
+Podemos conseguir isso indexando o mesmo texto em outros campos para fornecer uma correspondência mais
+precisa. Um campo pode conter a versão sem haste, outro a palavra original com diacríticos e um terceiro pode usar
+telhas para fornecer informações sobre a proximidade da palavra. Esses outros campos atuam como sinais que
+aumentam a pontuação de relevância de cada documento correspondente. Quanto mais campos corresponderem,
+melhor.
+
+Um documento é incluído na lista de resultados se corresponder ao campo principal de correspondência ampla.
+Se também corresponder aos campos de sinal, recebe pontos extras e é empurrado para cima na lista de resultados
+
+-------------------Mapeamento de vários campos-----------------------
+
+//TODO 228.
+
