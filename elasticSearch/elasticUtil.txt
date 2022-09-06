@@ -3895,5 +3895,81 @@ Se também corresponder aos campos de sinal, recebe pontos extras e é empurrado
 
 -------------------Mapeamento de vários campos-----------------------
 
-//TODO 228.
+A primeira coisa a fazer é configurar nosso campo para ser indexado duas vezes: uma vez em um formulário com
+base e uma vez em um formulário sem base. Para fazer isso, usaremos multicampos, que apresentamos em
+“Classificação de strings e multicampos”.
 
+PUT /my_index
+{
+ "settings": { "number_of_shards": 1 }, 1
+ "mappings": {
+ "my_type": {
+ "properties": {
+ "title": { 2
+ "type": "string",
+ "analyzer": "english",
+ "fields": {
+ "std": { 3
+ "type": "string",
+ "analyzer": "standard"
+ }
+ }
+ }
+ }
+ }
+ }
+}
+
+1 - parte para melhorar o calculo
+
+2  - O campo de título é originado pelo analisador inglês .
+
+3 - O campo title.std usa o analisador padrão e, portanto, não é derivado.
+
+
+Next we index some documents:
+PUT /my_index/my_type/1
+{ "title": "My rabbit jumps" }
+
+PUT /my_index/my_type/2
+{ "title": "Jumping jack rabbits" }
+
+Here is a simple match query on the title field for jumping rabbits:
+GET /my_index/_search
+{
+ "query": {
+ "match": {
+ "title": "jumping rabbits"
+ }
+ }
+}
+
+Isso se torna uma consulta para os dois termos derivados jump e rabbit, graças ao analisador inglês . O campo de
+título de ambos os documentos contém ambos os termos, de modo que ambos os documentos recebem a mesma
+pontuação:
+
+{
+ "hits": [
+ {
+ "_id": "1",
+ "_score": 0.42039964,
+ "_source": {
+ "title": "My rabbit jumps"
+ }
+ },
+ {
+ "_id": "2",
+ "_score": 0.42039964,
+ "_source": {
+ "title": "Jumping jack rabbits"
+ }
+ }
+ ]
+}
+
+
+
+--------------------Campos de valor exato-----------------------------
+
+
+//TODO 239
