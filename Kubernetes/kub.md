@@ -13,4 +13,92 @@ Uma	syscall	 pode	 ser,	 por	 exemplo,	 uma	 ordem	 de	 abertura
 para	 um	 socket	 TCP	 para,	 por	 exemplo,	 realizar	 uma
 requisição	HTTP	simples.
 
-//20
+### CONTAINER REGISTRIES
+
+Estes	são	repositórios	(públicos	ou	privados)	de	imagens	que
+podem	 ser	 baixadas	 ou	 enviadas	 através	 de	APIs	 próprias.	E
+são	 utilizados	 por	 ferramentas	 como	 o	 Docker	 para	 fazer	 o
+download	 de	 suas	 imagens	 em	 tempo	 real,	 sem	 ter	 a
+necessidade	 de	 armazenar	 todas	 elas	 na	 sua	 máquina	 ou
+possuir	um	armazenamento	separado	apenas	para	isto.
+
+### Kubernetes siginificado 
+
+Kubernetes	é	a	palavra	grega	para	"timoneiro",	"governador"	ou
+"piloto".	É	definido	como	um	sistema	open	source	para	automação,
+gerência,	 escalabilidade	 e	 deploy	 de	 aplicações	 baseadas	 em
+contêineres.
+Ele	é	o	responsável	por	criar	os	contêineres,	gerenciar	seu
+funcionamento,	manter	a	infraestrutura	em	estado	de	execução	e,
+quando	um	contêiner	falha	ou	deixa	de	funcionar,	também	é	tarefa
+dele	executar	uma	nova	instância,	mantendo	o	que	é	chamado	de
+estado	ideal	do	cluster.
+
+K8S?
+Kubernetes	 também	pode	ser	chamado	de	k8s	porque	é	uma
+letra	K	com	oito	letras	no	meio	e	depois	S,	para	aqueles	 que
+gostam	de	ser	mais	concisos.
+
+### Slave, master conceito
+As	 demais	 máquinas	slaves	 que	 vão,	 de
+fato,	conter	os	contêineres	rodando	nossas	aplicações,	ou	seja,	eles
+serão	a	mão	de	obra	necessária	para	que	possamos	executar	o	que
+precisamos	 em	 nosso	 cluster,	 enquanto	 o	 master	 apenas	 faz	 o
+trabalho	de	gerência.	Separar	o	master	dos	demais	é	essencial	para
+este	 tipo	 de	 arquitetura,	 pois	 ele	 deve	 ser	 o	 nó	mais	 resiliente	 de
+todo	o	conjunto,	de	forma	que,	se	algo	acontecer,	temos	que	ter	a
+certeza	 de	 que	 o	master	 vai	 estar	 de	 pé	 para	 corrigir	 os	 danos.	 E
+isto	é	muito	mais	fácil	quando	ele	tem	somente	a	responsabilidade
+de	gerenciar,	e	não	a	de	executar.
+
+#### ETCD
+
+O	ETCD	é	um	banco	de	dados	chave/valor	desenvolvido	pela
+CoreOS,	 feito	 para	 ser	 confiável	 e	 resiliente	 no
+armazenamento,	 principalmente	 sendo	 utilizado	 em
+ambientes	com	arquitetura	distribuída,	como	clusters.
+O	 projeto	 é	 open	 source	 e	 está	 disponível	 no	 site	 oficial:
+https://coreos.com/etcd
+
+#### Kubectl
+
+(nome	curto	de	Kube	Control).	Este	pequeno	binário	nada	mais	é
+do	que	um	conjunto	de	chamadas	REST,	pois	toda	a	ferramenta	é
+construída	sobre	uma	API	RESTful,	que	é	servida	pelo	master.
+
+Será	 com	 ele	 que	vamos	 enviar	 comandos	 e	alterar	 os	 estados	 do
+nosso	 cluster,	 criar	 novos	 ou	 alterar	 workloads	 existentes,	 bem
+como	 extrair	 informações	 dos	 mesmos	 e	 também	 executar
+comandos	 administrativos.	 Tudo	 isto	 é	 servido	 em	 um	 pequeno
+web	server	pelo	master
+
+### SLAVE NODES
+
+O	 oposto	 do	 master	 são	 os	 chamados	 slave	 nodes,	 ou,
+simplesmente,	 nodes.	 Eles	 serão	 os	 responsáveis	 por	 executar	 o
+trabalho	 que	 está	 sendo	 enviado	 pelo	 master	 como	 se	 fosse	 um
+escravo	 dele	 (por	isso,	 eles	 eram	 conhecidos	 como	minions).	 São
+eles	que	vão	executar	nossos	contêineres	em	estruturas	chamadas
+de	pods,	que	vamos	ver	mais	à	frente.
+
+Um	slave	é	composto	basicamente	por:
+1.	 Um	ou	mais	workloads	(nossos	contêineres);
+2.	 O	 engine	 do	 Docker,	 responsável	 por	 baixar	 as	 imagens	 e
+       iniciar	estes	contêineres;
+3.	 Um	kubelet.
+
+### Kubelet
+
+Portanto,	terceirizamos	este	trabalho	para	os	kubelets,	que
+vão	 ser	 responsáveis	 por	 receber	 estes	 comandos	 e	 executá-los
+individualmente	em	suas	próprias	máquinas.	Todo	nó	criado	pelo
+master	 deverá	 obrigatoriamente	 conter	 um	 kubelet	 funcional.
+
+Eles	 são	 o	 que	 chamamos	 de	 primary	 node	 agents,	 ou	 seja,
+processos	 que	 rodarão	 dentro	 de	 um	 nó	 worker	 para,	 além	 de
+executar	 os	 comandos	 enviados	 pelo	 master,	 também	 garantir
+algumas	informações	como:
+A	máquina	que	o	nó	está	rodando	está	saudável.
+Os	contêineres	rodando	neste	nó	estão	saudáveis.
+
+//TODO 59
