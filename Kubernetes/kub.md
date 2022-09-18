@@ -101,4 +101,42 @@ algumas	informações	como:
 A	máquina	que	o	nó	está	rodando	está	saudável.
 Os	contêineres	rodando	neste	nó	estão	saudáveis.
 
-//TODO 59
+### K8s
+
+Toda	a	linha	de	comando	é	baseada	na	estrutura	que	também	é
+proposta	para	os	CLIs	dos	principais	provedores	cloud.	A	estrutura
+basicamente	 segue	 uma	 ordem	 lógica:	 	 kubectl	 <comando> <recurso	 ou	 opções>	 <opções>	 --<flags>	 .	 Então,	 por
+exemplo,	 se	 quisermos	 obter	 a	 descrição	 de	 um	 recurso	 rodando
+no	 nosso	 cluster,	 vamos	 usar	 um	 comando	 	kubectl	 describe
+meurecurso	—namespace	apis.
+
+kubectl	version	,	que	mostra	o	número	de	versão	do	CLI	e	do
+cluster.
+
+#### kubectl	cluster-info:	
+vai	se	conectar	ao	cluster,	buscar
+e	 mostrar	 diversas	 informações	 como	 o	 IP	 externo	 do
+cluster	e	a	localização	de	diversos	 recursos	de	 sistema	que
+vamos	estudar	mais	tarde.
+
+#### kubectl	 completion	 <bash|zsh>:	 
+gera	 um	 script	 de autocomplete	 de	 código	 para	 a	 linha	 de	 comando.	 Para
+executá-lo,	 siga	 o	 tutorial	 no	 link:
+https://kubernetes.io/docs/tasks/tools/installkubectl/#enabling-shell-autocompletion
+
+
+#### kubectl	 proxy:	 
+este	 é	 um	 dos	 comandos	 mais
+interessantes	e	úteis	da	ferramenta.	Ele	gerará	um	link	local
+(geralmente	 	 localhost:8001	 )	 para	 que	 você	 possa
+acessar	 o	 dashboard	 visual	 do	 seu	 cluster	 direto	 do	 seu
+computador.	Ao	executar	o	comando,	você	deverá	ter	uma
+saída	como:		Starting	to	serve	on	127.0.0.1:8001	,	a
+partir	 daí	 basta	 entrar	 no	 endereço		localhost:8001		 ou
+localhost:8001/ui		para	começar	a	ver	o	seu	dashboard
+
+
+Para	 qualquer	 comando,	 é	 possível	 digitar	 	 kubectl
+<comando>	-h		para	exibir	informações	mais	detalhadas	sobre	ele.
+
+//TODO 53.
