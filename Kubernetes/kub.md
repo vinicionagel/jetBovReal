@@ -139,4 +139,79 @@ localhost:8001/ui		para	começar	a	ver	o	seu	dashboard
 Para	 qualquer	 comando,	 é	 possível	 digitar	 	 kubectl
 <comando>	-h		para	exibir	informações	mais	detalhadas	sobre	ele.
 
-//TODO 53.
+
+### Por que utilizar k8s:
+
+Essas	características	nos	remetem	diretamente	ao	Kubernetes,	a
+solução	 feita	 para	 empresas	 que	 precisam	 otimizar	 sua
+infraestrutura	 e	 disseminar	 sua	 gerência	 entre	 os	 times,	 para	 que
+não	 seja	 necessária	 a	 contratação	 de	 outras	 empresas	 ou	 serviços
+externos.	Além	disso,	o	Kubernetes	é	um	excelente	gerenciador	de
+microsserviços,	 pois,	 devido	 à	 sua	 arquitetura	 e	 ao	 seu
+gerenciamento	de	contêineres,	podemos	facilmente	gerenciar	tudo
+que	está	acontecendo	em	cada	parte	do	nosso	cluster.
+
+### Minikube
+
+O	 Minikube	 é,	 basicamente,	 uma	 ferramenta	 de
+desenvolvimento	 que	 simula	 um	 cluster	 Kubernetes	 para	 que
+possamos	 testar	 nossos	 contêineres	 em	 desenvolvimento.	 O	 que
+esta	ferramenta,	 basicamente,	faz	é	criar	uma	máquina	virtual	no
+seu	 computador	 utilizando	 algum	 gerenciador	 escolhido	 pelo
+usuário	 (como	 o	 VirtualBox).	 E	 esta	máquina	faz	 o	 papel	 de	 um
+cluster	Kubernetes	de	um	único	nó.
+
+
+CONTEXTO	(OU	CONTEXT)	é	o	nome	que	damos	ao	arquivo	que
+contém	os	dados	de	conexão	para	um	cluster	Kubernetes.	Em
+máquinas	 baseadas	 em	 Linux,	 o	 arquivo	 de	 contextos	 fica
+localizado	 em	 	~/.kube/config		 e	 este	 é	 o	 arquivo	 que
+contém	tanto	os	tokens	de	autenticação	quanto	os	certificados
+digitais	 para	 podermos	 nos	 comunicar	 com	 a	 API	 Rest
+disponibilizada	pelo	master.
+
+### ESTRUTURA kubectl:
+
+Toda	a	linha	de	comando	é	baseada	na	estrutura	que	também	é
+proposta	para	os	CLIs	dos	principais	provedores	cloud.	A	estrutura
+basicamente	 segue	 uma	 ordem	 lógica:	 	 kubectl	 <comando><recurso	 ou	 opções>	 <opções>	 --<flags>	 .	 Então,	 por
+exemplo,	 se	 quisermos	 obter	 a	 descrição	 de	 um	 recurso	 rodando
+no	 nosso	 cluster,	 vamos	 usar	 um	 comando	 	kubectl	 describe
+meurecurso	—namespace	apis	.
+
+kubectl	 completion	 <bash|zsh>	:	 gera	 um	 script	 de
+autocomplete	 de	 código	 para	 a	 linha	 de	 comando.	 Para
+executá-lo,	 siga	 o	 tutorial	 no	 link:
+https://kubernetes.io/docs/tasks/tools/installkubectl/#enabling-shell-autocompletion
+
+kubectl	 cluster-info, mostra algumas informações do cluster
+
+### KUBEDNS:
+
+KubeDNS:	é	o	serviço	responsável	por	gerenciar	o	serviço
+de	nomes	do	sistema.	Por	padrão,	todo	serviço	definido	no
+cluster	 recebe	 um	 nome	 DNS	 que	 permite	 que	 ele	 seja
+acessado	por	outros	recursos	dentro	da	mesma	rede	interna
+do	 cluster	 (veja	 mais	 na	 documentação:
+https://kubernetes.io/docs/concepts/servicesnetworking/dns-pod-service).
+
+### PODS
+
+Um	 pod	 é	 a	menor	 estrutura	 publicável	 do	Kubernetes.	 Ele	 é
+uma	 abstração	 para	 um	 processo	 rodando	 no	 seu	 cluster,	 por
+exemplo,	um	servidor	Web	para	uma	API.	Aqui	é	onde	colocamos
+nosso	conhecimento	de	contêineres	em	ação.	Além	de	ser	descrito
+como	 esta	 abstração,	 o	 pod	 pode	 ser	 mais	 facilmente
+compreensível	 como	 um	 agrupamento	 de	 contêineres,	 ou	 seja,
+você	 pode	 rodar	 um	 ou	mais	 contêineres	 dentro	 do	mesmo	 pod.
+
+1.	 Se	 este	 pod,	 por	 algum	 motivo,	 cair,	 todas	 as	 aplicações
+       dentro	dele	cairão	junto.
+2.	 Todos	 os	 contêineres	 compartilham	 os	 mesmos	 recursos
+       (CPU,	RAM	 etc.);	 é	 como	 se	 eles	 estivessem	 executando	 na
+       mesma	VM.
+3.	 Todos	os	contêineres	compartilham	a	mesma	rede,	então	se
+       esta	rede	ficar	indisponível,	 todos	os	processos	dentro	deste
+       pod	não	a	conseguirão	acessar.
+
+//TODO 99
