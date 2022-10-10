@@ -214,4 +214,28 @@ você	 pode	 rodar	 um	 ou	mais	 contêineres	 dentro	 do	mesmo	 pod.
        esta	rede	ficar	indisponível,	 todos	os	processos	dentro	deste
        pod	não	a	conseguirão	acessar.
 
-//TODO 99
+Apesar	 de	 compartilharem	 tudo,	 desde	 o	 sistema	 de	 arquivos
+até	a	interface	 de	 rede,	 o	 pod	agrupa	 todos	 os	 processos	internos
+sob	 um	 único	 IP.	 Desta	 forma,	 os	 processos	 que	 estão	 rodando
+dentro	 deste	 pod	 poderão	 se	 encontrar	 internamente	 através	 da
+localhost		como	se	estivessem	na	mesma	máquina,	assim	como os	processos	externos	poderão	se	comunicar	com	este	pod	através
+do	seu	IP	único,	variando	apenas	a	porta	exposta	dos	serviços.
+
+Tenha	 em	 mente	 que	 o	 range	 de	 portas	 também	 é
+compartilhado.	 Se	 você	 expôs	 a	 porta	 8080	 em	 um	 contêiner,	 o
+outro	não	poderá	expor	a	mesma	porta.
+
+### Modelo	interativo
+
+Vamos	 então	 começar	 a	 descrever	 como	 podemos
+criar	 um	 pod.	 Para	 começar,	 um	 pod	 precisa,	 primeiramente,	 de
+uma	 imagem,	 seja	 ela	 Docker	 ou	 qualquer	 outro	 sistema	 de
+contêineres	 suportados.
+
+Vamos	 executar	 o	 comando	 	 kubectl	 run	 mongodb	 —-
+image=mongo	 --port=27017	 ,	 para	 criar	 um	 pod	 chamado
+mongodb		 com	a	imagem		mongo		 existente	 no	 Docker	Hub.	Ao
+executá-lo	 você	 receberá	 uma	 resposta	 parecida	 com	 esta:
+pod/mongodb	created	.
+
+//TODO        102
