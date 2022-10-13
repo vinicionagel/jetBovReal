@@ -238,4 +238,16 @@ mongodb		 com	a	imagem		mongo		 existente	 no	 Docker	Hub.	Ao
 executá-lo	 você	 receberá	 uma	 resposta	 parecida	 com	 esta:
 pod/mongodb	created	.
 
-//TODO        102
+
+Para	 outros	 exemplos	 deste	 comando,	 mostrando	 outras
+opções	de	flags,	use		kubectl	logs	-h
+
+### Modelo	declarativo
+
+Diferentemente	 do	 modelo	 interativo,	 no	 modelo	 declarativo
+não	 vamos	 depender	 da	 interação	 da	 linha	 de	 comando	 e	 da
+instrução	imperativa	 para	 o	 cluster.	 Em	 vez	 disso,	 vamos	 colocar
+todas	 as	 informações	 que	 precisamos	 dentro	 de	 um	 arquivo	 de
+manifesto.
+
+//TODO        105
