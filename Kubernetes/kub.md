@@ -250,4 +250,56 @@ instrução	imperativa	 para	 o	 cluster.	 Em	 vez	 disso,	 vamos	 colocar
 todas	 as	 informações	 que	 precisamos	 dentro	 de	 um	 arquivo	 de
 manifesto.
 
-//TODO        105
+Este	arquivo	de	manifesto	pode	ser	escrito	em	formato	YAML
+ou	 JSON.	 Ele	 precisa	 seguir	 uma	 estrutura	 pré-configurada	 e
+definida	 pelo	 Kubernetes,	 que	 pode	 ser	 conferida	 tanto	 na
+documentação	 oficial	 como	 através	 do	 comando	 	 **kubectl
+explain	pod**	.
+```json
+{
+"apiVersion":	"v1",
+"kind":	"Pod",
+"metadata":	{	//	Aqui	vamos	ter	metadados	sobre	o	pod,	informaç
+ões	internas	do	cluster
+"name":	"mongodb-pod"	//	Nome	interno	do	pod	(até	15	letras)
+},
+"spec":	{	//	Maneira	como	o	pod	tem	de	se	comportar
+"containers":	[	//	Informações	sobre	os	contêineres	que	vão	r
+odar	no	pod
+{
+"name":	"mongodb",	//	Nome	do	contêiner
+"image":	"mongo",	//	Nome	da	imagem
+"ports":	[{
+"containerPort":	27017	//	Porta	interna	do	contêiner
+}]
+}
+]
+}
+}
+```
+
+```yml
+Ficaria algo como:
+
+apiVersion:	v1
+kind:	Pod
+metadata:
+name:	mongodb-pod
+spec:
+containers:
+ -name:	mongodb
+image:	mongo
+ports:
+ -containerPort:	27017
+```
+
+**ports**: é	o	array	de	portas	que	devem	ser	abertas	para	fora
+do	contêiner,	mas	isto	não	significa	que	estas	portas	estarão
+liberadas	 para	fora	 do	 cluster.	 Vamos	 ver	mais	 sobre	isso
+mais	 tarde.	 Este	 array	 pode	 conter	 outras	 chaves,	 o	 que
+implica	 que	 outros	 contêineres	 dentro	 do	 mesmo	 cluster
+estarão	disponíveis	para	comunicação	entre	si.
+
+### Limitando	recursos:
+
+//TODO 109
