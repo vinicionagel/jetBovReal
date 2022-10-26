@@ -302,4 +302,71 @@ estarão	disponíveis	para	comunicação	entre	si.
 
 ### Limitando	recursos:
 
-//TODO 109
+Na	grande	maioria	das	vezes,	teremos	um	número	de	recursos
+limitado	para	poder	executar	nossos	pods.	Temos	que	lembrar	que
+nossos	 nós	 nada	 mais	 são	 do	 que	 máquinas	 virtuais	 com	 CPU	 e
+memória	limitados,	portanto,	é	uma	boa	ideia	limitar	a	quantidade
+de	 recursos	 que	 um	 pod	 pode	 usar.	
+
+Para	 isso,	 podemos
+simplesmente	 adicionar	 mais	 uma	 chave	 no	 nosso	 arquivo
+declarativo,	informando	qual	é	o	limite	que	este	pod	terá:
+
+```yml
+Ficaria algo como:
+
+       "resources":	{
+              "requests":	{
+                     "cpu":	"100m",
+                     "memory":	"128M"
+              },
+              "limits":	{
+                     "cpu":	"250m",
+                     "memory":	"256M"
+              }
+```
+
+
+Entendendo os parametros
+
+**CPU:**
+
+utilizar	um	valor	como		1		para	CPU	garantirá	o	uso
+de	 100%	 do	 processador,	 que	 é	 o	mesmo	 que	 colocarmos
+1000m	–	dizemos	1000	milicores,	 uma	fração	 de	 um	core.
+Um	contêiner	com	este	requisito	de	recurso	ocupará	a	CPU
+inteira	do	nó	ao	qual	ele	foi	alocado.	Se	colocarmos		0.5	,
+estamos	dizendo		500m		 e,	 consequentemente,	 o	 contêiner
+poderá	 ocupar	 até	 metade	 do	 uso	 da	 CPU.	 Isto	 se	 aplica
+para	qualquer	tipo	de	CPU,	independente	de	sua	potência
+computacional.
+
+**Memória:**	
+
+são	limites	medidos	em	bytes.	É	possível	utilizar
+a	terminação	E,	P,	T,	G,	M	e	K	para	identificar	quantidades
+de	 memória	 (2M,	 2K	 etc.),	 assim	 como	 as	 representações
+em	 potências	 de	 2,	 como	 Ei,	 Pi,	 Ti,	 Gi,	Mi	 e	 Ki	 (que	 são
+representações	 de	 unidades	 de	 dados	 no	 Sistema
+Internacional).      
+
+### Para	 cada	 uma	 dessas	 métricas	 temos	 duas	 outras	 chaves, requests		e		limits	:
+
+**Requests**:	
+
+é	a	quantidade	que	vamos	requisitar	de	CPU	ou
+memória	 para	 a	 nossa	 aplicação.	 Isso	 significa	 que,	 se
+requisitarmos	 100m	 de	 CPU	 para	 um	 pod	 através	 desta
+chave,	este	pod	rodará	com	no	mínimo	esta	quantidade	de
+CPU	alocada	para	ele.	É	como	se	disséssemos	ao	K8S	quais
+são	as	 especificações	mínimas	 que	nosso	 pod	 precisa	 para
+rodar.
+
+Limits:	 é	 o	 máximo	 que	 aquele	 contêiner	 poderá	 usar
+daquele	recurso	específico	(CPU	ou	memória).	Esta	chave	é
+opcional;	 se	omitida,	o	workload	 terá	 somente	o	limitador
+inferior	de	recursos	e	escalará	conforme	a	necessidade	até	o
+limite	de	CPU	ou	memória	daquele	nó.	É	sempre	uma	boa
+prática	definir	um	limite	de	uso	de	recursos	de	máquina.
+
+//TODO 112
