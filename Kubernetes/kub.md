@@ -369,4 +369,52 @@ inferior	de	recursos	e	escalará	conforme	a	necessidade	até	o
 limite	de	CPU	ou	memória	daquele	nó.	É	sempre	uma	boa
 prática	definir	um	limite	de	uso	de	recursos	de	máquina.
 
-//TODO 112
+### SOBRE ALOCAÇÃO DE RECURSOS
+
+
+Como	 nós	 são	 máquinas	 limitadas,	 antes	 de	 criar	 qualquer
+pod	com	uma	das	limitações	de	recursos,	o	K8S	verificará	se	o
+nó	 tem	a	capacidade	para	atender	à	quantidade		limits		 de
+cada	contêiner	executando	dentro	deste	pod.
+
+#### Exemplo:
+
+Portanto	vamos	criar	uma	situação.	Temos	um	nó	que	possui 1	CPU	e	512M	de	memória	com	dois	pods	rodando,	um	deles
+requisitando	o	limite	250m	de	CPU	e	256M	de	memória,	e	o
+outro	 requisitando	 também	 250m	 de	 CPU,	 mas	 128M	 de
+memória.
+
+Quando	 pedimos	 para	 criar	 um	 novo	 pod	 (através	 do
+comando	 	 create	 )	 o	 K8S	 realiza	 um	 scheduling	 (ou
+agendamento)	 para	 a	 criação	 deste	 workload,	 que	 significa
+que	o	master	vai	escolher	um	dos	nós	para	colocar	aquele	pod.
+Se,	por	exemplo,	pedirmos	a	criação	de	um	pod	que	requisita
+500m	 de	 CPU	 e	 256M	 de	 memória,	 nosso	 comando	 será
+atendido,	 mas	 o	 pod	 não	 será	 criado,	 pois	 a	 soma	 da
+quantidade	 de	 memória	 de	 todos	 excede	 os	 512M	 máximos
+do	 nó.	 Da	mesma	forma,	 se	 o	 novo	 pod	 requisitar	 750m	 de
+CPU	 este	 recurso	 também	 excederá	 o	limite	 de	1000m	CPU
+do	nó.
+Isto	significa	que	o	pod	será	"agendado"	para	criação,	mas	não
+há	nenhum	nó	capaz	de	abrigar	este	pod	atualmente	devido	à
+falta	 de	 recursos,	 então	 ele	 ficará	 pendente	 até	 que	 a
+quantidade	de	recurso	seja	liberada	e	ele	possa	ser	criado.
+Tenha	 em	 mente	 que,	 se	 houver,	 o	 valor	 de	 	limits		 será
+levado	 em	 conta,	 uma	 vez	 que	 ele	 é	 o	 limitante	 superior	 do
+contêiner.	Caso	contrário,	o	valor	mínimo	será	o	limitante
+
+Pods	 que	 excederem	 a	 quantidade	 de	 recursos	 pré-alocados
+para	eles	poderão	ser	terminados	sem	aviso.
+
+### Interagindo	com	um	pod
+
+No	entanto,	temos	que	lembrar	que	o	pod	nada	mais	é	do	que
+um	wrapper	 de	 um	 ou	 mais	 contêineres.	 O	 que	 temos	 rodando
+neles,	 muitas	 vezes,	 é	 uma	 imagem	 baseada	 em	 um	 sistema
+operacional	completo,	então	poderemos	interagir	diretamente	com
+o	 pod	 como	 se	 estivéssemos	 utilizando	 um	 computador
+remotamente.
+
+## CICLO	DE	VIDA	DE	UM	POD
+
+//TODO 116
