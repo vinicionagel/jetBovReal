@@ -74,9 +74,41 @@ No entanto, se você desconstruir módulos como serviços individuais, recomenda
 
 ### Compartilhar dados por uma API
 
+separar as funcionalidades ou módulos principais em microsserviços, normalmente são usadas APIs para compartilhar e expor dados. O serviço referenciado expõe os dados como uma API necessária ao serviço de chamada, 
+conforme mostrado no diagrama a seguir:
 
 
+![Exemplo Domínios](./diagrama3.png)
+
+Na figura 4, um módulo de pedido usa uma chamada de API para receber dados de um módulo de produto. 
+Essa implementação tem problemas óbvios de desempenho devido a chamadas adicionais de rede e banco de dados. 
+No entanto, o compartilhamento de dados uma API **funciona bem quando o tamanho dos dados é limitado**
+
+Além disso, se o serviço chamado estiver retornando dados que têm uma taxa de alteração conhecida, 
+**é possível implementar um cache TTL local no autor da chamada para reduzir as solicitações de rede para o serviço chamado.**
+
+![Exemplo Domínios](./diagrama4.png)
+
+Exemplo de diagrama TTL. Link últil: https://docs.aws.amazon.com/pt_br/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html
+
+### Replicação de dados
+
+Outra maneira de compartilhar dados entre dois microsserviços separados é replicar os dados no banco de dados do serviço dependente.
+**Esse padrão permite que o serviço seja mais coeso**
+
+![Exemplo Domínios](./diagrama5.png)
 
 
+Na figura 5, o banco de dados de serviço do produto é replicado para o banco de dados de serviço do pedido. 
+Essa implementação permite que o serviço de pedido receba dados do produtos sem chamadas repetidas para o serviço do produto.
 
+Para criar a replicação de dados, é possível usar técnicas como visualizações materializadas, captura de dados de alterações (CDC, na sigla em inglês) e notificações de eventos. Os dados replicados são consistentes, mas pode haver atraso na replicação dos dados, portanto, 
+**há o risco de exibir dados desatualizados.**
 
+### Dados estáticos como configuração
+
+Os dados estáticos, como códigos de países e moedas compatíveis, mudam lentamente. É possível injetar dados estáticos como uma configuração em um microsserviço. 
+Microsserviços modernos e frameworks de nuvem fornecem recursos para gerenciar esses dados de configuração usando servidores de configuração, armazenamentos de chave-valor e cofres. 
+É possível incluir esses recursos de maneira declarativa.
+
+### Dados mutáveis compartilhados
