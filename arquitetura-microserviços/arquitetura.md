@@ -112,3 +112,11 @@ Microsserviços modernos e frameworks de nuvem fornecem recursos para gerenciar 
 É possível incluir esses recursos de maneira declarativa.
 
 ### Dados mutáveis compartilhados
+
+Os aplicativos monolíticos têm um padrão comum, conhecido como estado mutável compartilhado. 
+Em uma configuração de estado mutável compartilhada, vários módulos usam uma única tabela, conforme mostrado no diagrama a seguir:
+
+![Exemplo Domínios](./diagrama6.png)
+
+
+
