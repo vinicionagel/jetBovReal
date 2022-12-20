@@ -118,5 +118,5 @@ Em uma configuração de estado mutável compartilhada, vários módulos usam um
 
 ![Exemplo Domínios](./diagrama6.png)
 
-
+-----------------------------------
 
