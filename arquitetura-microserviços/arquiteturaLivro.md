@@ -91,4 +91,13 @@ execução, os serviços são isolados uns dos outros — por exemplo, um servi�
 outro serviço mantém um bloqueio de banco de dados.
 
 
-//TODO 42
+### A arquitetura de microsserviços exemplo FTGO
+
+![Exemplo Domínios](./diagrama-ftgo.png)
+
+Ponto forte, cada um pode ser desenvolvido, testado, implantado e dimensionado de forma independente.
+
+![Exemplo Domínios](./diagrama_microservicos_ftgo.png)
+
+//TODO 47
+
