@@ -99,5 +99,44 @@ Ponto forte, cada um pode ser desenvolvido, testado, implantado e dimensionado d
 
 ![Exemplo Domínios](./diagrama_microservicos_ftgo.png)
 
-//TODO 47
+### A linguagem padrão de arquitetura de microsserviços
 
+Arquitetura e design têm tudo a ver com tomada de decisões. Você precisa decidir se a arquitetura
+monolítica ou de microsserviço é a mais adequada para seu aplicativo.
+
+Uma boa maneira de descrever as várias opções de arquitetura e design e melhorar a tomada de
+decisões é usar uma linguagem de padrões. Vamos primeiro ver por que precisamos de padrões e
+de uma linguagem de padrões e, em seguida, faremos um tour pela linguagem de padrões de
+arquitetura de microsserviços.
+
+Um padrão é uma solução reutilizável para um problema que ocorre em um contexto particular.
+
+Deploy a service as a container é uma especialização de Single service per host.
+
+![Exemplo Domínios](./diagrama_contexto_consequencias.png)
+
+
+### Visão geral da linguagem padrão de arquitetura de microsserviços
+
+A linguagem de padrão de arquitetura de microsserviço é uma coleção de padrões que ajudam você a arquitetar um aplicativo usando a arquitetura de microsserviço
+
+A linguagem padrão primeiro ajuda você a decidir se deve usar a
+arquitetura de microsserviço. Ele descreve a arquitetura monolítica e a arquitetura de microsserviços,
+juntamente com seus benefícios e desvantagens. Então, se a arquitetura de microsserviço for
+adequada para seu aplicativo, a linguagem padrão ajudará você a usá-la de forma eficaz, resolvendo
+vários problemas de arquitetura e design
+
+A linguagem padrão consiste em vários grupos de padrões. À esquerda na figura 1.10 está o
+grupo de padrões de arquitetura de aplicativos, o padrão de arquitetura monolítica e o padrão de
+arquitetura de microsserviços. Esses são os padrões que discutimos
+
+![Exemplo Domínios](./diagrama_complexidade_microservico.png)
+
+
+#### PADRÕES PARA DECOMPOSIÇÃO DE UM APLICATIVO EM SERVIÇOS
+
+Decidir como decompor um sistema em um conjunto de serviços é uma arte, mas há várias estratégias que
+podem ajudar. Os dois padrões de decomposição mostrados na figura 1.11 são estratégias diferentes que você
+pode usar para definir a arquitetura de seu aplicativo
+
+//TODO 54
