@@ -139,4 +139,71 @@ Decidir como decompor um sistema em um conjunto de serviços é uma arte, mas h�
 podem ajudar. Os dois padrões de decomposição mostrados na figura 1.11 são estratégias diferentes que você
 pode usar para definir a arquitetura de seu aplicativo
 
-//TODO 54
+#### PADRÕES DE COMUNICAÇÃO
+
+![Exemplo Domínios](./padroes_comunicação.png)
+
+![Exemplo Domínios](./comunicacoes.png)
+
+![Exemplo Domínios](./implementacao_servicos.png)
+
+#### PADRÕES DE OBSERVABILIDADE FORNECEM INSIGHTS SOBRE O COMPORTAMENTO DO APLICATIVO
+
+entender e diagnosticar problemas em uma arquitetura de microsserviço é muito
+mais complicado. Uma solicitação pode oscilar entre vários serviços antes que uma resposta seja
+finalmente retornada a um cliente. Conseqüentemente, não há um arquivo de log para examinar. Da
+mesma forma, problemas com latência são mais difíceis de diagnosticar porque existem vários
+suspeitos.
+
+#### PADRÕES PARA O TESTE AUTOMÁTICO DE SERVIÇOS
+
+A arquitetura de microsserviço facilita o teste de serviços individuais porque eles são muito menores do que o aplicativo
+monolítico. Ao mesmo tempo, porém, é importante testar se os diferentes serviços funcionam juntos, evitando o uso de
+testes de ponta a ponta complexos, lentos e frágeis que testam vários serviços juntos. Aqui estão os padrões para simplificar
+o teste testando serviços isoladamente:
+* Teste de contrato orientado ao consumidor — Verifica se um serviço atende às expectativas de seu
+clientes.
+* Teste de contrato do lado do consumidor - Verifique se o cliente de um serviço pode se comunicar
+com o serviço.
+* Teste de componente de serviço 
+* Teste um serviço isoladamente.
+
+Padrão Microservice Chassis -- 
+
+### Além dos microsserviços: processo e organização
+
+Para um aplicativo
+grande e complexo, a arquitetura de microsserviço geralmente é a melhor escolha. Mas, além de ter a
+arquitetura certa, o desenvolvimento de software de sucesso exige que você também tenha organização
+e processos de desenvolvimento e entrega.
+
+![Exemplo Domínios](./processo_entrega.png)
+
+#### Desenvolvimento de software e organização de entrega
+
+O sucesso inevitavelmente significa que a equipe de engenharia crescerá. Por um lado, isso é bom
+porque mais desenvolvedores podem fazer mais. O problema com equipes grandes é, como Fred
+Brooks escreveu em The Mythical Man-Month, a comunicação aérea de uma equipe de tamanho N é
+O(N^2). Se a equipe ficar muito grande, ela se tornará ineficiente devido à sobrecarga de comunicação. 
+Imagine, por exemplo, tentar fazer uma diária com 20 pessoas
+
+
+Para  entregar software de forma eficaz ao usar a arquitetura de microsserviços, você precisa levar em
+consideração a lei de Conway (https://en.wikipedia.org/wiki/Conway%27s _law), que afirma o seguinte:
+Organizações que projetam sistemas … são obrigadas a produzir projetos que são cópias das
+estruturas de comunicação dessas organizações.
+Melvin Conway
+Em outras palavras, a arquitetura do seu aplicativo reflete a estrutura da organização que o desenvolveu.
+É importante, portanto, aplicar a lei de Conway ao contrário (www.thoughtworks.com/radar/techniques/
+inverse-conway-maneuver) e projete sua organização para que sua estrutura espelhe sua arquitetura de
+microsserviço. Ao fazer isso, você garante que suas equipes de desenvolvimento sejam tão frouxamente
+acopladas quanto os serviços.
+
+#### Processo de desenvolvimento e entrega de software
+
+Usar a arquitetura de microsserviços com um processo de desenvolvimento em cascata é como
+dirigir uma Ferrari puxada a cavalo — você desperdiça a maior parte do benefício de usar
+microsserviços. Se você deseja desenvolver um aplicativo com a arquitetura de microsserviços, é
+essencial adotar práticas ágeis de desenvolvimento e implantação, como Scrum ou Kanban.
+
+TODO página 61
