@@ -206,4 +206,46 @@ dirigir uma Ferrari puxada a cavalo — você desperdiça a maior parte do benef
 microsserviços. Se você deseja desenvolver um aplicativo com a arquitetura de microsserviços, é
 essencial adotar práticas ágeis de desenvolvimento e implantação, como Scrum ou Kanban.
 
-TODO página 61
+#### Mova-se rapidamente sem quebrar as coisas
+
+O objetivo da entrega/implantação contínua (e, mais geralmente, DevOps) é entregar
+software de maneira rápida, mas confiável. Quatro métricas úteis para avaliar o desenvolvimento
+de software são as seguintes:
+
+* Frequência de implantação—Com que frequência o software é implantado na produção ÿ
+Lead time—Tempo de um desenvolvedor verificando uma alteração até que a alteração seja
+implantado
+* Tempo médio de recuperação—Tempo de recuperação de um problema de produção
+* Taxa de falha de alteração—Percentual de alterações que resultam em um problema de produção
+
+
+#### O lado humano da adoção de microsserviços
+
+Adotar a arquitetura de microsserviço muda sua arquitetura, sua organização e seus processos
+de desenvolvimento. Em última análise, porém, muda o ambiente de trabalho das pessoas, que
+são, como mencionado anteriormente, criaturas emocionais. Se ignoradas, suas emoções podem
+tornar a adoção de microsserviços uma jornada acidentada.
+
+1. Terminar, Perder e Deixar Ir — O período de turbulência emocional e resistência quando
+   as pessoas se deparam com uma mudança que as força a sair de sua zona de conforto.
+   Muitas vezes lamentam a perda da velha maneira de fazer as coisas. Por exemplo,
+   quando as pessoas se reorganizam em equipes multifuncionais, elas sentem falta de seus
+   ex-companheiros de equipe. Da mesma forma, um grupo de modelagem de dados que
+   possui o modelo de dados global será ameaçado pela ideia de cada serviço ter seu próprio
+   modelo de dados.
+
+2. A Zona Neutra — O estágio intermediário entre as velhas e as novas maneiras de fazer as coisas,
+onde as pessoas geralmente se confundem. Muitas vezes, eles estão lutando para aprender a
+nova maneira de fazer as coisas.
+
+3. O novo começo—O estágio final em que as pessoas abraçaram com entusiasmo a nova maneira de
+fazer as coisas e estão começando a experimentar os benefícios.
+
+
+## Estratégias de decomposição
+
+O principal desafio, que é a essência da arquitetura de microsserviços, é a decomposição funcional da aplicação em serviços.
+O primeiro e mais importante aspecto da arquitetura é, portanto, a definição dos serviços.
+Os serviços são organizados em torno de preocupações comerciais, e não técnicas.
+
+todo 64
