@@ -248,4 +248,92 @@ O principal desafio, que é a essência da arquitetura de microsserviços, é a 
 O primeiro e mais importante aspecto da arquitetura é, portanto, a definição dos serviços.
 Os serviços são organizados em torno de preocupações comerciais, e não técnicas.
 
-todo 64
+### O que é exatamente a arquitetura de microsserviços?
+
+Tradicionalmente, o objetivo da arquitetura tem sido escalabilidade, confiabilidade e segurança.
+Mas hoje é importante que a arquitetura também permita a entrega rápida e segura de software.
+
+#### O que é arquitetura de software e por que isso importa?
+
+A arquitetura de software de um sistema computacional é o conjunto de estruturas necessárias para raciocinar
+sobre o sistema, que compreende os elementos de software, as relações entre eles e as propriedades de ambos.
+
+Mas sua essência é que a arquitetura de um aplicativo é sua decomposição em partes (os elementos) e os relacionamentos (as relações) entre essas partes.
+
+* Facilita a divisão do trabalho e do conhecimento. Ele permite que várias pessoas (ou várias
+equipes) com conhecimento possivelmente especializado trabalhem produtivamente juntas
+em um aplicativo. 
+* Define como os elementos de software interagem.
+
+A arquitetura é importante porque permite que um aplicativo satisfaça a segunda categoria de
+requisitos: seus requisitos de qualidade de serviço. Estes também são conhecidos como atributos de
+qualidade e são os chamados -ilities. Os requisitos de qualidade de serviço definem as qualidades de
+tempo de execução, como escalabilidade e confiabilidade.
+
+#### SOBRE O ESTILO DE ARQUITETURA HEXAGONAL
+
+A arquitetura hexagonal é uma alternativa ao estilo arquitetônico em camadas. Como mostra a figura 2.2, o estilo de
+arquitetura hexagonal organiza a visão lógica de forma a colocar a lógica de negócios no centro. Em vez da camada
+de apresentação, o aplicativo possui um ou mais adaptadores de entrada que manipulam solicitações de fora
+invocando a lógica de negócios.
+
+![Exemplo Domínios](./hexazonal.png)
+
+#### Exemplo microserviços
+
+![Exemplo Domínios](./diagrama-microserviços.png)
+
+
+Uma restrição importante imposta pela arquitetura de microsserviço é que os serviços são
+fracamente acoplados. Consequentemente, há restrições sobre como os serviços colaboram.
+Para explicar essas restrições, tentarei definir o termo serviço, descrever o que significa ser
+fracamente acoplado e explicar por que isso é importante.
+
+#### O QUE É UM SERVIÇO?
+
+Um serviço é um componente de software independente e implementável que implementa algumas funcionalidades úteis.
+Um serviço tem uma API que fornece aos seus clientes acesso à sua funcionalidade.
+Existem dois tipos de operações: comandos e consultas. A API consiste em comandos, consultas
+e eventos. Um comando, como createOrder(), executa ações de formulários e atualiza dados. Uma
+consulta, como findOrderById(), recupera dados. Um serviço também publica eventos, como
+OrderCreated, que são consumidos por seus clientes
+
+#### O QUE É ACOPLAMENTO SOLTO?
+
+A exigência de que os serviços sejam fracamente acoplados e que colaborem apenas por meio de
+APIs proíbe que os serviços se comuniquem por meio de um banco de dados. Você deve tratar os
+dados persistentes de um serviço como os campos de uma classe e mantê-los privados. Manter os
+dados privados permite que um desenvolvedor altere o esquema de banco de dados de seu serviço sem precisar
+gaste tempo coordenando com desenvolvedores que trabalham em outros serviços.
+
+Ele garante, por exemplo,
+que um serviço não pode conter bloqueios de banco de dados que bloqueiam outro serviço. Mais tarde,
+porém, você aprenderá que **uma desvantagem de não compartilhar bancos de dados é que manter a
+consistência dos dados e consultar os serviços é mais complexo.**
+
+#### O PAPEL DAS BIBLIOTECAS COMPARTILHADAS
+
+Imagine, por exemplo, que diversos serviços precisem atualizar o objeto de negócios Order . Uma
+abordagem é empacotar essa funcionalidade como uma biblioteca usada por vários serviços. Por um lado,
+usar uma biblioteca elimina a duplicação de código. **Por outro lado, considere o que acontece quando os
+requisitos são alterados de forma a afetar o objeto de negócios Pedido** . Você precisaria reconstruir e
+reimplantar simultaneamente esses serviços. Uma abordagem muito melhor seria implementar a
+funcionalidade que provavelmente mudará, como o gerenciamento de pedidos , como um serviço.
+
+#### O TAMANHO DE UM SERVIÇO NÃO É IMPORTANTE
+
+Um problema com o termo microsserviço é que a primeira coisa que você ouve é micro. Isso sugere que
+um serviço deve ser muito pequeno. Isso também vale para outros termos baseados em tamanho, como
+minisserviço ou nanoserviço. Na realidade, o tamanho não é uma métrica útil.
+
+Em teoria, uma equipe só pode ser responsável por um único serviço, de modo que o
+serviço não é micro. Por outro lado, se um serviço requer uma equipe grande ou leva muito tempo para ser
+testado, provavelmente faz sentido dividir a equipe e o serviço. Ou se você precisar alterar constantemente
+um serviço devido a alterações em outros serviços ou se estiver provocando alterações em outros serviços,
+isso é um sinal de que não está frouxamente acoplado. Você pode até ter construído um monólito distribuído.
+
+Para desenvolver uma
+arquitetura de microsserviço para seu aplicativo, você precisa identificar os serviços e determinar como
+eles colaboram.
+
+TODO 74.
