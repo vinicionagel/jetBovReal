@@ -336,4 +336,67 @@ Para desenvolver uma
 arquitetura de microsserviço para seu aplicativo, você precisa identificar os serviços e determinar como
 eles colaboram.
 
-TODO 74.
+#### Definindo a arquitetura de microsserviço de um aplicativo
+
+Como devemos definir uma arquitetura de microsserviço? Como em qualquer esforço de
+desenvolvimento de software, os pontos de partida são os requisitos escritos,
+esperançosamente especialistas de domínio e talvez um aplicativo existente.
+
+![Exemplo Domínios](./exemplo_diagrama_criar_arquitetura.png)
+
+Um aplicativo existe para lidar com solicitações, portanto, a primeira etapa na definição de sua
+arquitetura é destilar os requisitos do aplicativo nas principais solicitações. Mas, em vez de
+descrever as solicitações em termos de tecnologias IPC específicas, como REST ou mensagens, eu uso 
+a noção mais abstrata de operação do sistema. Uma operação do sistema é uma abstração de uma
+solicitação que o aplicativo deve manipular. É um comando que atualiza dados ou uma consulta que
+recupera dados. O comportamento de cada comando é definido em termos de um modelo de domínio
+abstrato, que também é derivado dos requisitos. As operações do sistema tornam-se os cenários
+arquitetônicos que ilustram como os serviços colaboram.
+
+A segunda etapa do processo é determinar a decomposição em serviços.
+Existem várias estratégias para escolher. Uma estratégia, que tem suas origens na disciplina de
+arquitetura de negócios, é definir serviços correspondentes às capacidades de negócios. Outra
+estratégia é organizar os serviços em torno de subdomínios de design orientados por domínio. O
+resultado final são serviços organizados em torno de conceitos de negócios, em vez de conceitos
+técnicos.
+
+A terceira etapa na definição da arquitetura do aplicativo é determinar a API de cada serviço.
+Para fazer isso, você atribui cada operação do sistema identificada na primeira etapa a um serviço.
+Um serviço pode implementar uma operação inteiramente por si só. Como alternativa, pode ser
+necessário colaborar com outros serviços. Nesse caso, você determina como os serviços colaboram,
+o que geralmente requer serviços para dar suporte a operações adicionais.
+Você também precisará decidir qual dos mecanismos IPC que descrevo no capítulo 3 implementará
+a API de cada serviço.
+Existem vários obstáculos à decomposição. A primeira é a latência da rede. Você pode descobrir
+que uma decomposição específica seria impraticável devido a muitas viagens de ida e volta entre os
+serviços. Outro obstáculo à decomposição é que a comunicação síncrona entre os serviços reduz a
+disponibilidade. Você pode precisar usar o conceito de serviços independentes, descrito no capítulo
+3. 
+O terceiro obstáculo é o requisito para manter a consistência dos dados entre os serviços.
+   Normalmente, você precisará usar sagas, discutidas no capítulo 4. O quarto e último obstáculo à
+   decomposição são as chamadas classes divinas, que são usadas em todo o aplicativo. Felizmente,
+   você pode usar conceitos de design orientado a domínio para eliminar classes divinas
+
+#### Identificando as operações do sistema
+
+A primeira etapa na definição da arquitetura de um aplicativo é definir as operações do sistema:
+
+![Exemplo Domínios](./modelo_operacao.png)
+
+O modelo de domínio é derivado principalmente dos substantivos das histórias do usuário, e as
+operações do sistema são derivadas principalmente dos verbos. Você também pode definir o
+modelo de domínio usando uma técnica chamada Event Storming
+
+#### CRIANDO UM MODELO DE DOMÍNIO DE ALTO NÍVEL
+
+A primeira etapa no processo de definição das operações do sistema é esboçar um modelo de
+domínio de alto nível para o aplicativo. Observe que esse modelo de domínio é muito mais
+simples do que o que será implementado no final, **cada serviço tem seu próprio modelo de
+domínio.**
+
+Apesar de ser uma simplificação drástica, um modelo de domínio de alto nível é útil
+neste estágio porque define o vocabulário para descrever o comportamento das operações do
+sistema.
+
+//TODO 77
+
