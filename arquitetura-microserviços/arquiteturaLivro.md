@@ -398,5 +398,75 @@ Apesar de ser uma simplificação drástica, um modelo de domínio de alto níve
 neste estágio porque define o vocabulário para descrever o comportamento das operações do
 sistema.
 
-//TODO 77
+Podemos expandir essa história em vários cenários de usuário,
+incluindo este:
+Dado um consumidor
+E um restaurante
+E um endereço/horário de entrega que pode ser atendido por esse restaurante
+E um total de pedido que atenda ao pedido mínimo do restaurante
+Quando o consumidor faz um pedido para o restaurante
+Em seguida, o cartão de crédito do consumidor é autorizado
+E um pedido é criado no estado PENDING_ACCEPTANCE
+E o pedido está associado ao consumidor
+E o pedido está associado ao restaurante
 
+
+Os substantivos neste cenário de usuário sugerem a existência de várias classes,
+incluindo Consumer, Order, Restaurant e CreditCard.
+
+Da mesma forma, a história Aceitar pedido pode ser expandida para um cenário como este:
+Dado um pedido que está no estado PENDING_ACCEPTANCE e um mensageiro disponível para
+entregar o pedido: 
+
+Quando um restaurante aceita um pedido com a promessa de preparar por um determinado Tempo;
+
+* Em seguida, o estado do pedido é alterado para ACEITO
+* E o promiseByTime do pedido é atualizado para o horário prometido
+* E o correio é designado para entregar o pedido
+
+O resultado final após algumas iterações de análise será um modelo de domínio que consiste, sem surpresa, nessas classes e outras, como MenuItem e Address
+
+![Exemplo Domínios](./diagrama_dominio_exemplo.png)
+
+
+As responsabilidades de cada classe são as seguintes:
+* Consumidor: Um consumidor que faz pedidos.
+* Pedido: 
+Um pedido feito por um consumidor. Ele descreve o pedido e rastreia seu status.
+OrderLineItem—
+* Um item de linha de um pedido. 
+DeliveryInfo— 
+* A hora e o local para entregar um pedido. 
+Restaurante:
+* Restaurante que prepara pedidos para entrega aos consumidores. 
+* MenuItem—Um item no menu do restaurante.
+* Courier—Um mensageiro que entrega pedidos aos consumidores. Ele rastreia a disponibilidade do
+* correio e sua localização atual.
+* Endereço—O endereço de um consumidor ou restaurante.
+* Location—A latitude e longitude de um entregador.
+
+#### DEFININDO AS OPERAÇÕES DO SISTEMA
+
+Depois de definir um modelo de domínio de alto nível, a próxima etapa é identificar as solicitações que o
+aplicativo deve manipular. Mas você pode imaginar que, em cada cenário de usuário, a IU fará solicitações à lógica de negócios de back-end para recuperar e atualizar dados.
+
+Um bom ponto de partida para identificar os comandos do sistema é analisar os verbos nas histórias
+e cenários do usuário. Considere, por exemplo, a história do Place Order . Sugere claramente que o
+sistema deve fornecer uma operação Create Order . Muitas outras histórias são mapeadas individualmente
+diretamente para os comandos do sistema.
+
+![Exemplo Domínios](./tabela_de_acoes.png)
+
+Um comando tem uma especificação que define seus parâmetros, valor de retorno e
+comportamento em termos das classes de modelo de domínio. A especificação de comportamento
+consiste em pré-condições que devem ser verdadeiras quando a operação é invocada e pós-
+condições que são verdadeiras depois que a operação é invocada. Aqui, por exemplo, está a
+especificação da operação do sistema createOrder()
+
+![Exemplo Domínios](./tabela_create_order.png)
+
+As pré-condições espelham as fornecidas no cenário do usuário Colocar pedido descrito
+anteriormente. As pós-condições espelham os então do cenário. Quando uma operação do
+sistema é invocada, ela verifica as pré-condições e executa as ações necessárias para tornar as
+pós-condições verdadeiras.
+Aqui está a especificação da operação do sistema acceptOrder():
