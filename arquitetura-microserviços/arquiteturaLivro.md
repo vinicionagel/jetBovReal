@@ -470,3 +470,5 @@ anteriormente. As pós-condições espelham os então do cenário. Quando uma op
 sistema é invocada, ela verifica as pré-condições e executa as ações necessárias para tornar as
 pós-condições verdadeiras.
 Aqui está a especificação da operação do sistema acceptOrder():
+
+![Exemplo Domínios](./acept_order_diagrama.png)
