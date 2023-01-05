@@ -472,3 +472,140 @@ pós-condições verdadeiras.
 Aqui está a especificação da operação do sistema acceptOrder():
 
 ![Exemplo Domínios](./acept_order_diagrama.png)
+
+A maioria das operações de sistema arquitetonicamente relevantes são comandos. As vezes,
+porém, as consultas, que recuperam dados, também são importantes.
+Além de implementar comandos, um aplicativo também deve implementar consultas.
+As consultas fornecem à interface do usuário as informações de que um usuário precisa para tomar decisões.
+
+Nesta fase, não temos um design de interface do usuário específico para o aplicativo FTGO em mente, mas
+considere, por exemplo, o fluxo quando um consumidor faz um pedido:
+1 O usuário insere o endereço e horário de entrega.
+2 O sistema exibe os restaurantes disponíveis.
+3 O usuário seleciona o restaurante.
+4 O sistema exibe o menu.
+5 O usuário seleciona o item e faz o check-out.
+6 Sistema cria ordem.
+
+*  findAvailableRestaurants (deliveryAddress, deliveryTime)—Recupera os restaurantes que podem entregar no endereço de entrega especificado no horário especificado 
+*  findRestaurantMenu (id)—Recupera informações sobre um restaurante, incluindo os itens do menu
+
+Das duas consultas, findAvailableRestaurants() é provavelmente a mais significativa em termos de arquitetura.
+É uma consulta complexa que envolve pesquisa geográfica. O componente de geopesquisa da consulta consiste
+em encontrar todos os pontos—restaurantes—que estejam próximos a um local—o endereço de entrega. Ele
+também filtra os restaurantes que estão fechados quando o pedido precisa ser preparado e retirado. Além disso,
+o desempenho é crítico, pois essa consulta é executada sempre que um consumidor deseja fazer um pedido.
+
+O modelo de domínio de alto nível e as operações do sistema capturam o que o aplicativo faz. Eles ajudam
+a conduzir a definição da arquitetura do aplicativo. O comportamento de cada operação do sistema é descrito
+em termos do modelo de domínio. Cada operação importante do sistema representa um cenário
+arquitetonicamente significativo que faz parte da descrição da arquitetura.
+
+Definidas as operações do sistema, o próximo passo é identificar os serviços da aplicação. Como
+mencionado anteriormente, não há um processo mecânico a seguir.
+Existem, no entanto, várias estratégias de decomposição que você pode usar. Cada um ataca o problema de
+uma perspectiva diferente e usa sua própria terminologia. Mas com todas as estratégias, o resultado final é o
+mesmo: uma arquitetura que consiste em serviços organizados principalmente em torno de negócios, em vez
+de conceitos técnicos
+
+### Definindo serviços aplicando o padrão Decompor por capacidade de negócios
+
+Uma estratégia para criar uma arquitetura de microsserviço é decompor por
+capacidade de negócios. Um conceito da modelagem de arquitetura de negócios, uma capacidade de negócios é
+algo que um negócio faz para gerar valor. O conjunto de recursos para um determinado negócio depende do tipo
+de negócio. Por exemplo, as capacidades de uma companhia de seguros normalmente incluem subscrição,
+gerenciamento de sinistros, cobrança, conformidade e assim por diante. Os recursos de uma loja online incluem
+gerenciamento de pedidos, gerenciamento de estoque, remessa e assim por diante.
+
+os serviços correspondentes às capacidades de negócios. Consulte http://microservices.io/ patterns/
+decomposition/decompose-by-business-capability.html.
+
+#### AS CAPACIDADES DE NEGÓCIOS DEFINEM O QUE UMA ORGANIZAÇÃO FAZ
+
+Eles são geralmente estáveis, ao contrário de como uma organização conduz seus negócios, que muda ao longo
+do tempo, às vezes dramaticamente. Isso é especialmente verdadeiro hoje, com o uso crescente da tecnologia
+para automatizar muitos processos de negócios. Por exemplo, não faz muito tempo que você depositava cheques
+em seu banco entregando-os a um caixa. Tornou-se então possível depositar cheques usando um caixa eletrônico.
+Hoje você pode depositar convenientemente a maioria dos cheques usando seu smartphone. Como você pode ver,
+a capacidade de negócios de cheques de depósito permaneceu estável, mas a maneira como isso é feito mudou
+drasticamente
+
+#### DAS CAPACIDADES DE NEGÓCIOS A SERVIÇOS
+
+A Figura 2.8 mostra o mapeamento de capacidades para serviços para o aplicativo FTGO. Alguns recursos de nível superior,
+como o recurso Accounting, são mapeados para serviços. Em outros casos, subcapacidades são mapeadas para serviços.
+
+![Exemplo Domínios](./diagrama_decomposição_servicos.png)
+
+
+Mais tarde, poderá fazer sentido separar pagamentos (de Restaurantes e Estafetas) e
+faturação (de Consumidores).
+Um benefício importante de organizar serviços em torno de recursos é que, por serem
+estáveis, a arquitetura resultante também será relativamente estável. Os componentes
+individuais da arquitetura podem evoluir conforme o aspecto do negócio muda, mas a
+arquitetura permanece inalterada.
+
+Dito isso, é importante lembrar que os serviços mostrados na figura 2.8 são apenas a
+primeira tentativa de definir a arquitetura. Eles podem evoluir com o tempo conforme
+aprendemos mais sobre o domínio do aplicativo.
+
+Você pode, por exemplo, descobrir que uma decomposição específica é ineficiente devido à comunicação excessiva entre processos e
+que você deve combinar serviços.
+
+Por outro lado, um serviço pode crescer em complexidade para o ponto em que vale a pena dividi-lo em vários serviços.
+
+### Definindo serviços aplicando o padrão Decompor por subdomínio
+
+O DDD, conforme descrito no excelente livro Domain-driven design de Eric Evans (Addison-Wesley Professional,
+2003), é uma abordagem para construir aplicativos de software complexos centrados no desenvolvimento de um
+modelo de domínio orientado a objetos. Um modo de domínio captura o conhecimento sobre um domínio de uma
+forma que pode ser usada para resolver problemas dentro desse domínio. Ele define o vocabulário utilizado pela
+equipe, o que DDD chama de Linguagem Ubíqua. O modelo de domínio é estreitamente espelhado no design e
+na implementação do aplicativo. O DDD tem dois conceitos incrivelmente úteis ao aplicar a arquitetura de
+microsserviços: subdomínios e contextos limitados.
+
+Padrão: Decompor por subdomínio
+Definir os serviços correspondentes aos subdomínios DDD. Consulte http://
+microservices.io /patterns/decomposition/decompose-by-subdomain.html.
+
+O DDD é bem diferente da abordagem tradicional de modelagem corporativa, que cria um único modelo para toda
+a empresa. Nesse modelo haveria, por exemplo, uma única definição de cada entidade de negócios, como cliente,
+pedido e assim por diante. O problema com esse tipo de modelagem é que fazer com que diferentes partes de
+uma organização concordem com um único modelo é uma tarefa monumental. Além disso, significa que, do ponto
+de vista de uma determinada parte da organização, o modelo é excessivamente complexo para suas necessidades.
+Além disso, o modelo de domínio pode ser confuso porque diferentes partes da organização podem usar o mesmo
+termo para conceitos diferentes ou termos diferentes para o mesmo conceito. O DDD evita esses problemas
+definindo vários modelos de domínio, cada um com um escopo explícito.
+
+DDD define um modelo de domínio separado para cada subdomínio. Um subdomínio é uma parte do domínio,
+o termo DDD para o espaço de problemas do aplicativo. Os subdomínios são identificados usando a mesma
+abordagem de identificação de capacidades de negócios: analise o negócio e identifique as diferentes áreas de
+especialização. É muito provável que o resultado final sejam subdomínios semelhantes aos recursos de negócios.
+Os exemplos de subdomínios no FTGO incluem recebimento de pedidos, gerenciamento de pedidos,
+gerenciamento de cozinha, entrega e finanças. Como você pode ver, esses subdomínios são muito semelhantes
+aos recursos de negócios descritos anteriormente.
+
+Ao usar a arquitetura de microsserviço, cada contexto limitado é um serviço ou possivelmente um conjunto de serviços. Podemos criar
+uma arquitetura de microsserviço aplicando DDD e definindo um serviço para cada subdomínio.
+
+
+![Exemplo Domínios](./diagrama_ddd.png)
+
+O DDD e a arquitetura de microsserviços estão em alinhamento quase perfeito. O conceito DDD
+de subdomínios e contextos limitados mapeia bem os serviços dentro de uma arquitetura de
+microsserviço. Além disso, o conceito da arquitetura de microsserviços de equipes autônomas
+que possuem serviços está totalmente alinhado com o conceito do DDD de cada modelo de
+domínio pertencer e ser desenvolvido por uma única equipe. Melhor ainda, como descrevo mais
+adiante nesta seção, o conceito de um subdomínio com seu próprio modelo de domínio é uma
+ótima maneira de eliminar classes divinas e, assim, facilitar a decomposição.
+
+### Diretrizes de decomposição
+
+TODO PAGINA 86
+
+
+
+
+
+
+
