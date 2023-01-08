@@ -601,7 +601,65 @@ adiante nesta seção, o conceito de um subdomínio com seu próprio modelo de d
 
 ### Diretrizes de decomposição
 
-TODO PAGINA 86
+Examinamos as principais formas de definir uma arquitetura de microsserviço. Também podemos adaptar e usar alguns princípios do design orientado a objetos ao
+aplicar o padrão de arquitetura de microsserviços.
+
+#### PRINCÍPIO DE RESPONSABILIDADE ÚNICA
+
+"Uma classe deve ter apenas um motivo para mudar."
+
+Podemos aplicar o SRP ao definir uma arquitetura de microsserviço e criar serviços pequenos e
+coesos, cada um com uma única responsabilidade. Isso reduzirá o tamanho dos serviços e
+aumentará sua estabilidade.
+
+A nova arquitetura FTGO é um exemplo de SRP em ação. Cada aspecto da entrega de comida ao consumidor – anotação do pedido, preparação do pedido e entrega – é responsabilidade de um serviço separado.
+
+#### PRINCÍPIO DE FECHAMENTO COMUM
+
+O outro princípio útil é o Princípio de Fechamento Comum:
+
+"As classes em um pacote devem ser fechadas juntas contra os mesmos tipos de alterações. Uma
+alteração que afeta um pacote afeta todas as classes desse pacote."
+
+Podemos aplicar o CCP ao criar uma arquitetura de microsserviço e empacotar componentes
+que mudam pelo mesmo motivo no mesmo serviço. Fazendo isso irá minimizar o número de serviços que precisam ser alterados e implantados quando algum requisito muda. Idealmente,
+uma mudança afetará apenas uma única equipe e um único serviço. O CCP é o antídoto para o antipadrão
+monólito distribuído.
+
+A decomposição por capacidade de negócios e por subdomínio juntamente com SRP e CCP são boas
+técnicas para decompor um aplicativo em serviços. Para aplicá-los e desenvolver com sucesso uma
+arquitetura de microsserviços, você deve resolver alguns problemas de gerenciamento de transações e
+comunicação entre processos.
+
+### Obstáculos para decompor um aplicativo em serviços
+
+*  Latência de rede 
+*  Disponibilidade reduzida devido à comunicação síncrona 
+*  Manutenção da consistência dos dados entre os serviços 
+*  Obtenção de uma visão consistente dos dados 
+*  God classes evitando a decomposição
+
+#### Latência de rede
+
+A latência da rede é uma preocupação sempre presente em um sistema distribuído. Você pode descobrir
+que uma decomposição específica em serviços resulta em um grande número de viagens de ida e volta
+entre dois serviços. Às vezes, você pode reduzir a latência a um valor aceitável implementando uma API
+em lote para buscar vários objetos em uma única viagem de ida e volta. Mas em outras situações, a solução
+é combinar serviços, substituindo o caro IPC por chamadas de função ou método em nível de linguagem.
+
+#### A COMUNICAÇÃO SÍNCRONA ENTRE PROCESSOS REDUZ A DISPONIBILIDADE
+
+Outro problema é como implementar a comunicação entre serviços de forma a não reduzir a disponibilidade.
+Por exemplo, a maneira mais direta de implementar a operação createOrder() é fazer com que o Order
+Service invoque de forma síncrona os outros serviços usando REST. A desvantagem de usar um protocolo
+como REST é que ele reduz a disponibilidade do Order Service. Ele não poderá criar um pedido se algum
+desses outros serviços estiver indisponível. Às vezes, essa é uma compensação que vale a pena, mas no
+capítulo 3 você aprenderá que o uso de mensagens assíncronas, que elimina o acoplamento rígido e
+melhora a disponibilidade, geralmente é uma escolha melhor.
+
+#### MANTENDO A CONSISTÊNCIA DE DADOS ENTRE OS SERVIÇOS
+
+
 
 
 
