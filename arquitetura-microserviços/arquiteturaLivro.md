@@ -659,11 +659,78 @@ melhora a disponibilidade, geralmente é uma escolha melhor.
 
 #### MANTENDO A CONSISTÊNCIA DE DADOS ENTRE OS SERVIÇOS
 
+Outro desafio é manter a consistência dos dados entre os serviços. Algumas operações do sistema
+precisam atualizar dados em vários serviços. Por exemplo, quando um restaurante aceita um pedido, as
+atualizações devem ocorrer tanto no Serviço de Cozinha quanto no Serviço de Entrega.
+O Serviço de Cozinha altera o estado do Ticket. O Serviço de Entregas agenda a entrega da encomenda.
+Ambas as atualizações devem ser feitas atomicamente.
+
+A solução tradicional é usar um mecanismo de gerenciamento de transação distribuído, baseado em
+confirmação e de duas fases. Mas, como você verá no capítulo 4, essa não é uma boa escolha para
+aplicativos modernos e você deve usar uma abordagem muito diferente para o gerenciamento de
+transações, uma saga. Uma saga é uma sequência de transações locais que são coordenadas usando
+mensagens. As sagas são mais complexas do que as transações ACID tradicionais, mas funcionam bem
+em muitas situações. Uma limitação das sagas é que elas são eventualmente consistentes. Se você
+precisar atualizar alguns dados atomicamente, eles devem residir em um único serviço, o que pode ser
+um obstáculo à decomposição
+
+#### OBTER UMA VISÃO CONSISTENTE DOS DADOS
+
+Outro obstáculo à decomposição é a incapacidade de obter uma exibição verdadeiramente consistente
+dos dados em vários bancos de dados. Em um aplicativo monolítico, as propriedades das transações
+ACID garantem que uma consulta retornará uma exibição consistente do banco de dados. Por outro lado,
+em uma arquitetura de microsserviço, mesmo que o banco de dados de cada serviço seja consistente,
+você não pode obter uma visão globalmente consistente dos dados. Se você precisar de uma visualização
+consistente de alguns dados, eles devem residir em um único serviço, o que pode evitar a decomposição.
+Felizmente, na prática isso raramente é um problema
+
+#### AS GOD CLASS EVITAM A DECOMPOSIÇÃO
+
+Uma classe god normalmente implementa a lógica de negócios para muitos aspectos diferentes do aplicativo. 
+Normalmente possui um grande número de campos mapeados para uma tabela de banco de dados com muitas colunas. 
+A maioria dos aplicativos tem pelo menos uma dessas classes, cada uma representando um conceito central para o domínio: contas em bancos, pedidos em e-commerce, apólices em seguros e assim por diante. 
+Como uma classe god agrupa estado e comportamento para muitos aspectos diferentes de um aplicativo, é um obstáculo intransponível para dividir qualquer lógica de negócios que a use em serviços.
+
+A classe Order é um ótimo exemplo de classe god no aplicativo FTGO. Isso não é surpreendente - afinal, o objetivo do FTGO é entregar pedidos de comida aos clientes.
+A maioria das partes do sistema envolve pedidos. Se o aplicativo FTGO tivesse um único modelo dedomínio, a classe Order seria uma classe muito grande. 
+Teria estado e comportamento correspondentes a muitas partes diferentes do aplicativo.
+
+![Exemplo Domínios](./class_order.png)
+
+Em sua forma atual, essa classe torna extremamente difícil dividir o código em serviços.
+Uma solução é empacotar a classe Order em uma biblioteca e criar um banco de dados Order
+central. Todos os serviços que processam encomendas utilizam esta biblioteca e acedem à base
+de dados de acesso. 
+O problema com essa abordagem é que ela viola um dos princípios-chave da arquitetura de microsserviços e resulta em um acoplamento rígido e indesejável. 
+Por exemplo, qualquer alteração no esquema Order exige que as equipes atualizem seu código em passo de bloqueio.
+
+Outra solução é encapsular o banco de dados Order em um Order Service, que é invocado pelos outros serviços para recuperar e atualizar pedidos. 
+O problema com esse design é que o Order Service seria um serviço de dados com um modelo de domínio anêmico contendo pouca ou nenhuma lógica de negócios. 
+Nenhuma dessas opções é atraente, mas, felizmente, o DDD oferece uma solução.
+
+Uma abordagem muito melhor é aplicar DDD e tratar cada serviço como um subdomínioseparado com seu próprio modelo de domínio. 
+O aplicativo que tem algo a ver com pedidos tem seu próprio modelo de domínio com sua versão da
+classe Pedido. 
+Um grande exemplo do benefício dos modelos de domínio múltiplo é o Serviço de Entrega. 
+Sua visão de um Pedido, mostrada na figura 2.11, é extremamente simples: endereço de
+retirada, horário de retirada, endereço de entrega e horário de entrega. 
+Além disso, em vez de chamá-lo de Pedido, o Serviço de Entrega usa o nome mais apropriado de Entrega.
+
+![Exemplo Domínios](./entrega_pedido.png)
 
 
+O serviço de entrega não está interessado em nenhum dos outros atributos de um pedido.
+O Serviço de Cozinha também tem uma visão muito mais simples de um pedido. Sua versão de
+uma Ordem é chamada de Ticket. Como mostra a figura 2.12, um Ticket consiste simplesmente em
+um status, o requestDeliveryTime , um prepareByTime e uma lista de itens de linha que informam ao
+restaurante o que preparar. É despreocupado com o consumidor, pagamento, entrega e assim por
+diante.
 
+![Exemplo Domínios](./bilhete_pedido.png)
 
+O serviço Pedido possui a visão mais complexa de um pedido, mostrada na figura 2.13. Embora
+tenha alguns campos e métodos, ainda é muito mais simples que a versão original
 
-
+//todo 90
 
 
