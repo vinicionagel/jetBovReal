@@ -731,6 +731,55 @@ diante.
 O serviço Pedido possui a visão mais complexa de um pedido, mostrada na figura 2.13. Embora
 tenha alguns campos e métodos, ainda é muito mais simples que a versão original
 
-//todo 90
+O serviço Pedido possui a visão mais complexa de um pedido, mostrada na figura. 
+Embora tenha alguns campos e métodos, ainda é muito mais simples que a versão original.
+
+![Exemplo Domínios](./dominio_pedido_resto.png)
+
+A classe Order em cada modelo de domínio representa diferentes aspectos da mesma entidade de negócios Order. 
+O aplicativo FTGO deve manter a consistência entre esses diferentes objetos em diferentes serviços. 
+Por exemplo, uma vez que o Serviço de Pedidos tenha autorizado cartão de crédito do consumidor, deve acionar a criação do Ticket no Serviço de Cozinha. 
+Da mesma forma, se o restaurante rejeitar o pedido via Serviço de Cozinha, este deverá ser cancelado no serviço
+de Pedidos, sendo o cliente creditado no serviço de faturação. 
+Usando as sagas de mecanismos orientados a eventos encionadas anteriormente.
+
+Além de criar desafios técnicos, ter vários modelos de domínio também afeta a implementação da experiência do usuário. 
+Um aplicativo deve traduzir entre a experiência do usuário, que é seu próprio modelo de domínio, e os modelos de domínio de cada um dos serviços.
+
+Essa tradução geralmente é tratada pelo gateway de API, apesar desses desafios, é essencial que você identifique 
+e elimine as god classes ao definir uma arquitetura de microsserviço.
+
+#### Definindo APIs de serviço
+
+Até agora, temos uma lista de operações do sistema e uma lista de serviços potenciais. O próximo
+passo é definir a API de cada serviço: suas operações e eventos. 
+Uma operação de API de serviço existe por um destes dois motivos: algumas operações correspondem a operações do sistema. 
+Eles são chamados por clientes externos e talvez por outros serviços. 
+As outras operações existem para dar suporte à colaboração entre os serviços. 
+Essas operações são invocadas apenas por outros serviços
+
+O ponto de partida para definir as APIs de serviço é mapear cada operação do sistema para um serviço. 
+Depois disso, decidimos se um serviço precisa colaborar com outros para implementar uma operação do sistema. 
+Se a colaboração for necessária, determinamos quais APIs esses outros serviços devem fornecer para oferecer suporte à colaboração.
+
+#### ATRIBUIÇÃO DE OPERAÇÕES DO SISTEMA A SERVIÇOS
+
+A primeira etapa é decidir qual serviço é o ponto de entrada inicial para uma solicitação. 
+Muitas operações do sistema mapeiam perfeitamente para um serviço, mas às vezes o mapeamento é menos óbvio.
+
+Considere, por exemplo, a operação noteUpdatedLocation(), que atualiza a localização do entregador.
+Por um lado, por se tratar de estafetas, esta operação deverá ser atribuída ao serviço de Courier. 
+Por outro lado, é o Serviço de Entrega que necessita da localização do estafeta. 
+Nesse caso, atribuir uma operação a um serviço que precisa das informações fornecidas pela operação é uma escolha melhor.
+
+Em outras situações, pode fazer sentido atribuir uma operação ao serviço que possui as informações necessárias para manipulá-la.
+
+![Exemplo Domínios](./mapeamento operacoes.png)
+
+Depois de atribuir operações aos serviços, o próximo passo é decidir como os serviços colaboram para
+lidar com cada operação do sistema
+
+//TODO 92
+
 
 
